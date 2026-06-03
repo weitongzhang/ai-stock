@@ -1,0 +1,121 @@
+{
+  "workspace": "skills-engineering-workspace",
+  "created_on": "2026-06-03",
+  "architecture_version": "3",
+  "runtime_skills_root": "C:/Users/wtzhang12/.codex/skills",
+  "domains": [
+    {
+      "name": "market-data",
+      "purpose": "统一市场数据底座，负责获取和标准化行情/K线/指数/ETF/基金/宏观等数据"
+    },
+    {
+      "name": "stock-selection",
+      "purpose": "策略层，消费标准化行情数据并生成选股信号、评分和报告"
+    },
+    {
+      "name": "tracking",
+      "purpose": "观察池跟踪层，按长期/中期/短期持续跟踪标的、板块、主题、ETF和指数"
+    },
+    {
+      "name": "content-collection",
+      "purpose": "内容采集层，负责公众号文章、图片、评论与摘要归档"
+    }
+  ],
+  "skills": [
+    {
+      "name": "ftshare-market-data",
+      "domain": "market-data",
+      "type": "data-provider",
+      "path": "skills/market-data/ftshare-market-data",
+      "runtime_path": "C:/Users/wtzhang12/.codex/skills/ftshare-market-data",
+      "purpose": "股票、ETF、指数、基金、宏观、港股等市场数据接口能力",
+      "provides": ["stock-list", "stock-quotes", "stock-ohlcv", "index-data", "etf-data", "macro-data"]
+    },
+    {
+      "name": "yc-buy-selector",
+      "domain": "stock-selection",
+      "type": "strategy",
+      "path": "skills/stock-selection/yc-buy-selector",
+      "runtime_path": "C:/Users/wtzhang12/.codex/skills/yc-buy-selector",
+      "purpose": "A股13买点、三重滤网、技术选股与CSV输出",
+      "consumes": ["stock-ohlcv"],
+      "future_primary_provider": "ftshare-market-data",
+      "source_repo": "sources/upstream-repos/YC-buy/YC-buy-main"
+    },
+    {
+      "name": "watchlist-tracker",
+      "domain": "tracking",
+      "type": "tracker",
+      "path": "skills/tracking/watchlist-tracker",
+      "runtime_path": "C:/Users/wtzhang12/.codex/skills/watchlist-tracker",
+      "purpose": "长期/中期/短期持续跟踪股票、板块、主题、ETF和指数，输出观察池报告",
+      "consumes": ["watchlist", "stock-quotes", "stock-ohlcv"],
+      "future_primary_provider": "ftshare-market-data",
+      "provides": ["watchlist-report", "trigger-status", "next-check-plan"]
+    },
+    {
+      "name": "wechat-official-collector",
+      "domain": "content-collection",
+      "type": "collector",
+      "path": "skills/content-collection/wechat-official-collector",
+      "runtime_path": "C:/Users/wtzhang12/.codex/skills/wechat-official-collector",
+      "purpose": "微信公众号文章、图片、评论、图文Markdown和每日摘要采集归档",
+      "provides": ["article-html", "article-markdown", "article-images", "comments", "daily-digest"]
+    }
+  ],
+  "sources": [
+    {
+      "name": "YC-buy",
+      "type": "upstream-repo",
+      "path": "sources/upstream-repos/YC-buy/YC-buy-main",
+      "purpose": "yc-buy-selector依赖的已修正选股系统代码，后续可逐步内化到src/skill_lab/stock_selection"
+    },
+    {
+      "name": "tracking-frameworks",
+      "type": "methodology-intake",
+      "path": "sources/imported-methods/tracking-frameworks",
+      "purpose": "后续导入长期/中期/短期跟踪框架、复盘模板、板块轮动观察方法"
+    },
+    {
+      "name": "imported-methods",
+      "type": "methodology-intake",
+      "path": "sources/imported-methods",
+      "purpose": "后续导入选股策略、交易策略、博主方法论和框架化笔记"
+    },
+    {
+      "name": "raw-materials",
+      "type": "raw-reference-intake",
+      "path": "sources/raw-materials",
+      "purpose": "后续保存文章、书籍笔记、导出资料等原始材料"
+    }
+  ],
+  "examples": [
+    {
+      "name": "wechat-daily",
+      "path": "examples/content/wechat/wechat-daily",
+      "purpose": "微信公众号采集样例输出"
+    },
+    {
+      "name": "yc_buy_today_20260603_110530.csv",
+      "path": "examples/market/stock-selection/yc_buy_today_20260603_110530.csv",
+      "purpose": "2026-06-03 A股候选筛选样例"
+    },
+    {
+      "name": "watchlist.csv",
+      "path": "examples/market/tracking/watchlist.csv",
+      "purpose": "长中短周期观察池样例"
+    }
+  ],
+  "integration_decisions": [
+    {
+      "topic": "ftshare-market-data vs yc-buy-selector",
+      "decision": "不合并技能；FTShare作为数据层，YC-buy作为策略层，在src/skill_lab中用provider接口衔接。",
+      "reason": "数据接口变化和策略迭代节奏不同，分层可减少耦合并方便替换数据源。"
+    },
+    {
+      "topic": "watchlist-tracker",
+      "decision": "作为独立tracking领域，而不是并入stock-selection。",
+      "reason": "选股是发现候选，tracking是持续观察与复盘，未来会覆盖板块、主题、ETF、指数和交易策略，不应只绑定单次选股。"
+    }
+  ]
+}

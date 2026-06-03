@@ -1,0 +1,3 @@
+display_name: YC Buy Selector
+short_description: A股13买点与三重滤网选股助手
+default_prompt: 用YC Buy Selector分析A股股票，说明触发的买点、三重滤网信号和主要风险。

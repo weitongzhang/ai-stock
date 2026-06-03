@@ -1,0 +1,3 @@
+display_name: Watchlist Tracker
+short_description: 标的与板块长中短周期跟踪助手
+default_prompt: 跟踪我的股票、板块和主题观察池，按长期/中期/短期输出状态、触发条件、风险和下一步动作。

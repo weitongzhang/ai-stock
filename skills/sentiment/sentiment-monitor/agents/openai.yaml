@@ -1,0 +1,4 @@
+display_name: Sentiment Monitor
+short_description: A股舆情、公告与事件风险监控助手
+default_prompt: 分析指定A股的新闻、公告、监管、业绩和题材舆情，输出风险标签、事件摘要和对技术交易计划的影响。
+

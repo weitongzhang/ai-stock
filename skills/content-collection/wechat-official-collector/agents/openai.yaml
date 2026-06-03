@@ -1,0 +1,3 @@
+display_name: WeChat Official Collector
+short_description: 微信公众号文章采集归档与每日摘要助手
+default_prompt: 收集指定微信公众号文章，保存原文HTML、正文图片、图文版Markdown、评论文件和每日CSV摘要。
