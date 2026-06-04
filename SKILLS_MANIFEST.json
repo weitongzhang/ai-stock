@@ -65,6 +65,7 @@
         "market-breadth"
       ],
       "provides": [
+        "market-breadth-snapshot",
         "market-flow-report",
         "sector-priority-list",
         "next-day-observation-plan"

@@ -293,6 +293,7 @@ def write_markdown(
     market_state: str,
     rows: list[dict[str, Any]],
     top_lhb: list[dict[str, Any]],
+    overview: dict[str, float],
     limits: list[str],
 ) -> None:
     lines = [
@@ -304,11 +305,38 @@ def write_markdown(
         "",
         "判断口径：F-M-C-T = Flow资金强度、Map板块集中、Core核心确认、Timing交易时机。",
         "",
-        "## 主题优先级",
-        "",
-        "| 排名 | 主题 | 分数 | 动作 | F | M | C | T | 开盘啦 | 龙虎榜净买额 | 核心观察 |",
-        "|---:|---|---:|---|---:|---:|---:|---:|---:|---:|---|",
     ]
+    if overview:
+        def show(*names: str) -> str:
+            for name in names:
+                if name in overview:
+                    value = overview[name]
+                    return str(int(value)) if float(value).is_integer() else str(value)
+            return "暂无"
+
+        def show_with_unit(unit: str, *names: str) -> str:
+            value = show(*names)
+            return value if value == "暂无" else f"{value}{unit}"
+
+        lines.extend(
+            [
+                "## 市场宽度快照",
+                "",
+                f"- 成交额：{show_with_unit('亿元', '两市成交额', '成交额', 'turnover')}",
+                f"- 涨跌家数：上涨 {show('上涨家数', 'advancers')} / 下跌 {show('下跌家数', 'decliners')} / 平盘 {show('平盘家数', 'flat_count')}",
+                f"- 涨跌停：涨停 {show('涨停数', 'limit_up_count')} / 炸板 {show('炸板数', 'failed_limit_up_count')} / 跌停 {show('跌停数', 'limit_down_count')}",
+                f"- 情绪质量：封板率 {show_with_unit('%', '封板率', 'seal_rate')}，炸板率 {show_with_unit('%', '炸板率', 'failed_limit_up_rate')}",
+                "",
+            ]
+        )
+    lines.extend(
+        [
+            "## 主题优先级",
+            "",
+            "| 排名 | 主题 | 分数 | 动作 | F | M | C | T | 开盘啦 | 龙虎榜净买额 | 核心观察 |",
+            "|---:|---|---:|---|---:|---:|---:|---:|---:|---:|---|",
+        ]
+    )
     for idx, row in enumerate(rows, start=1):
         lines.append(
             f"| {idx} | {row['theme']} | {row['total_score']} | {row['stance']} | "
@@ -377,7 +405,7 @@ def main() -> int:
     csv_path = out_dir / f"{args.date}-market-flow.csv"
     md_path = out_dir / f"{args.date}-market-flow.md"
     write_csv(csv_path, scored)
-    write_markdown(md_path, args.date, market_state, scored, top_lhb, limits)
+    write_markdown(md_path, args.date, market_state, scored, top_lhb, overview, limits)
 
     print(json.dumps({"status": "ok", "market_state": market_state, "themes": len(scored), "csv": str(csv_path), "markdown": str(md_path)}, ensure_ascii=False, indent=2))
     return 0

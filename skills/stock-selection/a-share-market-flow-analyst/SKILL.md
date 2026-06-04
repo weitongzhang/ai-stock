@@ -32,20 +32,27 @@ Use any available combination:
 - CLS market plan CSV from `cls-telegraph-collector/scripts/analyze_cls_market_plan.py`.
 - KPL / Tushare `kpl_list` CSV or JSON from `collect_tushare_kpl.py`.
 - Eastmoney/AkShare dragon-tiger CSV.
-- Optional market overview CSV with columns such as `metric,value` or common Chinese column names.
+- Market breadth CSV from `scripts/collect_market_breadth.py`, or any compatible overview CSV with columns such as `metric,value`.
 
 The workflow is designed to run even when some inputs are missing. Missing data is written into the report as a limitation.
 
 ## Commands
 
+Collect market breadth from Eastmoney/AkShare:
+
+```powershell
+python skills\stock-selection\a-share-market-flow-analyst\scripts\collect_market_breadth.py --date 2026-06-04 --out-dir examples\market\market-breadth
+```
+
 Generate a next-day market-flow plan:
 
 ```powershell
-python skills\stock-selection\a-share-market-flow-analyst\scripts\analyze_market_flow.py --date 2026-06-04 --cls-plan examples\market\cls-market-plan-kpl\2026-06-04-cls-market-plan.csv --kpl examples\market\tushare-kpl\sample-tushare-kpl.csv --lhb examples\market\dragon-tiger\20260604-eastmoney-lhb.csv --out-dir examples\market\market-flow
+python skills\stock-selection\a-share-market-flow-analyst\scripts\analyze_market_flow.py --date 2026-06-04 --cls-plan examples\market\cls-market-plan-kpl\2026-06-04-cls-market-plan.csv --kpl examples\market\tushare-kpl\sample-tushare-kpl.csv --lhb examples\market\dragon-tiger\20260604-eastmoney-lhb.csv --market examples\market\market-breadth\2026-06-04-market-breadth.csv --out-dir examples\market\market-flow
 ```
 
 The script writes:
 
+- `<date>-market-breadth.csv`: market breadth metrics, including turnover, advancing/declining counts when available, limit-up count, failed-limit count, limit-down count, seal rate, and failed-limit rate.
 - `<date>-market-flow.csv`: theme score table.
 - `<date>-market-flow.md`: readable market state and next-day observation plan.
 
@@ -64,4 +71,3 @@ For tomorrow's plan, prefer scenarios over predictions:
 - Strong news but weak board response: do not chase.
 - Dragon-tiger net buying supports the same core names: raise priority.
 - Failed limit-up or high-open fade in the theme core: reduce priority.
-

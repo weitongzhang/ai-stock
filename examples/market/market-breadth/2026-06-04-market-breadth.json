@@ -1,0 +1,57 @@
+{
+  "date": "2026-06-04",
+  "rows": [
+    {
+      "metric": "涨停数",
+      "value": 80,
+      "source": "eastmoney:stock_zt_pool_em",
+      "note": ""
+    },
+    {
+      "metric": "连板家数",
+      "value": 10,
+      "source": "eastmoney:stock_zt_pool_em",
+      "note": ""
+    },
+    {
+      "metric": "最高连板",
+      "value": 4,
+      "source": "eastmoney:stock_zt_pool_em",
+      "note": ""
+    },
+    {
+      "metric": "涨停封板资金",
+      "value": 81.13,
+      "source": "eastmoney:stock_zt_pool_em",
+      "note": "亿元"
+    },
+    {
+      "metric": "炸板数",
+      "value": 19,
+      "source": "eastmoney:stock_zt_pool_zbgc_em",
+      "note": ""
+    },
+    {
+      "metric": "跌停数",
+      "value": 7,
+      "source": "eastmoney:stock_zt_pool_dtgc_em",
+      "note": ""
+    },
+    {
+      "metric": "炸板率",
+      "value": 19.19,
+      "source": "derived:eastmoney_limit_pools",
+      "note": "%"
+    },
+    {
+      "metric": "封板率",
+      "value": 80.81,
+      "source": "derived:eastmoney_limit_pools",
+      "note": "%"
+    }
+  ],
+  "errors": [
+    "stock_zh_a_spot_em: ConnectionError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))",
+    "stock_market_fund_flow: ConnectionError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))"
+  ]
+}

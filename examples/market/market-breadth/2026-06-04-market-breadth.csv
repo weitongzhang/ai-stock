@@ -1,0 +1,9 @@
+﻿metric,value,source,note
+涨停数,80,eastmoney:stock_zt_pool_em,
+连板家数,10,eastmoney:stock_zt_pool_em,
+最高连板,4,eastmoney:stock_zt_pool_em,
+涨停封板资金,81.13,eastmoney:stock_zt_pool_em,亿元
+炸板数,19,eastmoney:stock_zt_pool_zbgc_em,
+跌停数,7,eastmoney:stock_zt_pool_dtgc_em,
+炸板率,19.19,derived:eastmoney_limit_pools,%
+封板率,80.81,derived:eastmoney_limit_pools,%
