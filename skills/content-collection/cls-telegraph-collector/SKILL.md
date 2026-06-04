@@ -22,34 +22,40 @@ Use this skill for requests like:
 
 ## Quick Start
 
-Run:
+Run from the `cls-telegraph-collector` skill directory, or replace `scripts\...` with the script path in the current installation:
 
 ```powershell
-python C:\Users\wtzhang12\.codex\skills\cls-telegraph-collector\scripts\collect_cls_telegraph.py --out-dir .\cls-telegraph
+python scripts\collect_cls_telegraph.py --out-dir .\cls-telegraph
 ```
 
 Collect fewer items:
 
 ```powershell
-python C:\Users\wtzhang12\.codex\skills\cls-telegraph-collector\scripts\collect_cls_telegraph.py --limit 50 --out-dir .\cls-telegraph
+python scripts\collect_cls_telegraph.py --limit 50 --out-dir .\cls-telegraph
 ```
 
 Filter by keyword:
 
 ```powershell
-python C:\Users\wtzhang12\.codex\skills\cls-telegraph-collector\scripts\collect_cls_telegraph.py --keyword AI --keyword 半导体 --out-dir .\cls-telegraph
+python scripts\collect_cls_telegraph.py --keyword AI --keyword 半导体 --out-dir .\cls-telegraph
 ```
 
 Collect highlighted/red telegraph items:
 
 ```powershell
-python C:\Users\wtzhang12\.codex\skills\cls-telegraph-collector\scripts\collect_cls_telegraph.py --category red --limit 10 --out-dir .\cls-telegraph-red
+python scripts\collect_cls_telegraph.py --category red --limit 10 --out-dir .\cls-telegraph-red
+```
+
+Turn ordinary and red telegraph outputs into a next-day A-share theme plan:
+
+```powershell
+python scripts\analyze_cls_market_plan.py --input .\cls-telegraph\YYYY-MM-DD-cls-telegraph.json --input .\cls-telegraph-red\YYYY-MM-DD-cls-telegraph.json --out-dir .\cls-market-plan
 ```
 
 Collect items after a Unix timestamp:
 
 ```powershell
-python C:\Users\wtzhang12\.codex\skills\cls-telegraph-collector\scripts\collect_cls_telegraph.py --since-ts 1780502400 --out-dir .\cls-telegraph
+python scripts\collect_cls_telegraph.py --since-ts 1780502400 --out-dir .\cls-telegraph
 ```
 
 ## Outputs
@@ -62,6 +68,11 @@ The script writes:
 - `raw/YYYY-MM-DD/telegraph-response.json`: raw API response for audit/debug.
 - `raw/YYYY-MM-DD/images/<item-id>/`: downloaded item images when image URLs are present.
 
+The market-plan script writes:
+
+- `YYYY-MM-DD-cls-market-plan.csv`: theme score, sectors, candidate stocks, confirmation signals, give-up signals, and position plan.
+- `YYYY-MM-DD-cls-market-plan.md`: next-day plan using CLS news, LIFT-style theme/candidate mapping, and BSA-style action rules.
+
 ## Workflow
 
 1. Use `scripts/collect_cls_telegraph.py` for the public telegraph list.
@@ -69,7 +80,8 @@ The script writes:
 3. Check `image_count`, `image_urls`, and `local_images` for image-bearing items such as “涨停分析”.
 4. If the API returns no data or verification content, retry later with a smaller `--limit`; do not escalate into bypass tactics.
 5. For monitoring, filter with `--keyword` and keep daily output folders under `examples/content/cls` or a user-specified archive directory.
-6. Summarize only the count, time span, strongest themes, and output paths in chat.
+6. Run `scripts/analyze_cls_market_plan.py` on ordinary and red JSON outputs to create the next-day theme plan.
+7. Summarize only the count, time span, strongest themes, and output paths in chat.
 
 ## Interpretation
 
@@ -78,3 +90,4 @@ The script writes:
 - `status=fetch_failed`: network/API access failed; preserve the error and retry later if appropriate.
 - `--category red` collects the CLS highlighted/red feed. These items currently return `level=B` in the payload.
 - `is_red=1`, `level=B`, or similar raw fields may indicate highlighted/important CLS items when present in the payload.
+- The market-plan output is a candidate-pool generator. Confirm with next-day index, sector, volume, front-row, and core-stock feedback before acting.

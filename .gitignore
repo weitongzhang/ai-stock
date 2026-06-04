@@ -12,3 +12,11 @@ venv/
 
 *.log
 .DS_Store
+
+# Local credentials / browser sessions
+wechat_cookie.txt
+*_cookie.txt
+*_cookies.txt
+*_session.txt
+*_token.txt
+secrets/

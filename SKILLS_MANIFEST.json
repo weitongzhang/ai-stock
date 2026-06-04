@@ -2,7 +2,7 @@
   "workspace": "skills-engineering-workspace",
   "created_on": "2026-06-03",
   "architecture_version": "3",
-  "runtime_skills_root": "C:/Users/wtzhang12/.codex/skills",
+  "runtime_skills_root": "$USERPROFILE/.codex/skills",
   "domains": [
     {
       "name": "market-data",
@@ -27,7 +27,7 @@
       "domain": "market-data",
       "type": "data-provider",
       "path": "skills/market-data/ftshare-market-data",
-      "runtime_path": "C:/Users/wtzhang12/.codex/skills/ftshare-market-data",
+      "runtime_path": "$USERPROFILE/.codex/skills/ftshare-market-data",
       "purpose": "股票、ETF、指数、基金、宏观、港股等市场数据接口能力",
       "provides": ["stock-list", "stock-quotes", "stock-ohlcv", "index-data", "etf-data", "macro-data"]
     },
@@ -36,7 +36,7 @@
       "domain": "stock-selection",
       "type": "strategy",
       "path": "skills/stock-selection/yc-buy-selector",
-      "runtime_path": "C:/Users/wtzhang12/.codex/skills/yc-buy-selector",
+      "runtime_path": "$USERPROFILE/.codex/skills/yc-buy-selector",
       "purpose": "A股13买点、三重滤网、技术选股与CSV输出",
       "consumes": ["stock-ohlcv"],
       "future_primary_provider": "ftshare-market-data",
@@ -47,7 +47,7 @@
       "domain": "tracking",
       "type": "tracker",
       "path": "skills/tracking/watchlist-tracker",
-      "runtime_path": "C:/Users/wtzhang12/.codex/skills/watchlist-tracker",
+      "runtime_path": "$USERPROFILE/.codex/skills/watchlist-tracker",
       "purpose": "长期/中期/短期持续跟踪股票、板块、主题、ETF和指数，输出观察池报告",
       "consumes": ["watchlist", "stock-quotes", "stock-ohlcv"],
       "future_primary_provider": "ftshare-market-data",
@@ -58,7 +58,7 @@
       "domain": "content-collection",
       "type": "collector",
       "path": "skills/content-collection/wechat-official-collector",
-      "runtime_path": "C:/Users/wtzhang12/.codex/skills/wechat-official-collector",
+      "runtime_path": "$USERPROFILE/.codex/skills/wechat-official-collector",
       "purpose": "微信公众号文章、图片、评论、图文Markdown和每日摘要采集归档",
       "provides": ["article-html", "article-markdown", "article-images", "comments", "daily-digest"]
     },
@@ -67,9 +67,9 @@
       "domain": "content-collection",
       "type": "collector",
       "path": "skills/content-collection/cls-telegraph-collector",
-      "runtime_path": "C:/Users/wtzhang12/.codex/skills/cls-telegraph-collector",
+      "runtime_path": "$USERPROFILE/.codex/skills/cls-telegraph-collector",
       "purpose": "财联社7x24电报快讯采集、关键词过滤、CSV/JSON/Markdown摘要归档",
-      "provides": ["telegraph-items", "telegraph-csv", "telegraph-json", "telegraph-digest", "market-news-feed"]
+      "provides": ["telegraph-items", "telegraph-csv", "telegraph-json", "telegraph-digest", "market-news-feed", "theme-market-plan", "candidate-watchlist"]
     }
   ],
   "sources": [

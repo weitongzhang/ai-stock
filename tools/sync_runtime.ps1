@@ -1,5 +1,5 @@
 param(
-  [string]$RuntimeRoot = "C:\Users\wtzhang12\.codex\skills",
+  [string]$RuntimeRoot = (Join-Path $env:USERPROFILE ".codex\skills"),
   [string]$Skill = ""
 )
 

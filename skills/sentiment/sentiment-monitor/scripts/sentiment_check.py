@@ -9,13 +9,14 @@ import re
 import subprocess
 import sys
 import locale
+import os
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 from typing import Any
 
 
-DEFAULT_RUN_PY = Path(r"C:\Users\wtzhang12\.codex\skills\ftshare-market-data\run.py")
+DEFAULT_RUN_PY = Path(os.environ.get("CODEX_HOME", Path.home() / ".codex")) / "skills" / "ftshare-market-data" / "run.py"
 
 
 KEYWORDS = {

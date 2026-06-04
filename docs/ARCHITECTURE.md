@@ -129,6 +129,6 @@ There is overlap, but not duplication if layered correctly.
 
 ## Migration Rule
 
-- Do not delete runtime skills under `C:\Users\wtzhang12\.codex\skills` automatically.
+- Do not delete runtime skills under the configured runtime root, such as `$env:USERPROFILE\.codex\skills`, automatically.
 - Treat this workspace as source-of-truth for development.
 - Sync into runtime only after validation.

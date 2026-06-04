@@ -57,7 +57,7 @@ skills-engineering-workspace/
 
 `wechat-official-collector` 是内容采集层，负责采集用户提供的微信公众号文章链接或 HTML，保存正文、图片、评论状态、图文 Markdown 和每日摘要。
 
-`cls-telegraph-collector` 是财联社电报采集层，负责抓取 `https://www.cls.cn/telegraph` 对应的 7x24 快讯列表，保存 CSV、JSON、Markdown 摘要，并支持关键词和时间过滤。
+`cls-telegraph-collector` 是财联社电报采集层，负责抓取 `https://www.cls.cn/telegraph` 对应的 7x24 快讯列表，保存 CSV、JSON、Markdown 摘要，支持关键词和时间过滤，并可把普通/加红电报转成次日 A 股主题、候选股和交易计划观察表。
 
 ## Design Philosophy
 
@@ -86,7 +86,7 @@ FTShare provider
 1. 在 `src/skill_lab/market_data` 实现统一数据 provider，优先接 FTShare，保留 sample/akshare fallback。
 2. 在 `src/skill_lab/stock_selection` 抽象 YC-buy 策略 engine、评分模型、风险过滤和报告生成。
 3. 在 `src/skill_lab/tracking` 抽象观察池 schema、周期分类、规则触发、定时报告和 market-data enrichment。
-4. 在 `src/skill_lab/content_collection` 抽出公众号正文清洗、图片下载、评论抓取、财联社电报标准化和 Markdown 渲染模块。
+4. 在 `src/skill_lab/content_collection` 抽出公众号正文清洗、图片下载、评论抓取、财联社电报标准化、主题映射和 Markdown 渲染模块。
 5. 在 `tests/smoke` 增加四个领域的最小自动化测试。
 6. 在 `tools/` 完善同步运行副本、技能校验和脚手架命令。
 7. 后续新增技能时，先归入领域目录；若出现跨技能复用，再下沉到 `src/skill_lab/`。

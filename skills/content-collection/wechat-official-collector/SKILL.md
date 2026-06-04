@@ -29,16 +29,16 @@ https://mp.weixin.qq.com/s/QruXWVRkSnKAPFsOXFWfOQ
 C:\path\to\exported_article.html
 ```
 
-Run:
+Run from the `wechat-official-collector` skill directory, or replace `scripts\...` with the script path in the current installation:
 
 ```powershell
-python C:\Users\wtzhang12\.codex\skills\wechat-official-collector\scripts\collect_wechat_articles.py --input links.txt --out-dir .\wechat-daily
+python scripts\collect_wechat_articles.py --input links.txt --out-dir .\wechat-daily
 ```
 
 If the user provides a valid logged-in cookie text file for comments:
 
 ```powershell
-python C:\Users\wtzhang12\.codex\skills\wechat-official-collector\scripts\collect_wechat_articles.py --input links.txt --out-dir .\wechat-daily --cookie-file wechat_cookie.txt
+python scripts\collect_wechat_articles.py --input links.txt --out-dir .\wechat-daily --cookie-file wechat_cookie.txt
 ```
 
 ## Outputs
