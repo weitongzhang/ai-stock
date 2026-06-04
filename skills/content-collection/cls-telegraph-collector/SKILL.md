@@ -52,6 +52,19 @@ Turn ordinary and red telegraph outputs into a next-day A-share theme plan:
 python scripts\analyze_cls_market_plan.py --input .\cls-telegraph\YYYY-MM-DD-cls-telegraph.json --input .\cls-telegraph-red\YYYY-MM-DD-cls-telegraph.json --out-dir .\cls-market-plan
 ```
 
+Collect Tushare `kpl_list` data sourced from 开盘啦榜单:
+
+```powershell
+$env:TUSHARE_TOKEN="your-token"
+python scripts\collect_tushare_kpl.py --trade-date YYYYMMDD --tag 涨停 --tag 炸板 --out-dir .\tushare-kpl
+```
+
+Add 开盘啦榜单 validation to the market plan:
+
+```powershell
+python scripts\analyze_cls_market_plan.py --input .\cls-telegraph\YYYY-MM-DD-cls-telegraph.json --input .\cls-telegraph-red\YYYY-MM-DD-cls-telegraph.json --kpl .\tushare-kpl\YYYYMMDD-tushare-kpl.csv --out-dir .\cls-market-plan
+```
+
 Collect items after a Unix timestamp:
 
 ```powershell
@@ -73,6 +86,12 @@ The market-plan script writes:
 - `YYYY-MM-DD-cls-market-plan.csv`: theme score, sectors, candidate stocks, confirmation signals, give-up signals, and position plan.
 - `YYYY-MM-DD-cls-market-plan.md`: next-day plan using CLS news, LIFT-style theme/candidate mapping, and BSA-style action rules.
 
+The Tushare KPL script writes:
+
+- `YYYYMMDD-tushare-kpl.csv`: 开盘啦榜单 rows from Tushare `kpl_list`.
+- `YYYYMMDD-tushare-kpl.json`: normalized rows and raw API responses.
+- `YYYYMMDD-tushare-kpl.md`: readable list of names, themes, status, and涨停原因.
+
 ## Workflow
 
 1. Use `scripts/collect_cls_telegraph.py` for the public telegraph list.
@@ -80,8 +99,9 @@ The market-plan script writes:
 3. Check `image_count`, `image_urls`, and `local_images` for image-bearing items such as “涨停分析”.
 4. If the API returns no data or verification content, retry later with a smaller `--limit`; do not escalate into bypass tactics.
 5. For monitoring, filter with `--keyword` and keep daily output folders under `examples/content/cls` or a user-specified archive directory.
-6. Run `scripts/analyze_cls_market_plan.py` on ordinary and red JSON outputs to create the next-day theme plan.
-7. Summarize only the count, time span, strongest themes, and output paths in chat.
+6. If a Tushare token is available, run `scripts/collect_tushare_kpl.py` for tags such as `涨停`, `炸板`, `跌停`, `竞价`.
+7. Run `scripts/analyze_cls_market_plan.py` on ordinary/red CLS JSON outputs, plus `--kpl` CSV/JSON when available, to create the next-day theme plan.
+8. Summarize only the count, time span, strongest themes, and output paths in chat.
 
 ## Interpretation
 
@@ -90,4 +110,5 @@ The market-plan script writes:
 - `status=fetch_failed`: network/API access failed; preserve the error and retry later if appropriate.
 - `--category red` collects the CLS highlighted/red feed. These items currently return `level=B` in the payload.
 - `is_red=1`, `level=B`, or similar raw fields may indicate highlighted/important CLS items when present in the payload.
+- `collect_tushare_kpl.py` requires a valid Tushare token with `kpl_list` permission; pass `--token` or set `TUSHARE_TOKEN`.
 - The market-plan output is a candidate-pool generator. Confirm with next-day index, sector, volume, front-row, and core-stock feedback before acting.

@@ -39,6 +39,7 @@ $RuntimeRoot = "$env:USERPROFILE\.codex\skills"
 Copy-Item -Recurse -Force .\skills\content-collection\wechat-official-collector (Join-Path $RuntimeRoot "wechat-official-collector")
 Copy-Item -Recurse -Force .\skills\content-collection\cls-telegraph-collector (Join-Path $RuntimeRoot "cls-telegraph-collector")
 Copy-Item -Recurse -Force .\skills\stock-selection\yc-buy-selector (Join-Path $RuntimeRoot "yc-buy-selector")
+Copy-Item -Recurse -Force .\skills\stock-selection\a-share-market-flow-analyst (Join-Path $RuntimeRoot "a-share-market-flow-analyst")
 Copy-Item -Recurse -Force .\skills\tracking\watchlist-tracker (Join-Path $RuntimeRoot "watchlist-tracker")
 Copy-Item -Recurse -Force .\skills\market-data\ftshare-market-data (Join-Path $RuntimeRoot "ftshare-market-data")
 ```
@@ -50,7 +51,11 @@ python skills\content-collection\wechat-official-collector\scripts\collect_wecha
 
 python skills\content-collection\cls-telegraph-collector\scripts\collect_cls_telegraph.py --limit 50 --out-dir examples\content\cls\cls-telegraph
 
+python skills\content-collection\cls-telegraph-collector\scripts\collect_tushare_kpl.py --trade-date 20260604 --tag 涨停 --tag 炸板 --out-dir examples\market\tushare-kpl
+
 python skills\content-collection\cls-telegraph-collector\scripts\analyze_cls_market_plan.py --input examples\content\cls\cls-telegraph\2026-06-04-cls-telegraph.json --input examples\content\cls\cls-telegraph-red\2026-06-04-cls-telegraph.json --out-dir examples\market\cls-market-plan
+
+python skills\stock-selection\a-share-market-flow-analyst\scripts\analyze_market_flow.py --date 2026-06-04 --cls-plan examples\market\cls-market-plan-kpl\2026-06-04-cls-market-plan.csv --kpl examples\market\tushare-kpl\sample-tushare-kpl.csv --lhb examples\market\dragon-tiger\20260604-eastmoney-lhb.csv --out-dir examples\market\market-flow
 
 python skills\stock-selection\yc-buy-selector\scripts\screen_yc_buy.py --repo sources\upstream-repos\YC-buy\YC-buy-main --codes 000001,600519,000333 --source sample --mode both
 

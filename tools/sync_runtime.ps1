@@ -9,6 +9,7 @@ $WorkspaceRoot = Split-Path -Parent $PSScriptRoot
 $skills = @{
   "ftshare-market-data" = "skills\market-data\ftshare-market-data"
   "yc-buy-selector" = "skills\stock-selection\yc-buy-selector"
+  "a-share-market-flow-analyst" = "skills\stock-selection\a-share-market-flow-analyst"
   "watchlist-tracker" = "skills\tracking\watchlist-tracker"
   "wechat-official-collector" = "skills\content-collection\wechat-official-collector"
   "cls-telegraph-collector" = "skills\content-collection\cls-telegraph-collector"

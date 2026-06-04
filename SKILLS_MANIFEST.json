@@ -29,7 +29,14 @@
       "path": "skills/market-data/ftshare-market-data",
       "runtime_path": "$USERPROFILE/.codex/skills/ftshare-market-data",
       "purpose": "股票、ETF、指数、基金、宏观、港股等市场数据接口能力",
-      "provides": ["stock-list", "stock-quotes", "stock-ohlcv", "index-data", "etf-data", "macro-data"]
+      "provides": [
+        "stock-list",
+        "stock-quotes",
+        "stock-ohlcv",
+        "index-data",
+        "etf-data",
+        "macro-data"
+      ]
     },
     {
       "name": "yc-buy-selector",
@@ -38,9 +45,30 @@
       "path": "skills/stock-selection/yc-buy-selector",
       "runtime_path": "$USERPROFILE/.codex/skills/yc-buy-selector",
       "purpose": "A股13买点、三重滤网、技术选股与CSV输出",
-      "consumes": ["stock-ohlcv"],
+      "consumes": [
+        "stock-ohlcv"
+      ],
       "future_primary_provider": "ftshare-market-data",
       "source_repo": "sources/upstream-repos/YC-buy/YC-buy-main"
+    },
+    {
+      "name": "a-share-market-flow-analyst",
+      "domain": "stock-selection",
+      "type": "market-flow-strategy",
+      "path": "skills/stock-selection/a-share-market-flow-analyst",
+      "runtime_path": "$USERPROFILE/.codex/skills/a-share-market-flow-analyst",
+      "purpose": "A股资金流向、市场状态、板块强度、龙虎榜、涨停/连板与财联社催化综合分析，输出明日板块与核心个股观察计划",
+      "consumes": [
+        "theme-market-plan",
+        "tushare-kpl-list",
+        "dragon-tiger-list",
+        "market-breadth"
+      ],
+      "provides": [
+        "market-flow-report",
+        "sector-priority-list",
+        "next-day-observation-plan"
+      ]
     },
     {
       "name": "watchlist-tracker",
@@ -49,9 +77,17 @@
       "path": "skills/tracking/watchlist-tracker",
       "runtime_path": "$USERPROFILE/.codex/skills/watchlist-tracker",
       "purpose": "长期/中期/短期持续跟踪股票、板块、主题、ETF和指数，输出观察池报告",
-      "consumes": ["watchlist", "stock-quotes", "stock-ohlcv"],
+      "consumes": [
+        "watchlist",
+        "stock-quotes",
+        "stock-ohlcv"
+      ],
       "future_primary_provider": "ftshare-market-data",
-      "provides": ["watchlist-report", "trigger-status", "next-check-plan"]
+      "provides": [
+        "watchlist-report",
+        "trigger-status",
+        "next-check-plan"
+      ]
     },
     {
       "name": "wechat-official-collector",
@@ -60,7 +96,13 @@
       "path": "skills/content-collection/wechat-official-collector",
       "runtime_path": "$USERPROFILE/.codex/skills/wechat-official-collector",
       "purpose": "微信公众号文章、图片、评论、图文Markdown和每日摘要采集归档",
-      "provides": ["article-html", "article-markdown", "article-images", "comments", "daily-digest"]
+      "provides": [
+        "article-html",
+        "article-markdown",
+        "article-images",
+        "comments",
+        "daily-digest"
+      ]
     },
     {
       "name": "cls-telegraph-collector",
@@ -69,7 +111,16 @@
       "path": "skills/content-collection/cls-telegraph-collector",
       "runtime_path": "$USERPROFILE/.codex/skills/cls-telegraph-collector",
       "purpose": "财联社7x24电报快讯采集、关键词过滤、CSV/JSON/Markdown摘要归档",
-      "provides": ["telegraph-items", "telegraph-csv", "telegraph-json", "telegraph-digest", "market-news-feed", "theme-market-plan", "candidate-watchlist"]
+      "provides": [
+        "telegraph-items",
+        "telegraph-csv",
+        "telegraph-json",
+        "telegraph-digest",
+        "market-news-feed",
+        "tushare-kpl-list",
+        "theme-market-plan",
+        "candidate-watchlist"
+      ]
     }
   ],
   "sources": [
@@ -118,6 +169,11 @@
       "name": "watchlist.csv",
       "path": "examples/market/tracking/watchlist.csv",
       "purpose": "长中短周期观察池样例"
+    },
+    {
+      "name": "market-flow-20260604",
+      "path": "examples/market/market-flow/2026-06-04-market-flow.md",
+      "purpose": "财联社主题计划、开盘啦样例和龙虎榜数据融合后的A股资金流分析样例"
     }
   ],
   "integration_decisions": [

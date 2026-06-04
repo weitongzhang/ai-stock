@@ -49,6 +49,7 @@ skills-engineering-workspace/
 
 ## Capabilities
 
+`a-share-market-flow-analyst` 是 A 股资金流分析层，负责把财联社主题催化、开盘啦/涨停连板、龙虎榜核心资金和可选市场宽度数据合成 F-M-C-T 评分，输出明日板块优先级、核心观察股、确认条件和放弃条件。
 `ftshare-market-data` 是市场数据底座，负责获取 A 股行情、K 线、指数、ETF、基金、宏观等结构化数据。
 
 `yc-buy-selector` 是策略选股层，基于 YC-buy 的 13 买点和三重滤网，把 OHLCV 数据转成买点、趋势信号、评分和候选报告。
@@ -57,7 +58,7 @@ skills-engineering-workspace/
 
 `wechat-official-collector` 是内容采集层，负责采集用户提供的微信公众号文章链接或 HTML，保存正文、图片、评论状态、图文 Markdown 和每日摘要。
 
-`cls-telegraph-collector` 是财联社电报采集层，负责抓取 `https://www.cls.cn/telegraph` 对应的 7x24 快讯列表，保存 CSV、JSON、Markdown 摘要，支持关键词和时间过滤，并可把普通/加红电报转成次日 A 股主题、候选股和交易计划观察表。
+`cls-telegraph-collector` 是财联社电报采集层，负责抓取 `https://www.cls.cn/telegraph` 对应的 7x24 快讯列表，保存 CSV、JSON、Markdown 摘要，支持关键词和时间过滤，并可接入 Tushare 开盘啦榜单，把普通/加红电报转成次日 A 股主题、候选股和交易计划观察表。
 
 ## Design Philosophy
 

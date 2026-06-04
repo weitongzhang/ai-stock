@@ -178,12 +178,52 @@ def keyword_in_text(keyword: str, text: str) -> bool:
 
 def themes_for_item(item: dict[str, Any]) -> list[dict[str, Any]]:
     text = f"{item.get('title', '')} {item.get('content', '')}"
+    return themes_for_text(text, item)
+
+
+def themes_for_text(text: str, item: dict[str, Any] | None = None) -> list[dict[str, Any]]:
     matched: list[dict[str, Any]] = []
     for rule in THEME_RULES:
         keywords = [kw for kw in rule["keywords"] if keyword_in_text(kw, text)]
         if keywords:
-            matched.append({"rule": rule, "keywords": keywords, "item_score": score_item(item, keywords)})
+            matched.append({"rule": rule, "keywords": keywords, "item_score": score_item(item or {}, keywords)})
     return matched
+
+
+def read_kpl_rows(path: Path) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    if path.suffix.lower() == ".json":
+        data = json.loads(path.read_text(encoding="utf-8"))
+        items = data.get("items") or []
+        rows = [row for row in items if isinstance(row, dict)]
+    else:
+        with path.open(newline="", encoding="utf-8-sig") as f:
+            rows = [row for row in csv.DictReader(f)]
+    for row in rows:
+        row["source_file"] = str(path)
+    return rows
+
+
+def kpl_text(row: dict[str, Any]) -> str:
+    return " ".join(clean_text(row.get(key)) for key in ("name", "tag", "theme", "status", "lu_desc", "query_tag"))
+
+
+def score_kpl_row(row: dict[str, Any], matched_keywords: list[str]) -> int:
+    score = 6 + min(len(matched_keywords), 4)
+    tag = clean_text(row.get("tag") or row.get("query_tag"))
+    status = clean_text(row.get("status"))
+    if tag in {"涨停", "自然涨停"}:
+        score += 3
+    elif tag == "炸板":
+        score += 1
+    elif tag == "跌停":
+        score -= 3
+    match = re.search(r"(\d+)连板", status)
+    if match:
+        score += min(int(match.group(1)) * 2, 8)
+    if row.get("lu_time"):
+        score += 1
+    return max(score, 1)
 
 
 def raw_subjects(item: dict[str, Any]) -> str:
@@ -203,28 +243,35 @@ def raw_stocks(item: dict[str, Any]) -> str:
     return "、".join(n for n in names if n)
 
 
-def build_theme_rows(items: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+def ensure_bucket(buckets: dict[str, dict[str, Any]], rule: dict[str, Any]) -> dict[str, Any]:
+    theme = rule["theme"]
+    return buckets.setdefault(
+        theme,
+        {
+            "theme": theme,
+            "score": 0,
+            "news_count": 0,
+            "red_count": 0,
+            "policy_count": 0,
+            "market_count": 0,
+            "kpl_count": 0,
+            "keywords": set(),
+            "sectors": rule["sectors"],
+            "base_candidates": rule["candidates"],
+            "kpl_stocks": [],
+            "evidence": [],
+        },
+    )
+
+
+def build_theme_rows(items: list[dict[str, Any]], kpl_rows: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     buckets: dict[str, dict[str, Any]] = {}
     evidence_rows: list[dict[str, Any]] = []
     for item in items:
         for match in themes_for_item(item):
             rule = match["rule"]
             theme = rule["theme"]
-            bucket = buckets.setdefault(
-                theme,
-                {
-                    "theme": theme,
-                    "score": 0,
-                    "news_count": 0,
-                    "red_count": 0,
-                    "policy_count": 0,
-                    "market_count": 0,
-                    "keywords": set(),
-                    "sectors": rule["sectors"],
-                    "candidates": rule["candidates"],
-                    "evidence": [],
-                },
-            )
+            bucket = ensure_bucket(buckets, rule)
             event_type = classify_event(f"{item.get('title', '')} {item.get('content', '')}")
             bucket["score"] += match["item_score"]
             bucket["news_count"] += 1
@@ -248,17 +295,59 @@ def build_theme_rows(items: list[dict[str, Any]]) -> tuple[list[dict[str, Any]],
                 }
             )
 
+    for row in kpl_rows:
+        text = kpl_text(row)
+        for match in themes_for_text(text):
+            rule = match["rule"]
+            theme = rule["theme"]
+            bucket = ensure_bucket(buckets, rule)
+            item_score = score_kpl_row(row, match["keywords"])
+            name = clean_text(row.get("name"))
+            status = clean_text(row.get("status") or row.get("tag") or row.get("query_tag"))
+            stock_label = f"{name}({status})" if name and status else name
+            bucket["score"] += item_score
+            bucket["market_count"] += 1
+            bucket["kpl_count"] += 1
+            bucket["keywords"].update(match["keywords"])
+            if stock_label and stock_label not in bucket["kpl_stocks"]:
+                bucket["kpl_stocks"].append(stock_label)
+            bucket["evidence"].append(
+                {
+                    "time": row.get("trade_date", ""),
+                    "title": f"开盘啦榜单：{name} {status} {clean_text(row.get('theme'))}",
+                }
+            )
+            evidence_rows.append(
+                {
+                    "theme": theme,
+                    "event_type": "开盘啦验证",
+                    "item_score": item_score,
+                    "time": row.get("trade_date", ""),
+                    "level": "",
+                    "title": f"{name} {status}",
+                    "keywords": "、".join(match["keywords"]),
+                    "subjects": clean_text(row.get("theme")),
+                    "stocks": name,
+                    "shareurl": "",
+                }
+            )
+
     theme_rows: list[dict[str, Any]] = []
     for bucket in buckets.values():
         score = int(bucket["score"])
-        if bucket["red_count"] and bucket["policy_count"]:
+        if bucket["kpl_count"] and (bucket["red_count"] or bucket["policy_count"]):
             stance = "重点观察"
+        elif bucket["red_count"] and bucket["policy_count"]:
+            stance = "重点观察"
+        elif bucket["kpl_count"] and score >= 12:
+            stance = "盘面验证后参与"
         elif score >= 7:
             stance = "积极跟踪"
         elif bucket["market_count"] and bucket["news_count"] >= 2:
             stance = "盘面验证后参与"
         else:
             stance = "观察为主"
+        candidates = list(dict.fromkeys(bucket["kpl_stocks"] + bucket["base_candidates"]))
         theme_rows.append(
             {
                 "theme": bucket["theme"],
@@ -268,9 +357,11 @@ def build_theme_rows(items: list[dict[str, Any]]) -> tuple[list[dict[str, Any]],
                 "red_count": bucket["red_count"],
                 "policy_count": bucket["policy_count"],
                 "market_count": bucket["market_count"],
+                "kpl_count": bucket["kpl_count"],
                 "keywords": "、".join(sorted(bucket["keywords"])),
                 "sectors": "、".join(bucket["sectors"]),
-                "candidates": "、".join(bucket["candidates"]),
+                "candidates": "、".join(candidates),
+                "kpl_stocks": "、".join(bucket["kpl_stocks"]),
                 "confirm_signal": confirm_signal(bucket["theme"]),
                 "give_up_signal": give_up_signal(bucket["theme"]),
                 "position_plan": position_plan(stance),
@@ -306,7 +397,7 @@ def write_outputs(theme_rows: list[dict[str, Any]], evidence_rows: list[dict[str
     csv_path = out_dir / f"{date}-cls-market-plan.csv"
     md_path = out_dir / f"{date}-cls-market-plan.md"
 
-    fields = ["theme", "score", "stance", "news_count", "red_count", "policy_count", "market_count", "keywords", "sectors", "candidates", "confirm_signal", "give_up_signal", "position_plan"]
+    fields = ["theme", "score", "stance", "news_count", "red_count", "policy_count", "market_count", "kpl_count", "keywords", "sectors", "candidates", "kpl_stocks", "confirm_signal", "give_up_signal", "position_plan"]
     with csv_path.open("w", newline="", encoding="utf-8-sig") as f:
         writer = csv.DictWriter(f, fieldnames=fields)
         writer.writeheader()
@@ -334,9 +425,10 @@ def write_outputs(theme_rows: list[dict[str, Any]], evidence_rows: list[dict[str
             [
                 f"### {row['theme']} [{row['stance']}]",
                 "",
-                f"- 催化强度：{row['score']}，消息 {row['news_count']} 条，加红 {row['red_count']} 条，政策 {row['policy_count']} 条，盘面验证 {row['market_count']} 条",
+                f"- 催化强度：{row['score']}，消息 {row['news_count']} 条，加红 {row['red_count']} 条，政策 {row['policy_count']} 条，盘面验证 {row['market_count']} 条，开盘啦验证 {row['kpl_count']} 条",
                 f"- 映射板块：{row['sectors']}",
                 f"- 候选观察：{row['candidates']}",
+                f"- 开盘啦前排：{row['kpl_stocks'] or '-'}",
                 f"- 明日确认：{row['confirm_signal']}",
                 f"- 放弃条件：{row['give_up_signal']}",
                 f"- 仓位计划：{row['position_plan']}",
@@ -372,6 +464,7 @@ def write_outputs(theme_rows: list[dict[str, Any]], evidence_rows: list[dict[str
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--input", action="append", required=True, help="Collected CLS JSON/CSV file; repeatable")
+    parser.add_argument("--kpl", action="append", default=[], help="Tushare kpl_list CSV/JSON file; repeatable")
     parser.add_argument("--out-dir", default="cls-market-plan", help="Output directory")
     args = parser.parse_args()
 
@@ -379,9 +472,12 @@ def main() -> int:
     for value in args.input:
         items.extend(read_items(Path(value)))
     items = dedupe_items(items)
-    theme_rows, evidence_rows = build_theme_rows(items)
+    kpl_rows: list[dict[str, Any]] = []
+    for value in args.kpl:
+        kpl_rows.extend(read_kpl_rows(Path(value)))
+    theme_rows, evidence_rows = build_theme_rows(items, kpl_rows)
     csv_path, md_path = write_outputs(theme_rows, evidence_rows, Path(args.out_dir))
-    print(json.dumps({"themes": len(theme_rows), "items": len(items), "csv": str(csv_path), "markdown": str(md_path)}, ensure_ascii=False, indent=2))
+    print(json.dumps({"themes": len(theme_rows), "items": len(items), "kpl_rows": len(kpl_rows), "csv": str(csv_path), "markdown": str(md_path)}, ensure_ascii=False, indent=2))
     return 0
 
 

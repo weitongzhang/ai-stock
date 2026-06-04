@@ -1,0 +1,11 @@
+name: a-share-market-flow-analyst
+display_name: A股资金流分析
+description: 综合财联社、电报、开盘啦/涨停、龙虎榜与市场宽度，生成明日板块与个股观察计划。
+version: 0.1.0
+tags:
+  - A股
+  - 资金流
+  - 板块
+  - 龙虎榜
+  - 涨停
+  - 交易计划
