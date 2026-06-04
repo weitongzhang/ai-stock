@@ -430,3 +430,15 @@ YC-buy 当前重点是 13 个买点和三重滤网趋势过滤。方方土方法
 -- 止损距离过大，超过风险预算
 -- 接近测量目标后的追入
 ```
+
+## 与 BSA 框架的关系
+
+方方土方法论在 BSA 价格行为框架中主要承担“背景”“急迫感”和“反馈”三层：
+
+```text
+BSA = Background + Structure + Action
+方方土方法论 -> Background / 急迫感 / 反馈
+Al Brooks 方法论 -> Structure / 信号计数 / 执行
+```
+
+统一融合稿见：`sources/imported-methods/bsa-price-action-framework.md`。
