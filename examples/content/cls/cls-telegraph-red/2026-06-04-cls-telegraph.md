@@ -3,6 +3,15 @@
 - 来源：https://www.cls.cn/v1/roll/get_roll_list?app=CailianpressWeb&category=red&os=web&rn=10&sign=3cd4874035ba605b77f778bf8dcd9674
 - 数量：10
 
+## 2026-06-04 15:35:02 工信部：到2029年形成一批自主创新的6G技术方案
+
+【工信部：到2029年形成一批自主创新的6G技术方案】财联社6月4日电，工业和信息化部办公厅发布关于组织开展6G创新发展部省协同试点专项行动的通知，到2029年，通过实施6G创新发展部省协同试点专项行动，进一步激发地方和企业创新活力，形成一批自主创新的6G技术方案，培育一批前景可观的新型业务应用场景，涌现一批丰富多样的新型终端产品，为6G商用落地提供有力支撑。
+
+- 链接：https://api3.cls.cn/share/article/2390689?os=web&sv=&app=CailianpressWeb
+- 级别：B
+- 高亮：-
+- 图片：0 张
+
 ## 2026-06-04 15:20:08 欧盟内部有观点认为应对华“去风险” 外交部回应
 
 【欧盟内部有观点认为应对华“去风险” 外交部回应】财联社6月4日电，外交部发言人毛宁主持例行记者会。有记者提问，日前欧委会全体会议讨论对华关系，有观点认为中欧贸易和投资状况“不可持续”，欧盟应对华“去风险”。外界预计6月中旬，欧盟将借G7和欧盟夏季峰会推出新的对华贸易限制工具。但同时我们也注意到，中国欧盟商会最新的调查报告显示，68%的欧洲企业选择坚守或扩大在华业务，近1/3的企业将进一步深化在中国的本土化布局，“去风险”似乎并未成为欧洲企业的实际选择。发言人如何看待这种现象？毛宁表示，越来越多的欧洲企业选择深耕中国、扩大在华业务，这本身就是对所谓“去风险”最有力的回应。中欧经贸合作源于共同利益，本质上是比较优势和市场竞争共同作用的结果。优势互补不是风险，利益融合也不是威胁。毛宁指出，50多年来，中欧年贸易额增长了300多倍，相互双向投资接近2600亿美元，充分说明中欧合作动力强劲，前景广阔。贸易保护主义违背经济规律，损人不利己。希望欧方客观理性看待中欧经贸关系，同中方一道压缩问题清单，做大合作蛋糕，实现互利共赢。 (北京日报)
@@ -10,6 +19,7 @@
 - 链接：https://api3.cls.cn/share/article/2390663?os=web&sv=&app=CailianpressWeb
 - 级别：B
 - 高亮：-
+- 图片：0 张
 
 ## 2026-06-04 15:15:34 6月4日涨停分析
 
@@ -18,6 +28,11 @@
 - 链接：https://api3.cls.cn/share/article/2390656?os=web&sv=&app=CailianpressWeb
 - 级别：B
 - 高亮：-
+- 图片：2 张
+
+![6月4日涨停分析](C:/Users/wtzhang12/Documents/Codex/2026-06-03/pinarocko346-creator-yc-buy-git-https/skills-engineering-workspace/examples/content/cls/cls-telegraph-red/raw/2026-06-04/images/2390656/image-01.jpg)
+
+![6月4日涨停分析](C:/Users/wtzhang12/Documents/Codex/2026-06-03/pinarocko346-creator-yc-buy-git-https/skills-engineering-workspace/examples/content/cls/cls-telegraph-red/raw/2026-06-04/images/2390656/image-02.png)
 
 ## 2026-06-04 15:09:20 商务部：美滥用出口管制冲击全球半导体产供链稳定
 
@@ -26,6 +41,7 @@
 - 链接：https://api3.cls.cn/share/article/2390649?os=web&sv=&app=CailianpressWeb
 - 级别：B
 - 高亮：-
+- 图片：0 张
 
 ## 2026-06-04 15:07:30 收评：创业板指缩量调整跌0.83% 全市场超4100只个股下挫
 
@@ -34,6 +50,9 @@
 - 链接：https://api3.cls.cn/share/article/2390639?os=web&sv=&app=CailianpressWeb
 - 级别：B
 - 高亮：-
+- 图片：1 张
+
+![收评：创业板指缩量调整跌0.83% 全市场超4100只个股下挫](C:/Users/wtzhang12/Documents/Codex/2026-06-03/pinarocko346-creator-yc-buy-git-https/skills-engineering-workspace/examples/content/cls/cls-telegraph-red/raw/2026-06-04/images/2390639/image-01.jpg)
 
 ## 2026-06-04 15:01:26 油价今晚下调了 加满一箱油能少花20.5元
 
@@ -42,6 +61,7 @@
 - 链接：https://api3.cls.cn/share/article/2390640?os=web&sv=&app=CailianpressWeb
 - 级别：B
 - 高亮：-
+- 图片：0 张
 
 ## 2026-06-04 14:36:37 沪深两市成交额突破2.5万亿 较上一日此时缩量超3500亿
 
@@ -50,6 +70,9 @@
 - 链接：https://api3.cls.cn/share/article/2390609?os=web&sv=&app=CailianpressWeb
 - 级别：B
 - 高亮：-
+- 图片：1 张
+
+![沪深两市成交额突破2.5万亿 较上一日此时缩量超3500亿](C:/Users/wtzhang12/Documents/Codex/2026-06-03/pinarocko346-creator-yc-buy-git-https/skills-engineering-workspace/examples/content/cls/cls-telegraph-red/raw/2026-06-04/images/2390609/image-01.jpg)
 
 ## 2026-06-04 14:06:23 AI热潮助力财富跃升：全球百万富翁新增200万人 马斯克或将成为全球首位万亿富翁
 
@@ -58,6 +81,7 @@
 - 链接：https://api3.cls.cn/share/article/2390577?os=web&sv=&app=CailianpressWeb
 - 级别：B
 - 高亮：-
+- 图片：0 张
 
 ## 2026-06-04 13:54:35 财联社6月4日电，碳酸锂期货主力合约跌超5%，跌破160000元/吨
 
@@ -66,6 +90,7 @@
 - 链接：https://api3.cls.cn/share/article/2390564?os=web&sv=&app=CailianpressWeb
 - 级别：B
 - 高亮：-
+- 图片：0 张
 
 ## 2026-06-04 13:35:52 沪深两市成交额突破2万亿 较上一日此时缩量超2400亿
 
@@ -74,11 +99,6 @@
 - 链接：https://api3.cls.cn/share/article/2390547?os=web&sv=&app=CailianpressWeb
 - 级别：B
 - 高亮：-
+- 图片：1 张
 
-## 2026-06-04 12:36:26 日本央行据悉正在考虑6月加息 并可能今年晚些时候再次加息
-
-【日本央行据悉正在考虑6月加息 并可能今年晚些时候再次加息】财联社6月4日电，据知情人士称，日本央行官员势将在本月考虑将基准利率上调0.25个百分点，并认为今年晚些时候有可能进一步加息一次。知情人士说，日本央行可能在6月16日结束的政策会议上讨论将政策利率上调至1%。官员们还认为，鉴于实际利率仍然很低以及通胀持续面临上行风险，未来仍有进一步加息的空间。鉴于中东局势高度不确定，官员们将在做出最终决定前，尽可能多地收集数据和信息，直至最后一刻。他们表示，可能会有一些反对升息的声音，但不足以左右最终决定。
-
-- 链接：https://api3.cls.cn/share/article/2390490?os=web&sv=&app=CailianpressWeb
-- 级别：B
-- 高亮：-
+![沪深两市成交额突破2万亿 较上一日此时缩量超2400亿](C:/Users/wtzhang12/Documents/Codex/2026-06-03/pinarocko346-creator-yc-buy-git-https/skills-engineering-workspace/examples/content/cls/cls-telegraph-red/raw/2026-06-04/images/2390547/image-01.jpg)

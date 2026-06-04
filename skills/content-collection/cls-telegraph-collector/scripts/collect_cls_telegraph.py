@@ -102,6 +102,83 @@ def clean_text(value: Any) -> str:
     return re.sub(r"\s+", " ", text).strip()
 
 
+def image_ext(url: str, content_type: str) -> str:
+    if "png" in content_type:
+        return ".png"
+    if "webp" in content_type:
+        return ".webp"
+    if "gif" in content_type:
+        return ".gif"
+    if "jpeg" in content_type or "jpg" in content_type:
+        return ".jpg"
+    suffix = Path(urllib.parse.urlparse(url).path).suffix.lower()
+    return suffix if suffix in {".png", ".jpg", ".jpeg", ".webp", ".gif"} else ".jpg"
+
+
+def normalize_image_urls(item: dict[str, Any]) -> list[str]:
+    urls: list[str] = []
+
+    def add(value: Any) -> None:
+        if not value:
+            return
+        if isinstance(value, str):
+            parts = [part.strip() for part in value.split(",")]
+        elif isinstance(value, list):
+            parts = value
+        else:
+            parts = [value]
+        for part in parts:
+            if isinstance(part, dict):
+                candidate = part.get("url") or part.get("img") or part.get("src")
+            else:
+                candidate = str(part)
+            url = html.unescape(str(candidate or "")).strip()
+            if url.startswith("//"):
+                url = "https:" + url
+            if url.startswith("http") and url not in urls:
+                urls.append(url)
+
+    add(item.get("images"))
+    add(item.get("imgs"))
+    add(item.get("img"))
+    return urls
+
+
+def download_images(rows: list[dict[str, Any]], image_root: Path) -> None:
+    image_root.mkdir(parents=True, exist_ok=True)
+    for row in rows:
+        urls = row.get("image_urls_list") or []
+        if not urls:
+            row["local_images_list"] = []
+            row["local_images"] = ""
+            continue
+        item_dir = image_root / (row.get("id") or "item")
+        item_dir.mkdir(parents=True, exist_ok=True)
+        saved: list[str] = []
+        for idx, url in enumerate(urls, 1):
+            try:
+                req = urllib.request.Request(
+                    url,
+                    headers={
+                        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+                        "Referer": REFERER,
+                        "Accept": "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8",
+                    },
+                )
+                with urllib.request.urlopen(req, timeout=20) as resp:
+                    content = resp.read()
+                    ext = image_ext(url, resp.headers.get("Content-Type", ""))
+                if len(content) < 128:
+                    continue
+                path = item_dir / f"image-{idx:02d}{ext}"
+                path.write_bytes(content)
+                saved.append(str(path.resolve()).replace("\\", "/"))
+            except Exception:
+                continue
+        row["local_images_list"] = saved
+        row["local_images"] = "|".join(saved)
+
+
 def item_time(value: Any) -> tuple[str, str]:
     try:
         ts = int(value)
@@ -128,6 +205,7 @@ def normalize_item(item: dict[str, Any]) -> dict[str, Any]:
     item_id = str(item.get("id") or item.get("article_id") or "")
     if not share_url and item_id:
         share_url = f"https://www.cls.cn/detail/{item_id}"
+    image_urls = normalize_image_urls(item)
     return {
         "id": item_id,
         "ctime": ctime,
@@ -139,6 +217,11 @@ def normalize_item(item: dict[str, Any]) -> dict[str, Any]:
         "author": clean_text(item.get("author") or item.get("source")),
         "is_red": str(item.get("is_red") or item.get("red") or ""),
         "level": clean_text(item.get("level")),
+        "image_urls": "|".join(image_urls),
+        "image_count": str(len(image_urls)),
+        "image_urls_list": image_urls,
+        "local_images": "",
+        "local_images_list": [],
         "raw": item,
     }
 
@@ -160,18 +243,20 @@ def apply_filters(rows: list[dict[str, Any]], keywords: list[str], since_ts: int
     return filtered
 
 
-def write_outputs(rows: list[dict[str, Any]], raw_payload: dict[str, Any], source_url: str, out_dir: Path) -> tuple[Path, Path, Path, Path]:
+def write_outputs(rows: list[dict[str, Any]], raw_payload: dict[str, Any], source_url: str, out_dir: Path, download: bool) -> tuple[Path, Path, Path, Path]:
     out_dir.mkdir(parents=True, exist_ok=True)
     date = datetime.now().strftime("%Y-%m-%d")
     raw_dir = out_dir / "raw" / date
     raw_dir.mkdir(parents=True, exist_ok=True)
+    if download:
+        download_images(rows, raw_dir / "images")
 
     csv_path = out_dir / f"{date}-cls-telegraph.csv"
     json_path = out_dir / f"{date}-cls-telegraph.json"
     md_path = out_dir / f"{date}-cls-telegraph.md"
     raw_path = raw_dir / "telegraph-response.json"
 
-    fields = ["id", "ctime", "time", "title", "content", "shareurl", "category", "author", "level", "is_red"]
+    fields = ["id", "ctime", "time", "title", "content", "shareurl", "category", "author", "level", "is_red", "image_count", "image_urls", "local_images"]
     with csv_path.open("w", newline="", encoding="utf-8-sig") as f:
         writer = csv.DictWriter(f, fieldnames=fields)
         writer.writeheader()
@@ -204,6 +289,8 @@ def write_outputs(rows: list[dict[str, Any]], raw_payload: dict[str, Any], sourc
     for row in rows:
         title = row.get("title") or "Untitled"
         content = row.get("content") or "-"
+        image_urls = row.get("image_urls_list") or []
+        local_images = row.get("local_images_list") or []
         lines.extend(
             [
                 f"## {row.get('time') or '-'} {title}",
@@ -213,9 +300,16 @@ def write_outputs(rows: list[dict[str, Any]], raw_payload: dict[str, Any], sourc
                 f"- 链接：{row.get('shareurl') or '-'}",
                 f"- 级别：{row.get('level') or '-'}",
                 f"- 高亮：{row.get('is_red') or '-'}",
+                f"- 图片：{row.get('image_count') or '0'} 张",
                 "",
             ]
         )
+        for path in local_images:
+            lines.extend([f"![{title}]({path})", ""])
+        if image_urls and not local_images:
+            lines.extend(["图片链接：", ""])
+            lines.extend([f"- {url}" for url in image_urls])
+            lines.append("")
     md_path.write_text("\n".join(lines), encoding="utf-8")
     return csv_path, json_path, md_path, raw_path
 
@@ -228,6 +322,7 @@ def main() -> int:
     parser.add_argument("--keyword", action="append", default=[], help="Keyword filter; repeatable")
     parser.add_argument("--since-ts", type=int, default=None, help="Keep items with ctime >= this Unix timestamp")
     parser.add_argument("--last-time", type=int, default=None, help="Optional API pagination timestamp")
+    parser.add_argument("--no-download-images", action="store_true", help="Keep image URLs but do not download image files")
     args = parser.parse_args()
 
     limit = max(1, min(args.limit, 200))
@@ -237,7 +332,7 @@ def main() -> int:
         rows = [normalize_item(item) for item in raw_items if isinstance(item, dict)]
         rows = [row for row in rows if row.get("title") or row.get("content")]
         rows = apply_filters(rows, args.keyword, args.since_ts)
-        csv_path, json_path, md_path, raw_path = write_outputs(rows, payload, source_url, Path(args.out_dir))
+        csv_path, json_path, md_path, raw_path = write_outputs(rows, payload, source_url, Path(args.out_dir), not args.no_download_images)
         status = "ok" if rows else "no_items"
         print(
             json.dumps(

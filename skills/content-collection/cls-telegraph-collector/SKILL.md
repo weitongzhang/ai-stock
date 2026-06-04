@@ -60,14 +60,16 @@ The script writes:
 - `YYYY-MM-DD-cls-telegraph.json`: normalized items plus raw item payloads.
 - `YYYY-MM-DD-cls-telegraph.md`: readable digest with time, title, content, and source link.
 - `raw/YYYY-MM-DD/telegraph-response.json`: raw API response for audit/debug.
+- `raw/YYYY-MM-DD/images/<item-id>/`: downloaded item images when image URLs are present.
 
 ## Workflow
 
 1. Use `scripts/collect_cls_telegraph.py` for the public telegraph list.
 2. Inspect the generated Markdown digest and CSV row count.
-3. If the API returns no data or verification content, retry later with a smaller `--limit`; do not escalate into bypass tactics.
-4. For monitoring, filter with `--keyword` and keep daily output folders under `examples/content/cls` or a user-specified archive directory.
-5. Summarize only the count, time span, strongest themes, and output paths in chat.
+3. Check `image_count`, `image_urls`, and `local_images` for image-bearing items such as “涨停分析”.
+4. If the API returns no data or verification content, retry later with a smaller `--limit`; do not escalate into bypass tactics.
+5. For monitoring, filter with `--keyword` and keep daily output folders under `examples/content/cls` or a user-specified archive directory.
+6. Summarize only the count, time span, strongest themes, and output paths in chat.
 
 ## Interpretation
 
