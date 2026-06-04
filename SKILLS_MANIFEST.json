@@ -18,7 +18,7 @@
     },
     {
       "name": "content-collection",
-      "purpose": "内容采集层，负责公众号文章、图片、评论与摘要归档"
+      "purpose": "内容采集层，负责公众号文章、财联社电报、图片、评论与摘要归档"
     }
   ],
   "skills": [
@@ -61,6 +61,15 @@
       "runtime_path": "C:/Users/wtzhang12/.codex/skills/wechat-official-collector",
       "purpose": "微信公众号文章、图片、评论、图文Markdown和每日摘要采集归档",
       "provides": ["article-html", "article-markdown", "article-images", "comments", "daily-digest"]
+    },
+    {
+      "name": "cls-telegraph-collector",
+      "domain": "content-collection",
+      "type": "collector",
+      "path": "skills/content-collection/cls-telegraph-collector",
+      "runtime_path": "C:/Users/wtzhang12/.codex/skills/cls-telegraph-collector",
+      "purpose": "财联社7x24电报快讯采集、关键词过滤、CSV/JSON/Markdown摘要归档",
+      "provides": ["telegraph-items", "telegraph-csv", "telegraph-json", "telegraph-digest", "market-news-feed"]
     }
   ],
   "sources": [
@@ -94,6 +103,11 @@
       "name": "wechat-daily",
       "path": "examples/content/wechat/wechat-daily",
       "purpose": "微信公众号采集样例输出"
+    },
+    {
+      "name": "cls-telegraph",
+      "path": "examples/content/cls/cls-telegraph",
+      "purpose": "财联社电报采集样例输出"
     },
     {
       "name": "yc_buy_today_20260603_110530.csv",

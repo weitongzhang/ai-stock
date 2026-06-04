@@ -36,6 +36,7 @@
 
 ```powershell
 Copy-Item -Recurse -Force .\skills\content-collection\wechat-official-collector C:\Users\wtzhang12\.codex\skills\wechat-official-collector
+Copy-Item -Recurse -Force .\skills\content-collection\cls-telegraph-collector C:\Users\wtzhang12\.codex\skills\cls-telegraph-collector
 Copy-Item -Recurse -Force .\skills\stock-selection\yc-buy-selector C:\Users\wtzhang12\.codex\skills\yc-buy-selector
 Copy-Item -Recurse -Force .\skills\tracking\watchlist-tracker C:\Users\wtzhang12\.codex\skills\watchlist-tracker
 Copy-Item -Recurse -Force .\skills\market-data\ftshare-market-data C:\Users\wtzhang12\.codex\skills\ftshare-market-data
@@ -45,6 +46,8 @@ Copy-Item -Recurse -Force .\skills\market-data\ftshare-market-data C:\Users\wtzh
 
 ```powershell
 python skills\content-collection\wechat-official-collector\scripts\collect_wechat_articles.py --input examples\content\wechat\wechat_links.txt --out-dir examples\content\wechat\wechat-daily
+
+python skills\content-collection\cls-telegraph-collector\scripts\collect_cls_telegraph.py --limit 50 --out-dir examples\content\cls\cls-telegraph
 
 python skills\stock-selection\yc-buy-selector\scripts\screen_yc_buy.py --repo sources\upstream-repos\YC-buy\YC-buy-main --codes 000001,600519,000333 --source sample --mode both
 
@@ -60,5 +63,6 @@ python skills\market-data\ftshare-market-data\run.py stock-quotes-list --order_b
 - 在 `src/skill_lab/stock_selection` 抽出策略评分与报告生成。
 - 在 `src/skill_lab/tracking` 抽出观察池 schema、周期分类、规则触发和定时报告。
 - 给微信公众号采集技能增加浏览器导出 HTML 的辅助流程。
+- 给财联社电报采集增加去重增量归档和主题聚类。
 - 给三个技能补统一 smoke test。
 - 增加技能版本号和变更记录字段。

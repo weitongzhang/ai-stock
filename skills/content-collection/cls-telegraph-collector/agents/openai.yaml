@@ -1,0 +1,3 @@
+display_name: CLS Telegraph Collector
+short_description: 财联社 7x24 电报采集归档与快讯摘要助手
+default_prompt: 采集财联社电报，保存滚动快讯的CSV、JSON、Markdown摘要，并按关键词或时间过滤。

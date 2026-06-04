@@ -11,6 +11,7 @@ $skills = @{
   "yc-buy-selector" = "skills\stock-selection\yc-buy-selector"
   "watchlist-tracker" = "skills\tracking\watchlist-tracker"
   "wechat-official-collector" = "skills\content-collection\wechat-official-collector"
+  "cls-telegraph-collector" = "skills\content-collection\cls-telegraph-collector"
 }
 
 if ($Skill -and -not $skills.ContainsKey($Skill)) {

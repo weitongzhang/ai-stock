@@ -84,19 +84,22 @@ src/skill_lab/tracking/
 
 ### Content Collection Layer
 
-Owned by `wechat-official-collector`.
+Owned by `wechat-official-collector` and `cls-telegraph-collector`.
 
 Responsibilities:
 
 - 采集用户提供的公众号文章 URL 或本地 HTML。
 - 保存 HTML、图片、图文 Markdown、评论文件。
 - 输出每日 digest 和 CSV。
+- 采集财联社 7x24 电报列表，标准化为 CSV/JSON/Markdown。
+- 支持按关键词、时间窗口筛选快讯，用于市场信息监控和情绪复盘。
 
 Future module:
 
 ```text
 src/skill_lab/content_collection/
   wechat_article.py
+  cls_telegraph.py
   markdown_render.py
   comments.py
 ```

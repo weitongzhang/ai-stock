@@ -1,6 +1,6 @@
 # Skills Engineering Workspace
 
-这个工程用于持续开发、调优和工程化管理 Codex 技能。当前聚焦四类能力：金融市场数据、A 股技术选股、长中短周期跟踪、微信公众号文章采集。
+这个工程用于持续开发、调优和工程化管理 Codex 技能。当前聚焦四类能力：金融市场数据、A 股技术选股、长中短周期跟踪、内容信息采集。
 
 ## Code Map
 
@@ -22,6 +22,7 @@ skills-engineering-workspace/
       watchlist-tracker/
     content-collection/
       wechat-official-collector/
+      cls-telegraph-collector/
 
   src/skill_lab/          # 未来沉淀的可复用实现层
     market_data/
@@ -40,6 +41,7 @@ skills-engineering-workspace/
     market/stock-selection/
     market/tracking/
     content/wechat/
+    content/cls/
 
   tests/smoke/            # 最小可执行验证
   tools/                  # 同步、校验、脚手架等工程工具
@@ -54,6 +56,8 @@ skills-engineering-workspace/
 `watchlist-tracker` 是观察池跟踪层，用于长期/中期/短期跟踪想持续关注的标的、板块、主题、ETF 和指数，记录逻辑、关键位、触发条件、失效条件和下次检查时间。
 
 `wechat-official-collector` 是内容采集层，负责采集用户提供的微信公众号文章链接或 HTML，保存正文、图片、评论状态、图文 Markdown 和每日摘要。
+
+`cls-telegraph-collector` 是财联社电报采集层，负责抓取 `https://www.cls.cn/telegraph` 对应的 7x24 快讯列表，保存 CSV、JSON、Markdown 摘要，并支持关键词和时间过滤。
 
 ## Design Philosophy
 
@@ -82,7 +86,7 @@ FTShare provider
 1. 在 `src/skill_lab/market_data` 实现统一数据 provider，优先接 FTShare，保留 sample/akshare fallback。
 2. 在 `src/skill_lab/stock_selection` 抽象 YC-buy 策略 engine、评分模型、风险过滤和报告生成。
 3. 在 `src/skill_lab/tracking` 抽象观察池 schema、周期分类、规则触发、定时报告和 market-data enrichment。
-4. 在 `src/skill_lab/content_collection` 抽出公众号正文清洗、图片下载、评论抓取和 Markdown 渲染模块。
+4. 在 `src/skill_lab/content_collection` 抽出公众号正文清洗、图片下载、评论抓取、财联社电报标准化和 Markdown 渲染模块。
 5. 在 `tests/smoke` 增加四个领域的最小自动化测试。
 6. 在 `tools/` 完善同步运行副本、技能校验和脚手架命令。
 7. 后续新增技能时，先归入领域目录；若出现跨技能复用，再下沉到 `src/skill_lab/`。
@@ -92,3 +96,4 @@ FTShare provider
 - 股票筛选结果仅供技术研究，不构成投资建议。
 - 微信公众号采集不绕过登录、付费、访问控制或反爬限制。
 - 评论抓取只使用用户提供的合法登录态；没有 session 时保留失败状态。
+- 财联社电报采集只使用公开页面/公开 JSON，不绕过验证码、登录、付费或访问频率限制。
