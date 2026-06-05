@@ -69,7 +69,7 @@ The script writes:
 - `<date>-index-environment.csv`: major index trend and style environment.
 - `<date>-market-flow.csv`: theme score table.
 - `<date>-market-flow.md`: readable market state and next-day observation plan.
-- `<date>-daily-review.md`: post-market review with breadth, fragmentation, leading theme internal movement, tomorrow attack plan, and risk warnings.
+- `<date>-daily-review.md`: post-market review with breadth, fragmentation, leading theme internal movement, tomorrow attack plan, attack target pool, and risk warnings.
 
 ## Reading The Result
 

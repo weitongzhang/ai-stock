@@ -71,8 +71,28 @@ def stock_name(row: dict[str, Any]) -> str:
     return ""
 
 
+def stock_code(row: dict[str, Any]) -> str:
+    for key in ("ts_code", "code", "代码", "symbol"):
+        if row.get(key):
+            return str(row[key]).strip()
+    return ""
+
+
 def row_text(row: dict[str, Any]) -> str:
     return " ".join(str(v) for v in row.values() if v is not None)
+
+
+def split_stock_names(text: Any) -> list[str]:
+    if not text:
+        return []
+    value = str(text)
+    for sep in ("、", "/", "，", ",", "；", ";", "|"):
+        value = value.replace(sep, "、")
+    return [item.strip() for item in value.split("、") if item.strip()]
+
+
+def md_cell(value: Any) -> str:
+    return str(value or "").replace("|", "/").replace("\n", " ").strip()
 
 
 def theme_words(row: dict[str, Any]) -> list[str]:
@@ -245,13 +265,80 @@ def action_level(score: float, structure: str, breadth_stage: str, fragmentation
     return "放弃"
 
 
+def target_role(action: str, structure: str, row: dict[str, Any] | None) -> str:
+    text = row_text(row or {})
+    status = str((row or {}).get("status") or "")
+    if "炸" in text:
+        return "风险样本"
+    if action == "主攻":
+        if "首板" in text:
+            return "补涨前排"
+        if "连板" in status or "2" in status or "3" in status:
+            return "晋级前排"
+        return "进攻核心"
+    if action == "核心低吸":
+        return "容量核心"
+    if action == "观察":
+        return "观察前排"
+    if action == "只观察":
+        return "只看承接"
+    return "不参与"
+
+
+def build_target_pool(item: dict[str, Any], matched: list[dict[str, Any]]) -> list[dict[str, str]]:
+    targets: list[dict[str, str]] = []
+    seen: set[str] = set()
+    for row in matched:
+        name = stock_name(row)
+        if not name:
+            continue
+        key = stock_code(row) or name
+        if key in seen or name in seen:
+            continue
+        seen.add(key)
+        seen.add(name)
+        role = target_role(item["action"], item["structure"], row)
+        trigger = "竞价强于同方向，开盘承接不破分时均线；弱转强或前排晋级时再确认。"
+        if role == "风险样本":
+            trigger = "只作为风险观察；若继续冲高回落或封不住，降低该方向进攻级别。"
+        elif role in {"补涨前排", "晋级前排"}:
+            trigger = "竞价排名靠前，开盘主动上攻，封单/成交质量优于同方向后排。"
+        elif role == "容量核心":
+            trigger = "分歧低吸逻辑，只看放量承接和回踩不破关键均线，不追高。"
+        targets.append({
+            "theme": item["theme"],
+            "name": name,
+            "code": stock_code(row),
+            "role": role,
+            "status": str(row.get("status") or row.get("tag") or ""),
+            "trigger": trigger,
+            "risk": item["give_up"],
+        })
+
+    for name in split_stock_names(item.get("core")):
+        if name in seen:
+            continue
+        seen.add(name)
+        targets.append({
+            "theme": item["theme"],
+            "name": name,
+            "code": "",
+            "role": target_role(item["action"], item["structure"], None),
+            "status": "核心池",
+            "trigger": "先看竞价强弱和板块同步性；只有核心强、板块有扩散时才进入执行。",
+            "risk": item["give_up"],
+        })
+    return targets[:5]
+
+
 def build_attack_plan(themes: list[dict[str, Any]], kpl_rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
     plan: list[dict[str, Any]] = []
     sorted_themes = sorted(themes, key=lambda row: num(row.get("total_score") or row.get("score")), reverse=True)
     for row in sorted_themes[:4]:
+        matched = match_kpl_rows(row, kpl_rows)
         structure, reasons, strategy = classify_internal_structure(row, kpl_rows)
         score = num(row.get("total_score") or row.get("score"))
-        plan.append({
+        item = {
             "theme": row.get("theme") or row.get("主题") or "未命名主题",
             "score": score,
             "stance": row.get("stance") or row.get("动作") or "",
@@ -261,7 +348,9 @@ def build_attack_plan(themes: list[dict[str, Any]], kpl_rows: list[dict[str, Any
             "core": row.get("core_names") or row.get("candidates") or row.get("kpl_stocks") or "等待盘中确认",
             "confirm": row.get("confirm_signal") or "前排竞价强于板块，容量核心放量不破分时均线。",
             "give_up": row.get("give_up_signal") or "前排炸板、核心冲高回落，或板块无量无扩散。",
-        })
+        }
+        item["matched_rows"] = matched
+        plan.append(item)
     return plan
 
 
@@ -302,8 +391,16 @@ def write_report(
 ) -> None:
     for item in attack_plan:
         item["action"] = action_level(item["score"], item["structure"], breadth_stage, fragmentation)
+        item["targets"] = build_target_pool(item, item.get("matched_rows") or [])
     review_sentence = build_review_sentence(index_stage, breadth_stage, fragmentation, attack_plan)
     position_advice = build_position_advice(index_stage, breadth_stage, fragmentation)
+    attack_targets = [
+        target
+        for item in attack_plan
+        if item["action"] in {"主攻", "核心低吸", "观察", "只观察"}
+        for target in item.get("targets", [])
+        if target["role"] != "不参与"
+    ]
     lines = [
         f"# {report_date} A股盘后复盘报告",
         "",
@@ -331,6 +428,23 @@ def write_report(
             f"| {idx} | {item['theme']} | {item['action']} | {item['structure']} | "
             f"{item['core']} | {item['confirm']} | {item['give_up']} |"
         )
+    lines.extend([
+        "",
+        "## 明日进攻标的池",
+        "",
+        "| 优先级 | 标的 | 方向 | 角色 | 状态 | 触发方式 | 风险/放弃 |",
+        "|---:|---|---|---|---|---|---|",
+    ])
+    if attack_targets:
+        for idx, target in enumerate(attack_targets[:12], start=1):
+            code = f"（{target['code']}）" if target["code"] else ""
+            lines.append(
+                f"| {idx} | {md_cell(target['name'])}{code} | {md_cell(target['theme'])} | "
+                f"{md_cell(target['role'])} | {md_cell(target['status'])} | "
+                f"{md_cell(target['trigger'])} | {md_cell(target['risk'])} |"
+            )
+    else:
+        lines.append("| 1 | 暂无 | 数据不足 | 等待确认 | - | 先补充开盘啦/涨停/龙虎榜样本。 | 不做无标的方向。 |")
     lines.extend([
         "",
         "## 今日市场环境",
@@ -368,6 +482,11 @@ def write_report(
             f"- 核心观察：{item['core']}",
             f"- 内部判断：{item['strategy']}",
         ])
+        if item.get("targets"):
+            target_names = "、".join(
+                f"{target['name']}({target['role']})" for target in item["targets"][:4]
+            )
+            lines.append(f"- 标的池：{target_names}")
         for reason in item["reasons"][:3]:
             lines.append(f"- 依据：{reason}")
         lines.append("")
