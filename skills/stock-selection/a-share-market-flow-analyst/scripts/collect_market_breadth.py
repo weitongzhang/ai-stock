@@ -335,8 +335,9 @@ def write_markdown(path: Path, report_date: str, rows: list[dict[str, Any]], his
         return f"{row['value']}{note}" if note in {"%", "亿元"} else str(row["value"])
 
     stage, strategy, reasons = classify_breadth(rows)
+    current_status = val("今日涨跌停数据状态")
     lines = [
-        f"# {report_date} A股市场宽度快照",
+        f"# {report_date} A股市场宽度报告",
         "",
         "> 研究用途，非投资建议。",
         "",
@@ -344,49 +345,50 @@ def write_markdown(path: Path, report_date: str, rows: list[dict[str, Any]], his
         "",
         strategy,
         "",
-        "依据：",
+        "## 关键依据",
     ]
     lines.extend(f"- {reason}" for reason in reasons)
-    lines.extend([
-        "",
-        "## 核心指标",
-        "",
-        f"- 两市成交额：{val('两市成交额')}",
-        f"- 涨跌家数：上涨 {val('上涨家数')} / 下跌 {val('下跌家数')} / 平盘 {val('平盘家数')}",
-        f"- 涨跌停：涨停 {val('涨停数')} / 炸板 {val('炸板数')} / 跌停 {val('跌停数')}",
-        f"- 情绪质量：封板率 {val('封板率')}，炸板率 {val('炸板率')}",
-        f"- 连板结构：连板 {val('连板家数')}，最高连板 {val('最高连板')}",
-        "",
-    ])
+    lines.extend(["", "## 今日宽度", ""])
+    if current_status == "未更新":
+        lines.extend([
+            "- 今日涨跌停池：未更新",
+            "- 当前不使用 0 涨停 / 0 炸板 / 0 跌停判断盘面强弱",
+            "",
+        ])
+    else:
+        lines.extend([
+            f"- 涨跌停：涨停 {val('涨停数')} / 炸板 {val('炸板数')} / 跌停 {val('跌停数')}",
+            f"- 情绪质量：封板率 {val('封板率')}，炸板率 {val('炸板率')}",
+            f"- 最高连板：{val('最高连板')}",
+            "",
+        ])
     if history:
         lines.extend([
-            "## 近几日背景",
+            "## 近 5 日背景",
             "",
-            "| 日期 | 涨停 | 炸板 | 跌停 | 封板率 | 炸板率 | 连板家数 | 最高连板 |",
-            "|---|---:|---:|---:|---:|---:|---:|---:|",
+            "| 日期 | 涨停 | 炸板 | 跌停 | 封板率 | 炸板率 | 最高连板 |",
+            "|---|---:|---:|---:|---:|---:|---:|",
         ])
         for item in history:
             lines.append(
                 f"| {item['date']} | {item['limit_up_count']} | {item['failed_limit_up_count']} | "
                 f"{item['limit_down_count']} | {item['seal_rate']} | {item['failed_limit_up_rate']} | "
-                f"{item['double_limit_up_count']} | {item['highest_limit_streak']} |"
+                f"{item['highest_limit_streak']} |"
             )
         lines.extend([
             "",
-            f"- 涨停趋势差：{val('涨停趋势差')}，炸板率趋势差：{val('炸板率趋势差')}，跌停趋势差：{val('跌停趋势差')}",
+            "## 操作含义",
+            "",
+            "- 盘前或数据未更新时，不用 0 涨停/0 炸板判断弱势。",
+            "- 早盘以真实涨停扩散、炸板率和跌停数量确认进攻性。",
+            "- 封板率继续高、跌停维持低位时，优先观察主线前排。",
+            "- 炸板率快速升高时，降低追高和后排套利。",
             "",
         ])
-    lines.extend([
-        "## 明细",
-        "",
-        "| 指标 | 数值 | 来源 | 备注 |",
-        "|---|---:|---|---|",
-    ])
-    for row in rows:
-        lines.append(f"| {row['metric']} | {row['value']} | {row['source']} | {row.get('note', '')} |")
     if errors:
-        lines.extend(["", "## 采集限制", ""])
+        lines.extend(["", "## 数据说明", ""])
         lines.extend(f"- {error}" for error in errors)
+    lines.extend(["", "详细数据已保存在同名 CSV/JSON 文件中。"])
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
