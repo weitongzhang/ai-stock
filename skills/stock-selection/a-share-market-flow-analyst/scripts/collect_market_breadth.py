@@ -136,6 +136,17 @@ def collect_single_day_limit_snapshot(ak: Any, trade_date: str, retries: int, sl
     }, errors
 
 
+def is_empty_limit_snapshot(snapshot: dict[str, Any] | None) -> bool:
+    if not snapshot:
+        return True
+    return (
+        number(snapshot.get("limit_up_count")) == 0
+        and number(snapshot.get("failed_limit_up_count")) == 0
+        and number(snapshot.get("limit_down_count")) == 0
+        and number(snapshot.get("highest_limit_streak")) == 0
+    )
+
+
 def collect_limit_history(ak: Any, end_trade_date: str, days: int, retries: int, sleep_seconds: float) -> tuple[list[dict[str, Any]], list[str]]:
     history: list[dict[str, Any]] = []
     errors: list[str] = []
@@ -147,7 +158,7 @@ def collect_limit_history(ak: Any, end_trade_date: str, days: int, retries: int,
             trade_date = cursor.strftime("%Y%m%d")
             snapshot, day_errors = collect_single_day_limit_snapshot(ak, trade_date, retries, sleep_seconds)
             errors.extend(f"{trade_date}: {error}" for error in day_errors)
-            if snapshot:
+            if snapshot and not is_empty_limit_snapshot(snapshot):
                 history.append(snapshot)
         cursor -= timedelta(days=1)
     return sorted(history, key=lambda item: item["trade_date"]), errors
@@ -216,6 +227,24 @@ def write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
 
 def classify_breadth(rows: list[dict[str, Any]]) -> tuple[str, str, list[str]]:
     by_metric = {str(row["metric"]): number(row.get("value")) for row in rows}
+    status_by_metric = {str(row.get("metric")): str(row.get("value")) for row in rows}
+    if status_by_metric.get("今日涨跌停数据状态") == "未更新":
+        reasons = ["今日涨跌停池仍为空，当前不作为真实盘面宽度判断"]
+        if by_metric.get("近N日样本数", 0.0) >= 3:
+            reasons.append("近几日背景已保留，可用于盘前制定观察计划")
+            limit_trend = by_metric.get("涨停趋势差", 0.0)
+            failed_rate_trend = by_metric.get("炸板率趋势差", 0.0)
+            down_trend = by_metric.get("跌停趋势差", 0.0)
+            if limit_trend > 10:
+                reasons.append("最近已完成交易日涨停数高于前期均值，背景偏修复")
+            elif limit_trend < -10:
+                reasons.append("最近已完成交易日涨停数低于前期均值，背景偏收缩")
+            if failed_rate_trend < -5:
+                reasons.append("最近已完成交易日炸板率低于前期均值，封板质量改善")
+            if down_trend < 0:
+                reasons.append("最近已完成交易日跌停数低于前期均值，亏钱效应收敛")
+        reasons.append("成交额和涨跌家数缺失，仓位结论需要保守使用")
+        return "盘前/待确认", "今天盘面宽度尚未形成，先参考最近已完成交易日背景；等9:35-10:00后重新采集，再决定是否提高进攻性。", reasons
     limit_up = by_metric.get("涨停数", 0.0)
     failed_rate = by_metric.get("炸板率", 0.0)
     limit_down = by_metric.get("跌停数", 0.0)
@@ -385,6 +414,14 @@ def main() -> int:
     if not args.skip_spot:
         collect_spot(ak, rows, errors, args.retries, args.sleep)
     collect_limit_pools(ak, trade_date, rows, errors, args.retries, args.sleep)
+    current_snapshot = {
+        "limit_up_count": read_metric(rows, "涨停数") or 0.0,
+        "failed_limit_up_count": read_metric(rows, "炸板数") or 0.0,
+        "limit_down_count": read_metric(rows, "跌停数") or 0.0,
+        "highest_limit_streak": read_metric(rows, "最高连板") or 0.0,
+    }
+    if is_empty_limit_snapshot(current_snapshot):
+        add_metric(rows, "今日涨跌停数据状态", "未更新", "derived:current_limit_pools", "盘前或数据源未更新")
     if not args.skip_fund_flow:
         collect_market_fund_flow(ak, rows, errors, args.retries, args.sleep)
     history: list[dict[str, Any]] = []
