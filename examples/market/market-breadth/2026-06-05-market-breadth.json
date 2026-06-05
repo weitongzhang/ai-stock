@@ -32,6 +32,12 @@
       "note": "%"
     },
     {
+      "metric": "涨跌停强弱比",
+      "value": 0.0,
+      "source": "derived:eastmoney_limit_pools",
+      "note": ""
+    },
+    {
       "metric": "今日涨跌停数据状态",
       "value": "未更新",
       "source": "derived:current_limit_pools",
@@ -68,6 +74,12 @@
       "note": ""
     },
     {
+      "metric": "近几日涨跌停强弱比均值",
+      "value": 4.22,
+      "source": "derived:market_breadth_history",
+      "note": ""
+    },
+    {
       "metric": "涨停趋势差",
       "value": 4.5,
       "source": "derived:market_breadth_history",
@@ -90,6 +102,12 @@
       "value": 0.25,
       "source": "derived:market_breadth_history",
       "note": ""
+    },
+    {
+      "metric": "涨跌停强弱比趋势差",
+      "value": 7.21,
+      "source": "derived:market_breadth_history",
+      "note": ""
     }
   ],
   "history": [
@@ -101,6 +119,7 @@
       "limit_down_count": 50,
       "seal_rate": 56.32,
       "failed_limit_up_rate": 43.68,
+      "limit_up_down_ratio": 0.98,
       "limit_up_seal_amount_yi": 33.5,
       "double_limit_up_count": 9,
       "highest_limit_streak": 5
@@ -113,6 +132,7 @@
       "limit_down_count": 21,
       "seal_rate": 74.53,
       "failed_limit_up_rate": 25.47,
+      "limit_up_down_ratio": 5.71,
       "limit_up_seal_amount_yi": 88.49,
       "double_limit_up_count": 11,
       "highest_limit_streak": 4
@@ -125,6 +145,7 @@
       "limit_down_count": 16,
       "seal_rate": 76.14,
       "failed_limit_up_rate": 23.86,
+      "limit_up_down_ratio": 4.19,
       "limit_up_seal_amount_yi": 75.76,
       "double_limit_up_count": 16,
       "highest_limit_streak": 3
@@ -137,6 +158,7 @@
       "limit_down_count": 11,
       "seal_rate": 56.41,
       "failed_limit_up_rate": 43.59,
+      "limit_up_down_ratio": 6.0,
       "limit_up_seal_amount_yi": 58.25,
       "double_limit_up_count": 11,
       "highest_limit_streak": 3
@@ -149,6 +171,7 @@
       "limit_down_count": 7,
       "seal_rate": 80.81,
       "failed_limit_up_rate": 19.19,
+      "limit_up_down_ratio": 11.43,
       "limit_up_seal_amount_yi": 81.13,
       "double_limit_up_count": 10,
       "highest_limit_streak": 4

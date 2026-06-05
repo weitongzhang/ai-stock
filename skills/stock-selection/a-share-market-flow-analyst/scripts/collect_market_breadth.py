@@ -97,12 +97,16 @@ def collect_limit_pools(ak: Any, trade_date: str, rows: list[dict[str, Any]], er
 
     limit_up = counts.get("涨停数")
     failed = counts.get("炸板数")
+    limit_down = counts.get("跌停数")
     if limit_up is not None and failed is not None:
         denominator = limit_up + failed
         failed_rate = round(failed / denominator * 100, 2) if denominator else 0.0
         seal_rate = round(limit_up / denominator * 100, 2) if denominator else 0.0
         add_metric(rows, "炸板率", failed_rate, "derived:eastmoney_limit_pools", "%")
         add_metric(rows, "封板率", seal_rate, "derived:eastmoney_limit_pools", "%")
+    if limit_up is not None and limit_down is not None:
+        limit_up_down_ratio = round(limit_up / max(limit_down, 1), 2)
+        add_metric(rows, "涨跌停强弱比", limit_up_down_ratio, "derived:eastmoney_limit_pools")
 
 
 def read_metric(rows: list[dict[str, Any]], metric: str) -> float | None:
@@ -130,6 +134,7 @@ def collect_single_day_limit_snapshot(ak: Any, trade_date: str, retries: int, sl
         "limit_down_count": int(limit_down or 0),
         "seal_rate": read_metric(rows, "封板率") or 0.0,
         "failed_limit_up_rate": read_metric(rows, "炸板率") or 0.0,
+        "limit_up_down_ratio": read_metric(rows, "涨跌停强弱比") or 0.0,
         "limit_up_seal_amount_yi": read_metric(rows, "涨停封板资金") or 0.0,
         "double_limit_up_count": int(read_metric(rows, "连板家数") or 0),
         "highest_limit_streak": int(read_metric(rows, "最高连板") or 0),
@@ -176,14 +181,17 @@ def append_history_metrics(rows: list[dict[str, Any]], history: list[dict[str, A
     prev_failed_rate_avg = sum(number(x.get("failed_limit_up_rate")) for x in previous) / len(previous)
     prev_down_avg = sum(number(x.get("limit_down_count")) for x in previous) / len(previous)
     prev_streak_avg = sum(number(x.get("highest_limit_streak")) for x in previous) / len(previous)
+    prev_ratio_avg = sum(number(x.get("limit_up_down_ratio")) for x in previous) / len(previous)
     add_metric(rows, "近几日涨停均值", round(prev_limit_avg, 2), "derived:market_breadth_history")
     add_metric(rows, "近几日炸板率均值", round(prev_failed_rate_avg, 2), "derived:market_breadth_history", "%")
     add_metric(rows, "近几日跌停均值", round(prev_down_avg, 2), "derived:market_breadth_history")
     add_metric(rows, "近几日最高连板均值", round(prev_streak_avg, 2), "derived:market_breadth_history")
+    add_metric(rows, "近几日涨跌停强弱比均值", round(prev_ratio_avg, 2), "derived:market_breadth_history")
     add_metric(rows, "涨停趋势差", round(number(latest.get("limit_up_count")) - prev_limit_avg, 2), "derived:market_breadth_history")
     add_metric(rows, "炸板率趋势差", round(number(latest.get("failed_limit_up_rate")) - prev_failed_rate_avg, 2), "derived:market_breadth_history", "%")
     add_metric(rows, "跌停趋势差", round(number(latest.get("limit_down_count")) - prev_down_avg, 2), "derived:market_breadth_history")
     add_metric(rows, "连板高度趋势差", round(number(latest.get("highest_limit_streak")) - prev_streak_avg, 2), "derived:market_breadth_history")
+    add_metric(rows, "涨跌停强弱比趋势差", round(number(latest.get("limit_up_down_ratio")) - prev_ratio_avg, 2), "derived:market_breadth_history")
 
 
 def write_history_csv(path: Path, history: list[dict[str, Any]]) -> None:
@@ -196,6 +204,7 @@ def write_history_csv(path: Path, history: list[dict[str, Any]]) -> None:
         "limit_down_count",
         "seal_rate",
         "failed_limit_up_rate",
+        "limit_up_down_ratio",
         "limit_up_seal_amount_yi",
         "double_limit_up_count",
         "highest_limit_streak",
@@ -249,6 +258,7 @@ def classify_breadth(rows: list[dict[str, Any]]) -> tuple[str, str, list[str]]:
     failed_rate = by_metric.get("炸板率", 0.0)
     limit_down = by_metric.get("跌停数", 0.0)
     highest = by_metric.get("最高连板", 0.0)
+    limit_ratio = by_metric.get("涨跌停强弱比", 0.0)
     limit_trend = by_metric.get("涨停趋势差", 0.0)
     failed_rate_trend = by_metric.get("炸板率趋势差", 0.0)
     down_trend = by_metric.get("跌停趋势差", 0.0)
@@ -282,6 +292,13 @@ def classify_breadth(rows: list[dict[str, Any]]) -> tuple[str, str, list[str]]:
     elif limit_down >= 25:
         score -= 2
         reasons.append("跌停数量偏多，亏钱效应扩散")
+
+    if limit_ratio > 7:
+        score += 1
+        reasons.append("涨跌停强弱比大于7，短线赚钱效应占优")
+    elif 0 < limit_ratio < 7:
+        score -= 1
+        reasons.append("涨跌停强弱比小于7，短线行情偏弱")
 
     if highest >= 6:
         score += 1
@@ -358,6 +375,7 @@ def write_markdown(path: Path, report_date: str, rows: list[dict[str, Any]], his
     else:
         lines.extend([
             f"- 涨跌停：涨停 {val('涨停数')} / 炸板 {val('炸板数')} / 跌停 {val('跌停数')}",
+            f"- 涨跌停强弱比：{val('涨跌停强弱比')}（>7 偏好，<7 偏弱）",
             f"- 情绪质量：封板率 {val('封板率')}，炸板率 {val('炸板率')}",
             f"- 最高连板：{val('最高连板')}",
             "",
@@ -366,13 +384,14 @@ def write_markdown(path: Path, report_date: str, rows: list[dict[str, Any]], his
         lines.extend([
             "## 近 5 日背景",
             "",
-            "| 日期 | 涨停 | 炸板 | 跌停 | 封板率 | 炸板率 | 最高连板 |",
-            "|---|---:|---:|---:|---:|---:|---:|",
+            "| 日期 | 涨停 | 炸板 | 跌停 | 强弱比 | 封板率 | 炸板率 | 最高连板 |",
+            "|---|---:|---:|---:|---:|---:|---:|---:|",
         ])
         for item in history:
             lines.append(
                 f"| {item['date']} | {item['limit_up_count']} | {item['failed_limit_up_count']} | "
-                f"{item['limit_down_count']} | {item['seal_rate']} | {item['failed_limit_up_rate']} | "
+                f"{item['limit_down_count']} | {item.get('limit_up_down_ratio', 0)} | "
+                f"{item['seal_rate']} | {item['failed_limit_up_rate']} | "
                 f"{item['highest_limit_streak']} |"
             )
         lines.extend([
@@ -381,6 +400,7 @@ def write_markdown(path: Path, report_date: str, rows: list[dict[str, Any]], his
             "",
             "- 盘前或数据未更新时，不用 0 涨停/0 炸板判断弱势。",
             "- 早盘以真实涨停扩散、炸板率和跌停数量确认进攻性。",
+            "- 涨跌停强弱比大于 7 时，短线赚钱效应更友好；小于 7 时谨慎追高。",
             "- 封板率继续高、跌停维持低位时，优先观察主线前排。",
             "- 炸板率快速升高时，降低追高和后排套利。",
             "",

@@ -4,13 +4,16 @@
 跌停数,0,eastmoney:stock_zt_pool_dtgc_em,
 炸板率,0.0,derived:eastmoney_limit_pools,%
 封板率,0.0,derived:eastmoney_limit_pools,%
+涨跌停强弱比,0.0,derived:eastmoney_limit_pools,
 今日涨跌停数据状态,未更新,derived:current_limit_pools,盘前或数据源未更新
 近N日样本数,5,derived:market_breadth_history,
 近几日涨停均值,75.5,derived:market_breadth_history,
 近几日炸板率均值,34.15,derived:market_breadth_history,%
 近几日跌停均值,24.5,derived:market_breadth_history,
 近几日最高连板均值,3.75,derived:market_breadth_history,
+近几日涨跌停强弱比均值,4.22,derived:market_breadth_history,
 涨停趋势差,4.5,derived:market_breadth_history,
 炸板率趋势差,-14.96,derived:market_breadth_history,%
 跌停趋势差,-17.5,derived:market_breadth_history,
 连板高度趋势差,0.25,derived:market_breadth_history,
+涨跌停强弱比趋势差,7.21,derived:market_breadth_history,
