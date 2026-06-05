@@ -15,7 +15,7 @@ python ..\..\skills\content-collection\cls-telegraph-collector\scripts\collect_c
 
 python ..\..\skills\content-collection\cls-telegraph-collector\scripts\analyze_cls_market_plan.py --input ..\..\examples\content\cls\cls-telegraph\2026-06-04-cls-telegraph.json --input ..\..\examples\content\cls\cls-telegraph-red\2026-06-04-cls-telegraph.json --out-dir ..\..\examples\market\cls-market-plan
 
-python ..\..\skills\stock-selection\a-share-market-flow-analyst\scripts\collect_market_breadth.py --date 2026-06-04 --out-dir ..\..\examples\market\market-breadth
+python ..\..\skills\stock-selection\a-share-market-flow-analyst\scripts\collect_market_breadth.py --date 2026-06-04 --history-days 5 --out-dir ..\..\examples\market\market-breadth
 
 python ..\..\skills\stock-selection\a-share-market-flow-analyst\scripts\analyze_market_flow.py --date 2026-06-04 --cls-plan ..\..\examples\market\cls-market-plan-kpl\2026-06-04-cls-market-plan.csv --kpl ..\..\examples\market\tushare-kpl\sample-tushare-kpl.csv --lhb ..\..\examples\market\dragon-tiger\20260604-eastmoney-lhb.csv --market ..\..\examples\market\market-breadth\2026-06-04-market-breadth.csv --out-dir ..\..\examples\market\market-flow
 ```

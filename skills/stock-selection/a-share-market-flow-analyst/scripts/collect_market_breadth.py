@@ -13,7 +13,7 @@ import argparse
 import csv
 import json
 import time
-from datetime import date
+from datetime import date, datetime, timedelta
 from pathlib import Path
 from typing import Any, Callable
 
@@ -105,6 +105,96 @@ def collect_limit_pools(ak: Any, trade_date: str, rows: list[dict[str, Any]], er
         add_metric(rows, "封板率", seal_rate, "derived:eastmoney_limit_pools", "%")
 
 
+def read_metric(rows: list[dict[str, Any]], metric: str) -> float | None:
+    for row in rows:
+        if row.get("metric") == metric:
+            return number(row.get("value"))
+    return None
+
+
+def collect_single_day_limit_snapshot(ak: Any, trade_date: str, retries: int, sleep_seconds: float) -> tuple[dict[str, Any] | None, list[str]]:
+    rows: list[dict[str, Any]] = []
+    errors: list[str] = []
+    collect_limit_pools(ak, trade_date, rows, errors, retries, sleep_seconds)
+    limit_up = read_metric(rows, "涨停数")
+    failed = read_metric(rows, "炸板数")
+    limit_down = read_metric(rows, "跌停数")
+    if limit_up is None and failed is None and limit_down is None:
+        return None, errors
+    report_date = f"{trade_date[:4]}-{trade_date[4:6]}-{trade_date[6:]}"
+    return {
+        "date": report_date,
+        "trade_date": trade_date,
+        "limit_up_count": int(limit_up or 0),
+        "failed_limit_up_count": int(failed or 0),
+        "limit_down_count": int(limit_down or 0),
+        "seal_rate": read_metric(rows, "封板率") or 0.0,
+        "failed_limit_up_rate": read_metric(rows, "炸板率") or 0.0,
+        "limit_up_seal_amount_yi": read_metric(rows, "涨停封板资金") or 0.0,
+        "double_limit_up_count": int(read_metric(rows, "连板家数") or 0),
+        "highest_limit_streak": int(read_metric(rows, "最高连板") or 0),
+    }, errors
+
+
+def collect_limit_history(ak: Any, end_trade_date: str, days: int, retries: int, sleep_seconds: float) -> tuple[list[dict[str, Any]], list[str]]:
+    history: list[dict[str, Any]] = []
+    errors: list[str] = []
+    end_date = datetime.strptime(end_trade_date, "%Y%m%d").date()
+    cursor = end_date
+    max_calendar_days = max(days * 3, 10)
+    while len(history) < days and (end_date - cursor).days <= max_calendar_days:
+        if cursor.weekday() < 5:
+            trade_date = cursor.strftime("%Y%m%d")
+            snapshot, day_errors = collect_single_day_limit_snapshot(ak, trade_date, retries, sleep_seconds)
+            errors.extend(f"{trade_date}: {error}" for error in day_errors)
+            if snapshot:
+                history.append(snapshot)
+        cursor -= timedelta(days=1)
+    return sorted(history, key=lambda item: item["trade_date"]), errors
+
+
+def append_history_metrics(rows: list[dict[str, Any]], history: list[dict[str, Any]]) -> None:
+    if not history:
+        return
+    latest = history[-1]
+    previous = history[:-1]
+    add_metric(rows, "近N日样本数", len(history), "derived:market_breadth_history")
+    if not previous:
+        return
+    prev_limit_avg = sum(number(x.get("limit_up_count")) for x in previous) / len(previous)
+    prev_failed_rate_avg = sum(number(x.get("failed_limit_up_rate")) for x in previous) / len(previous)
+    prev_down_avg = sum(number(x.get("limit_down_count")) for x in previous) / len(previous)
+    prev_streak_avg = sum(number(x.get("highest_limit_streak")) for x in previous) / len(previous)
+    add_metric(rows, "近几日涨停均值", round(prev_limit_avg, 2), "derived:market_breadth_history")
+    add_metric(rows, "近几日炸板率均值", round(prev_failed_rate_avg, 2), "derived:market_breadth_history", "%")
+    add_metric(rows, "近几日跌停均值", round(prev_down_avg, 2), "derived:market_breadth_history")
+    add_metric(rows, "近几日最高连板均值", round(prev_streak_avg, 2), "derived:market_breadth_history")
+    add_metric(rows, "涨停趋势差", round(number(latest.get("limit_up_count")) - prev_limit_avg, 2), "derived:market_breadth_history")
+    add_metric(rows, "炸板率趋势差", round(number(latest.get("failed_limit_up_rate")) - prev_failed_rate_avg, 2), "derived:market_breadth_history", "%")
+    add_metric(rows, "跌停趋势差", round(number(latest.get("limit_down_count")) - prev_down_avg, 2), "derived:market_breadth_history")
+    add_metric(rows, "连板高度趋势差", round(number(latest.get("highest_limit_streak")) - prev_streak_avg, 2), "derived:market_breadth_history")
+
+
+def write_history_csv(path: Path, history: list[dict[str, Any]]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    fields = [
+        "date",
+        "trade_date",
+        "limit_up_count",
+        "failed_limit_up_count",
+        "limit_down_count",
+        "seal_rate",
+        "failed_limit_up_rate",
+        "limit_up_seal_amount_yi",
+        "double_limit_up_count",
+        "highest_limit_streak",
+    ]
+    with path.open("w", encoding="utf-8-sig", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=fields)
+        writer.writeheader()
+        writer.writerows(history)
+
+
 def collect_market_fund_flow(ak: Any, rows: list[dict[str, Any]], errors: list[str], retries: int, sleep_seconds: float) -> None:
     df = call_with_retry("stock_market_fund_flow", ak.stock_market_fund_flow, retries, sleep_seconds, errors)
     if df is None or len(df) == 0:
@@ -124,20 +214,111 @@ def write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
         writer.writerows(rows)
 
 
-def write_markdown(path: Path, report_date: str, rows: list[dict[str, Any]], errors: list[str]) -> None:
+def classify_breadth(rows: list[dict[str, Any]]) -> tuple[str, str, list[str]]:
+    by_metric = {str(row["metric"]): number(row.get("value")) for row in rows}
+    limit_up = by_metric.get("涨停数", 0.0)
+    failed_rate = by_metric.get("炸板率", 0.0)
+    limit_down = by_metric.get("跌停数", 0.0)
+    highest = by_metric.get("最高连板", 0.0)
+    limit_trend = by_metric.get("涨停趋势差", 0.0)
+    failed_rate_trend = by_metric.get("炸板率趋势差", 0.0)
+    down_trend = by_metric.get("跌停趋势差", 0.0)
+    sample_count = by_metric.get("近N日样本数", 1.0)
+
+    reasons: list[str] = []
+    score = 0
+    if limit_up >= 80:
+        score += 2
+        reasons.append("涨停家数处于较活跃区间")
+    elif limit_up >= 50:
+        score += 1
+        reasons.append("涨停家数处于可交易区间")
+    else:
+        score -= 1
+        reasons.append("涨停家数偏少，短线扩散不足")
+
+    if failed_rate <= 20:
+        score += 2
+        reasons.append("炸板率低，封板质量较好")
+    elif failed_rate <= 30:
+        score += 1
+        reasons.append("炸板率可控，但仍有分歧")
+    else:
+        score -= 2
+        reasons.append("炸板率偏高，追高失败率上升")
+
+    if limit_down <= 10:
+        score += 1
+        reasons.append("跌停数量未扩散，亏钱效应可控")
+    elif limit_down >= 25:
+        score -= 2
+        reasons.append("跌停数量偏多，亏钱效应扩散")
+
+    if highest >= 6:
+        score += 1
+        reasons.append("连板高度打开，短线风险偏好较强")
+    elif highest <= 3:
+        score -= 1
+        reasons.append("连板高度有限，资金更偏轮动而非抱团")
+
+    if sample_count >= 3:
+        if limit_trend > 10:
+            score += 1
+            reasons.append("涨停数高于近几日均值，情绪在加强")
+        elif limit_trend < -10:
+            score -= 1
+            reasons.append("涨停数低于近几日均值，扩散在收缩")
+        if failed_rate_trend < -5:
+            score += 1
+            reasons.append("炸板率低于近几日均值，封板质量改善")
+        elif failed_rate_trend > 5:
+            score -= 1
+            reasons.append("炸板率高于近几日均值，分歧升温")
+        if down_trend > 5:
+            score -= 1
+            reasons.append("跌停数高于近几日均值，防守需求上升")
+    if "两市成交额" not in {str(row.get("metric")) for row in rows} or "上涨家数" not in {str(row.get("metric")) for row in rows}:
+        reasons.append("成交额和涨跌家数缺失，仓位结论需要保守使用")
+
+    if score >= 5:
+        stage = "修复增强/局部进攻"
+        strategy = "明日可积极观察主线前排，但仍需竞价和开盘确认，不追后排一致性高潮。"
+    elif score >= 2:
+        stage = "结构性修复"
+        strategy = "明日适合小仓试错强主题前排或容量核心，弱分支只观察。"
+    elif score >= 0:
+        stage = "震荡试错"
+        strategy = "明日以确认后参与为主，优先低吸承接强的核心，减少追高。"
+    else:
+        stage = "分歧/防守"
+        strategy = "明日以防守为主，等待炸板率回落、跌停减少或新主线确认。"
+    return stage, strategy, reasons
+
+
+def write_markdown(path: Path, report_date: str, rows: list[dict[str, Any]], history: list[dict[str, Any]], errors: list[str]) -> None:
     by_metric = {str(row["metric"]): row for row in rows}
 
-    def val(metric: str, default: str = "-") -> str:
+    def val(metric: str, default: str = "暂无") -> str:
         row = by_metric.get(metric)
         if not row:
             return default
         note = str(row.get("note") or "")
         return f"{row['value']}{note}" if note in {"%", "亿元"} else str(row["value"])
 
+    stage, strategy, reasons = classify_breadth(rows)
     lines = [
         f"# {report_date} A股市场宽度快照",
         "",
         "> 研究用途，非投资建议。",
+        "",
+        f"## 结论：{stage}",
+        "",
+        strategy,
+        "",
+        "依据：",
+    ]
+    lines.extend(f"- {reason}" for reason in reasons)
+    lines.extend([
         "",
         "## 核心指标",
         "",
@@ -147,11 +328,31 @@ def write_markdown(path: Path, report_date: str, rows: list[dict[str, Any]], err
         f"- 情绪质量：封板率 {val('封板率')}，炸板率 {val('炸板率')}",
         f"- 连板结构：连板 {val('连板家数')}，最高连板 {val('最高连板')}",
         "",
+    ])
+    if history:
+        lines.extend([
+            "## 近几日背景",
+            "",
+            "| 日期 | 涨停 | 炸板 | 跌停 | 封板率 | 炸板率 | 连板家数 | 最高连板 |",
+            "|---|---:|---:|---:|---:|---:|---:|---:|",
+        ])
+        for item in history:
+            lines.append(
+                f"| {item['date']} | {item['limit_up_count']} | {item['failed_limit_up_count']} | "
+                f"{item['limit_down_count']} | {item['seal_rate']} | {item['failed_limit_up_rate']} | "
+                f"{item['double_limit_up_count']} | {item['highest_limit_streak']} |"
+            )
+        lines.extend([
+            "",
+            f"- 涨停趋势差：{val('涨停趋势差')}，炸板率趋势差：{val('炸板率趋势差')}，跌停趋势差：{val('跌停趋势差')}",
+            "",
+        ])
+    lines.extend([
         "## 明细",
         "",
         "| 指标 | 数值 | 来源 | 备注 |",
         "|---|---:|---|---|",
-    ]
+    ])
     for row in rows:
         lines.append(f"| {row['metric']} | {row['value']} | {row['source']} | {row.get('note', '')} |")
     if errors:
@@ -168,6 +369,7 @@ def main() -> int:
     parser.add_argument("--sleep", type=float, default=1.5, help="Seconds between retries.")
     parser.add_argument("--skip-spot", action="store_true", help="Skip full A-share realtime quote endpoint.")
     parser.add_argument("--skip-fund-flow", action="store_true", help="Skip market fund-flow endpoint.")
+    parser.add_argument("--history-days", type=int, default=5, help="Collect recent limit-pool history for context.")
     args = parser.parse_args()
 
     report_date, trade_date = normalize_date(args.date)
@@ -185,17 +387,24 @@ def main() -> int:
     collect_limit_pools(ak, trade_date, rows, errors, args.retries, args.sleep)
     if not args.skip_fund_flow:
         collect_market_fund_flow(ak, rows, errors, args.retries, args.sleep)
+    history: list[dict[str, Any]] = []
+    if args.history_days > 1:
+        history, history_errors = collect_limit_history(ak, trade_date, args.history_days, args.retries, args.sleep)
+        errors.extend(history_errors)
+        append_history_metrics(rows, history)
 
     out_dir = Path(args.out_dir)
     csv_path = out_dir / f"{report_date}-market-breadth.csv"
     json_path = out_dir / f"{report_date}-market-breadth.json"
     md_path = out_dir / f"{report_date}-market-breadth.md"
+    history_csv_path = out_dir / f"{report_date}-market-breadth-history.csv"
     write_csv(csv_path, rows)
-    json_path.write_text(json.dumps({"date": report_date, "rows": rows, "errors": errors}, ensure_ascii=False, indent=2), encoding="utf-8")
-    write_markdown(md_path, report_date, rows, errors)
+    write_history_csv(history_csv_path, history)
+    json_path.write_text(json.dumps({"date": report_date, "rows": rows, "history": history, "errors": errors}, ensure_ascii=False, indent=2), encoding="utf-8")
+    write_markdown(md_path, report_date, rows, history, errors)
 
     status = "ok" if rows and not errors else "partial" if rows else "failed"
-    print(json.dumps({"status": status, "metrics": len(rows), "errors": errors, "csv": str(csv_path), "json": str(json_path), "markdown": str(md_path)}, ensure_ascii=False, indent=2))
+    print(json.dumps({"status": status, "metrics": len(rows), "history_days": len(history), "errors": errors, "csv": str(csv_path), "history_csv": str(history_csv_path), "json": str(json_path), "markdown": str(md_path)}, ensure_ascii=False, indent=2))
     return 0 if rows else 1
 
 

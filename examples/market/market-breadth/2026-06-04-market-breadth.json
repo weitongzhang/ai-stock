@@ -48,10 +48,123 @@
       "value": 80.81,
       "source": "derived:eastmoney_limit_pools",
       "note": "%"
+    },
+    {
+      "metric": "近N日样本数",
+      "value": 5,
+      "source": "derived:market_breadth_history",
+      "note": ""
+    },
+    {
+      "metric": "近几日涨停均值",
+      "value": 75.5,
+      "source": "derived:market_breadth_history",
+      "note": ""
+    },
+    {
+      "metric": "近几日炸板率均值",
+      "value": 34.15,
+      "source": "derived:market_breadth_history",
+      "note": "%"
+    },
+    {
+      "metric": "近几日跌停均值",
+      "value": 24.5,
+      "source": "derived:market_breadth_history",
+      "note": ""
+    },
+    {
+      "metric": "近几日最高连板均值",
+      "value": 3.75,
+      "source": "derived:market_breadth_history",
+      "note": ""
+    },
+    {
+      "metric": "涨停趋势差",
+      "value": 4.5,
+      "source": "derived:market_breadth_history",
+      "note": ""
+    },
+    {
+      "metric": "炸板率趋势差",
+      "value": -14.96,
+      "source": "derived:market_breadth_history",
+      "note": "%"
+    },
+    {
+      "metric": "跌停趋势差",
+      "value": -17.5,
+      "source": "derived:market_breadth_history",
+      "note": ""
+    },
+    {
+      "metric": "连板高度趋势差",
+      "value": 0.25,
+      "source": "derived:market_breadth_history",
+      "note": ""
     }
   ],
-  "errors": [
-    "stock_zh_a_spot_em: ConnectionError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))",
-    "stock_market_fund_flow: ConnectionError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))"
-  ]
+  "history": [
+    {
+      "date": "2026-05-29",
+      "trade_date": "20260529",
+      "limit_up_count": 49,
+      "failed_limit_up_count": 38,
+      "limit_down_count": 50,
+      "seal_rate": 56.32,
+      "failed_limit_up_rate": 43.68,
+      "limit_up_seal_amount_yi": 33.5,
+      "double_limit_up_count": 9,
+      "highest_limit_streak": 5
+    },
+    {
+      "date": "2026-06-01",
+      "trade_date": "20260601",
+      "limit_up_count": 120,
+      "failed_limit_up_count": 41,
+      "limit_down_count": 21,
+      "seal_rate": 74.53,
+      "failed_limit_up_rate": 25.47,
+      "limit_up_seal_amount_yi": 88.49,
+      "double_limit_up_count": 11,
+      "highest_limit_streak": 4
+    },
+    {
+      "date": "2026-06-02",
+      "trade_date": "20260602",
+      "limit_up_count": 67,
+      "failed_limit_up_count": 21,
+      "limit_down_count": 16,
+      "seal_rate": 76.14,
+      "failed_limit_up_rate": 23.86,
+      "limit_up_seal_amount_yi": 75.76,
+      "double_limit_up_count": 16,
+      "highest_limit_streak": 3
+    },
+    {
+      "date": "2026-06-03",
+      "trade_date": "20260603",
+      "limit_up_count": 66,
+      "failed_limit_up_count": 51,
+      "limit_down_count": 11,
+      "seal_rate": 56.41,
+      "failed_limit_up_rate": 43.59,
+      "limit_up_seal_amount_yi": 58.25,
+      "double_limit_up_count": 11,
+      "highest_limit_streak": 3
+    },
+    {
+      "date": "2026-06-04",
+      "trade_date": "20260604",
+      "limit_up_count": 80,
+      "failed_limit_up_count": 19,
+      "limit_down_count": 7,
+      "seal_rate": 80.81,
+      "failed_limit_up_rate": 19.19,
+      "limit_up_seal_amount_yi": 81.13,
+      "double_limit_up_count": 10,
+      "highest_limit_streak": 4
+    }
+  ],
+  "errors": []
 }

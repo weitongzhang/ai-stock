@@ -41,7 +41,7 @@ The workflow is designed to run even when some inputs are missing. Missing data 
 Collect market breadth from Eastmoney/AkShare:
 
 ```powershell
-python skills\stock-selection\a-share-market-flow-analyst\scripts\collect_market_breadth.py --date 2026-06-04 --out-dir examples\market\market-breadth
+python skills\stock-selection\a-share-market-flow-analyst\scripts\collect_market_breadth.py --date 2026-06-04 --history-days 5 --out-dir examples\market\market-breadth
 ```
 
 Generate a next-day market-flow plan:
@@ -52,7 +52,8 @@ python skills\stock-selection\a-share-market-flow-analyst\scripts\analyze_market
 
 The script writes:
 
-- `<date>-market-breadth.csv`: market breadth metrics, including turnover, advancing/declining counts when available, limit-up count, failed-limit count, limit-down count, seal rate, and failed-limit rate.
+- `<date>-market-breadth.csv`: market breadth metrics, including turnover, advancing/declining counts when available, limit-up count, failed-limit count, limit-down count, seal rate, failed-limit rate, and recent trend deltas.
+- `<date>-market-breadth-history.csv`: recent daily limit-pool history used as context.
 - `<date>-market-flow.csv`: theme score table.
 - `<date>-market-flow.md`: readable market state and next-day observation plan.
 

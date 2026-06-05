@@ -260,6 +260,84 @@ def classify_market(rows: list[dict[str, Any]], overview: dict[str, float], has_
     return "信息不足"
 
 
+def analyze_breadth_context(overview: dict[str, float]) -> tuple[str, str, list[str]]:
+    if not overview:
+        return "宽度数据不足", "等待补齐市场宽度后再提高仓位，暂按题材证据保守处理。", []
+    limit_up = overview.get("涨停数") or overview.get("limit_up_count") or 0.0
+    failed_rate = overview.get("炸板率") or overview.get("failed_limit_up_rate") or 0.0
+    limit_down = overview.get("跌停数") or overview.get("limit_down_count") or 0.0
+    highest = overview.get("最高连板") or overview.get("highest_limit_streak") or 0.0
+    sample_count = overview.get("近N日样本数") or 1.0
+    limit_trend = overview.get("涨停趋势差") or 0.0
+    failed_rate_trend = overview.get("炸板率趋势差") or 0.0
+    down_trend = overview.get("跌停趋势差") or 0.0
+    streak_trend = overview.get("连板高度趋势差") or 0.0
+
+    score = 0
+    reasons: list[str] = []
+    if limit_up >= 80:
+        score += 2
+        reasons.append("涨停家数处于活跃区，短线资金有扩散能力。")
+    elif limit_up >= 50:
+        score += 1
+        reasons.append("涨停家数处于可交易区，但还不是全面高潮。")
+    else:
+        score -= 1
+        reasons.append("涨停家数偏少，短线扩散不足。")
+
+    if failed_rate <= 20:
+        score += 2
+        reasons.append("炸板率低于20%，封板质量较好。")
+    elif failed_rate <= 30:
+        score += 1
+        reasons.append("炸板率处于可控区，盘中仍有分歧。")
+    else:
+        score -= 2
+        reasons.append("炸板率偏高，追高失败率上升。")
+
+    if limit_down <= 10:
+        score += 1
+        reasons.append("跌停数量未扩散，亏钱效应可控。")
+    elif limit_down >= 25:
+        score -= 2
+        reasons.append("跌停数量偏多，亏钱效应扩散。")
+
+    if highest >= 6:
+        score += 1
+        reasons.append("连板高度打开，短线风险偏好增强。")
+    elif highest <= 3:
+        score -= 1
+        reasons.append("连板高度有限，资金偏轮动而非抱团。")
+
+    if sample_count >= 3:
+        if limit_trend > 10:
+            score += 1
+            reasons.append("涨停数高于近几日均值，情绪在加强。")
+        elif limit_trend < -10:
+            score -= 1
+            reasons.append("涨停数低于近几日均值，扩散在收缩。")
+        if failed_rate_trend < -5:
+            score += 1
+            reasons.append("炸板率低于近几日均值，封板质量改善。")
+        elif failed_rate_trend > 5:
+            score -= 1
+            reasons.append("炸板率高于近几日均值，分歧升温。")
+        if down_trend > 5:
+            score -= 1
+            reasons.append("跌停数高于近几日均值，防守需求上升。")
+        if streak_trend > 1:
+            score += 1
+            reasons.append("连板高度高于近几日均值，投机高度抬升。")
+
+    if score >= 5:
+        return "修复增强/局部进攻", "明日可积极观察主线前排，优先竞价强、开盘承接强、有涨停扩散的方向；后排一致性不追。", reasons
+    if score >= 2:
+        return "结构性修复", "明日适合小仓试错强主题前排或容量核心，弱分支只观察，等待分歧承接确认。", reasons
+    if score >= 0:
+        return "震荡试错", "明日以确认后参与为主，优先低吸承接强的核心，减少追高和后排套利。", reasons
+    return "分歧/防守", "明日以防守为主，等待炸板率回落、跌停减少或新主线确认后再提高进攻性。", reasons
+
+
 def write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     fields = [
@@ -307,6 +385,8 @@ def write_markdown(
         "",
     ]
     if overview:
+        breadth_stage, breadth_strategy, breadth_reasons = analyze_breadth_context(overview)
+
         def show(*names: str) -> str:
             for name in names:
                 if name in overview:
@@ -327,8 +407,16 @@ def write_markdown(
                 f"- 涨跌停：涨停 {show('涨停数', 'limit_up_count')} / 炸板 {show('炸板数', 'failed_limit_up_count')} / 跌停 {show('跌停数', 'limit_down_count')}",
                 f"- 情绪质量：封板率 {show_with_unit('%', '封板率', 'seal_rate')}，炸板率 {show_with_unit('%', '炸板率', 'failed_limit_up_rate')}",
                 "",
+                f"结论：{breadth_stage}。",
+                "",
+                f"明日策略：{breadth_strategy}",
+                "",
             ]
         )
+        if breadth_reasons:
+            lines.extend(["依据："])
+            lines.extend(f"- {reason}" for reason in breadth_reasons)
+            lines.append("")
     lines.extend(
         [
             "## 主题优先级",
