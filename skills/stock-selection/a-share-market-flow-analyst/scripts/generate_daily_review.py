@@ -231,14 +231,29 @@ def classify_internal_structure(theme_row: dict[str, Any], kpl_rows: list[dict[s
     return "结构待确认", reasons, "等竞价、开盘强弱和前排晋级确认。"
 
 
+def action_level(score: float, structure: str, breadth_stage: str, fragmentation: str) -> str:
+    if structure in {"内部分歧", "退潮/弱化"}:
+        return "只观察"
+    if score >= 55 and structure in {"低位扩散", "高切低/补涨试探"} and "防守" not in breadth_stage:
+        return "主攻"
+    if score >= 50 and structure == "高位抱团":
+        return "核心低吸"
+    if fragmentation in {"高", "中高"} and score < 55:
+        return "只观察"
+    if score >= 40:
+        return "观察"
+    return "放弃"
+
+
 def build_attack_plan(themes: list[dict[str, Any]], kpl_rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
     plan: list[dict[str, Any]] = []
     sorted_themes = sorted(themes, key=lambda row: num(row.get("total_score") or row.get("score")), reverse=True)
     for row in sorted_themes[:4]:
         structure, reasons, strategy = classify_internal_structure(row, kpl_rows)
+        score = num(row.get("total_score") or row.get("score"))
         plan.append({
             "theme": row.get("theme") or row.get("主题") or "未命名主题",
-            "score": num(row.get("total_score") or row.get("score")),
+            "score": score,
             "stance": row.get("stance") or row.get("动作") or "",
             "structure": structure,
             "reasons": reasons,
@@ -248,6 +263,27 @@ def build_attack_plan(themes: list[dict[str, Any]], kpl_rows: list[dict[str, Any
             "give_up": row.get("give_up_signal") or "前排炸板、核心冲高回落，或板块无量无扩散。",
         })
     return plan
+
+
+def build_review_sentence(index_stage: str, breadth_stage: str, fragmentation: str, attack_plan: list[dict[str, Any]]) -> str:
+    top = attack_plan[0] if attack_plan else None
+    if not top:
+        return "今日数据不足，明日不主动进攻，等待市场给出方向。"
+    if fragmentation in {"高", "中高"}:
+        return f"今日更像割裂行情：指数/宽度不能支持全面进攻，明日只围绕 {top['theme']} 等主线核心做确认，不碰弱分支后排。"
+    if "进攻" in breadth_stage or "修复" in breadth_stage:
+        return f"今日短线情绪修复，主线优先看 {top['theme']}，但指数环境为{index_stage}，明日仍以确认后的前排和核心为主。"
+    return f"今日市场仍偏试错，{top['theme']} 只作为观察方向，明日等竞价、开盘和核心承接确认。"
+
+
+def build_position_advice(index_stage: str, breadth_stage: str, fragmentation: str) -> str:
+    if fragmentation in {"高", "中高"}:
+        return "小仓位，只做主线核心，禁止非主线后排。"
+    if "偏防守" in index_stage or "防守" in breadth_stage:
+        return "防守仓位，等待宽度修复或主线分歧后的确定性。"
+    if "进攻" in breadth_stage and index_stage in {"支持进攻", "结构分化", "中性"}:
+        return "中等仓位试错，确认扩散后再加。"
+    return "轻仓试错，确认后参与。"
 
 
 def write_report(
@@ -264,20 +300,43 @@ def write_report(
     attack_plan: list[dict[str, Any]],
     limits: list[str],
 ) -> None:
+    for item in attack_plan:
+        item["action"] = action_level(item["score"], item["structure"], breadth_stage, fragmentation)
+    review_sentence = build_review_sentence(index_stage, breadth_stage, fragmentation, attack_plan)
+    position_advice = build_position_advice(index_stage, breadth_stage, fragmentation)
     lines = [
         f"# {report_date} A股盘后复盘报告",
         "",
         "> 研究用途，非投资建议。",
         "",
-        "## 结论",
+        "## 今日复盘一句话",
+        "",
+        review_sentence,
+        "",
+        "## 明日作战原则",
         "",
         f"- 指数环境：{index_stage}",
         f"- 市场宽度：{breadth_stage}",
         f"- 市场割裂度：{fragmentation}",
-        "- 明日原则：指数定仓位，宽度定情绪，板块定方向，个股定执行。",
+        f"- 仓位建议：{position_advice}",
+        "- 执行原则：指数定仓位，宽度定情绪，板块定方向，个股定执行。",
         "",
-        "## 指数环境",
+        "## 明日方向清单",
+        "",
+        "| 优先级 | 方向 | 动作 | 内部结构 | 核心观察 | 确认 | 放弃 |",
+        "|---:|---|---|---|---|---|---|",
     ]
+    for idx, item in enumerate(attack_plan, start=1):
+        lines.append(
+            f"| {idx} | {item['theme']} | {item['action']} | {item['structure']} | "
+            f"{item['core']} | {item['confirm']} | {item['give_up']} |"
+        )
+    lines.extend([
+        "",
+        "## 今日市场环境",
+        "",
+        "### 指数环境",
+    ])
     lines.extend(f"- {item}" for item in index_reasons[:4])
     if index_rows:
         lines.extend([
@@ -294,22 +353,20 @@ def write_report(
     lines.extend(f"- {item}" for item in index_constraints[:4])
     lines.extend([
         "",
-        "## 市场宽度",
+        "### 市场宽度",
     ]
     )
     lines.extend(f"- {item}" for item in breadth_reasons[:5])
-    lines.extend(["", "## 市场割裂度", ""])
+    lines.extend(["", "### 市场割裂度", ""])
     lines.extend(f"- {item}" for item in fragmentation_reasons)
-    lines.extend(["", "## 主线内部结构与明日方向", ""])
+    lines.extend(["", "## 主线内部结构", ""])
     for item in attack_plan:
         lines.extend([
             f"### {item['theme']}：{item['structure']}",
             "",
-            f"- 分数/动作：{item['score']:.1f} / {item['stance']}",
+            f"- 分数/动作：{item['score']:.1f} / {item['action']}",
             f"- 核心观察：{item['core']}",
             f"- 内部判断：{item['strategy']}",
-            f"- 确认：{item['confirm']}",
-            f"- 放弃：{item['give_up']}",
         ])
         for reason in item["reasons"][:3]:
             lines.append(f"- 依据：{reason}")
