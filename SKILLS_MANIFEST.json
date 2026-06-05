@@ -62,11 +62,14 @@
         "theme-market-plan",
         "tushare-kpl-list",
         "dragon-tiger-list",
-        "market-breadth"
+        "market-breadth",
+        "index-environment"
       ],
       "provides": [
         "market-breadth-snapshot",
+        "index-environment-report",
         "market-flow-report",
+        "daily-review-report",
         "sector-priority-list",
         "next-day-observation-plan"
       ]

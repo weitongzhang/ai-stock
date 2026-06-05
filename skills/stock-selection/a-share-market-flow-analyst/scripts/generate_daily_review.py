@@ -157,6 +157,37 @@ def classify_fragmentation(metrics: dict[str, Any], themes: list[dict[str, Any]]
     return "低/待确认", reasons
 
 
+def summarize_index_environment(index_rows: list[dict[str, Any]]) -> tuple[str, list[str], list[str]]:
+    if not index_rows:
+        return "未接入", ["未提供五大指数环境数据，仓位约束暂按市场宽度和主线强度判断。"], ["指数缺失时，不放大仓位。"]
+    is_sample = any(str(row.get("source")) == "sample" for row in index_rows)
+    strong_rows = [row for row in index_rows if str(row.get("environment")) in {"强", "偏强"}]
+    weak_rows = [row for row in index_rows if str(row.get("environment")) == "偏弱"]
+    ranked = sorted(index_rows, key=lambda row: num(row.get("pct_chg")), reverse=True)
+    reasons: list[str] = []
+    constraints: list[str] = []
+    for row in ranked[:2]:
+        reasons.append(f"{row.get('name')}相对更强，{row.get('role')}更受资金认可。")
+    if any(row.get("name") == "科创50" and row.get("environment") in {"强", "偏强"} for row in index_rows):
+        constraints.append("科创50强时，硬科技、AI硬件、半导体方向可优先验证。")
+    if any(row.get("name") == "创业板指" and row.get("environment") == "偏弱" for row in index_rows):
+        constraints.append("创业板偏弱时，高弹性成长方向不宜追高，优先核心承接。")
+    if any(row.get("name") == "北证50" and row.get("environment") in {"强", "偏强"} for row in index_rows):
+        constraints.append("北证50偏强时，小票题材可能外溢，但仍需市场宽度配合。")
+    if any(row.get("name") == "上证指数" and row.get("environment") in {"强", "偏强"} for row in index_rows):
+        constraints.append("上证偏稳时，结构性进攻的指数风险较低。")
+    if is_sample:
+        reasons.insert(0, "当前指数环境为 sample 示例数据，仅用于演示报告结构；实盘需替换为真实指数采集结果。")
+        constraints.insert(0, "指数为样例数据时，不参与真实仓位判断。")
+    if len(strong_rows) >= 4 and not weak_rows:
+        return "支持进攻", reasons, constraints or ["指数整体支持进攻，但仍需板块内部确认。"]
+    if strong_rows and weak_rows:
+        return "结构分化", reasons, constraints or ["指数分化时，只做与强指数共振的方向。"]
+    if len(weak_rows) >= 3:
+        return "偏防守", reasons, constraints or ["多数指数偏弱时，降低追高和后排仓位。"]
+    return "中性", reasons, constraints or ["指数中性时，以市场宽度和主线内部结构决定进攻性。"]
+
+
 def match_kpl_rows(theme_row: dict[str, Any], kpl_rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
     words = theme_words(theme_row)
     candidates = str(theme_row.get("core_names") or theme_row.get("candidates") or "")
@@ -222,6 +253,10 @@ def build_attack_plan(themes: list[dict[str, Any]], kpl_rows: list[dict[str, Any
 def write_report(
     path: Path,
     report_date: str,
+    index_stage: str,
+    index_reasons: list[str],
+    index_constraints: list[str],
+    index_rows: list[dict[str, Any]],
     breadth_stage: str,
     breadth_reasons: list[str],
     fragmentation: str,
@@ -236,12 +271,32 @@ def write_report(
         "",
         "## 结论",
         "",
+        f"- 指数环境：{index_stage}",
         f"- 市场宽度：{breadth_stage}",
         f"- 市场割裂度：{fragmentation}",
-        "- 明日原则：先看主线核心与前排确认，弱分支和后排谨慎。",
+        "- 明日原则：指数定仓位，宽度定情绪，板块定方向，个股定执行。",
+        "",
+        "## 指数环境",
+    ]
+    lines.extend(f"- {item}" for item in index_reasons[:4])
+    if index_rows:
+        lines.extend([
+            "",
+            "| 指数 | 涨跌幅 | 5日涨跌 | 形态 | 趋势 | 含义 |",
+            "|---|---:|---:|---|---|---|",
+        ])
+        for row in index_rows:
+            lines.append(f"| {row.get('name')} | {row.get('pct_chg')} | {row.get('five_day_pct')} | {row.get('shape')} | {row.get('environment')} | {row.get('meaning')} |")
+    lines.extend([
+        "",
+        "指数约束：",
+    ])
+    lines.extend(f"- {item}" for item in index_constraints[:4])
+    lines.extend([
         "",
         "## 市场宽度",
     ]
+    )
     lines.extend(f"- {item}" for item in breadth_reasons[:5])
     lines.extend(["", "## 市场割裂度", ""])
     lines.extend(f"- {item}" for item in fragmentation_reasons)
@@ -280,6 +335,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Generate A-share post-market daily review.")
     parser.add_argument("--date", required=True, help="Report date, e.g. 2026-06-04.")
     parser.add_argument("--market-breadth", required=True, help="Market breadth CSV from collect_market_breadth.py.")
+    parser.add_argument("--index-env", action="append", default=[], help="Index environment CSV/JSON from collect_index_environment.py. Repeatable.")
     parser.add_argument("--theme-plan", action="append", default=[], help="Market-flow or CLS theme plan CSV/JSON. Repeatable.")
     parser.add_argument("--kpl", action="append", default=[], help="KPL/Tushare limit-up CSV/JSON. Repeatable.")
     parser.add_argument("--out-dir", default="examples/market/daily-review", help="Output directory.")
@@ -289,6 +345,8 @@ def main() -> int:
     breadth_rows = read_rows(Path(args.market_breadth))
     metrics = metric_map(breadth_rows)
     breadth_stage, breadth_reasons = classify_breadth(metrics)
+    index_rows = read_optional(args.index_env)
+    index_stage, index_reasons, index_constraints = summarize_index_environment(index_rows)
     themes = read_optional(args.theme_plan)
     if not themes:
         limits.append("未提供主题计划，无法生成明日进攻方向。")
@@ -300,7 +358,7 @@ def main() -> int:
 
     out_dir = Path(args.out_dir)
     md_path = out_dir / f"{args.date}-daily-review.md"
-    write_report(md_path, args.date, breadth_stage, breadth_reasons, fragmentation, fragmentation_reasons, attack_plan, limits)
+    write_report(md_path, args.date, index_stage, index_reasons, index_constraints, index_rows, breadth_stage, breadth_reasons, fragmentation, fragmentation_reasons, attack_plan, limits)
     print(json.dumps({"status": "ok", "markdown": str(md_path), "themes": len(themes), "directions": len(attack_plan)}, ensure_ascii=False, indent=2))
     return 0
 

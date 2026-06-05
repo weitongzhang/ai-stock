@@ -44,6 +44,12 @@ Collect market breadth from Eastmoney/AkShare:
 python skills\stock-selection\a-share-market-flow-analyst\scripts\collect_market_breadth.py --date 2026-06-04 --history-days 5 --out-dir examples\market\market-breadth
 ```
 
+Collect index environment:
+
+```powershell
+python skills\stock-selection\a-share-market-flow-analyst\scripts\collect_index_environment.py --date 2026-06-04 --out-dir examples\market\index-environment
+```
+
 Generate a next-day market-flow plan:
 
 ```powershell
@@ -53,13 +59,14 @@ python skills\stock-selection\a-share-market-flow-analyst\scripts\analyze_market
 Generate a post-market daily review:
 
 ```powershell
-python skills\stock-selection\a-share-market-flow-analyst\scripts\generate_daily_review.py --date 2026-06-04 --market-breadth examples\market\market-breadth\2026-06-04-market-breadth.csv --theme-plan examples\market\market-flow\2026-06-04-market-flow.csv --kpl examples\market\tushare-kpl\sample-tushare-kpl.csv --out-dir examples\market\daily-review
+python skills\stock-selection\a-share-market-flow-analyst\scripts\generate_daily_review.py --date 2026-06-04 --index-env examples\market\index-environment\2026-06-04-index-environment.csv --market-breadth examples\market\market-breadth\2026-06-04-market-breadth.csv --theme-plan examples\market\market-flow\2026-06-04-market-flow.csv --kpl examples\market\tushare-kpl\sample-tushare-kpl.csv --out-dir examples\market\daily-review
 ```
 
 The script writes:
 
 - `<date>-market-breadth.csv`: market breadth metrics, including turnover, advancing/declining counts when available, limit-up count, failed-limit count, limit-down count, seal rate, failed-limit rate, and recent trend deltas.
 - `<date>-market-breadth-history.csv`: recent daily limit-pool history used as context.
+- `<date>-index-environment.csv`: major index trend and style environment.
 - `<date>-market-flow.csv`: theme score table.
 - `<date>-market-flow.md`: readable market state and next-day observation plan.
 - `<date>-daily-review.md`: post-market review with breadth, fragmentation, leading theme internal movement, tomorrow attack plan, and risk warnings.
