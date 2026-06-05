@@ -14,6 +14,16 @@ if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8")
 
 
+WORKSPACE_ROOT = Path(__file__).resolve().parents[4]
+SRC_ROOT = WORKSPACE_ROOT / "src"
+if str(SRC_ROOT) not in sys.path:
+    sys.path.insert(0, str(SRC_ROOT))
+
+from skill_lab.shared.enums import BarSpan, DataSource
+from skill_lab.shared.schemas import Bar
+from skill_lab.stock_analysis.yc_buy_adapter import YcBuyAdapter, YcBuyClassEngine
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Run YC-buy stock screening")
     parser.add_argument("--repo", default=".", help="Path to YC-buy repository root")
@@ -57,6 +67,33 @@ def summarize_triple(result: dict | None) -> tuple[str, str, str, str]:
     )
 
 
+def dataframe_to_bars(code: str, data, source: str) -> list[Bar]:
+    source_map = {
+        "sample": DataSource.SAMPLE,
+        "akshare": DataSource.AKSHARE,
+        "baostock": DataSource.UNKNOWN,
+        "auto": DataSource.UNKNOWN,
+    }
+    bars: list[Bar] = []
+    for index, row in data.iterrows():
+        bars.append(
+            Bar(
+                symbol=code,
+                timestamp=str(index)[:10],
+                open=float(row.get("open", 0.0)),
+                high=float(row.get("high", 0.0)),
+                low=float(row.get("low", 0.0)),
+                close=float(row.get("close", 0.0)),
+                volume=float(row.get("volume", 0.0)),
+                amount=float(row.get("amount", 0.0)),
+                span=BarSpan.DAY1,
+                source=source_map.get(source, DataSource.UNKNOWN),
+                raw=row.to_dict(),
+            )
+        )
+    return bars
+
+
 def main() -> int:
     args = parse_args()
     repo = Path(args.repo)
@@ -75,13 +112,7 @@ def main() -> int:
             continue
 
         buy_points: list[str] = []
-        if args.mode in ("buy-points", "both"):
-            buy_points = BuyPointAnalyzer(data).analyze_all_buy_points()
-
         triple = None
-        if args.mode in ("triple-screen", "both"):
-            triple = TripleScreenSystem(data).analyze()
-
         signal, trend, position, breakout = summarize_triple(triple)
         name = f"股票{code}"
         if args.source != "sample":
@@ -89,12 +120,18 @@ def main() -> int:
                 name = fetcher.get_stock_name(code)
             except Exception:
                 pass
+        bars = dataframe_to_bars(code, data, args.source)
+        engine = YcBuyClassEngine(BuyPointAnalyzer, TripleScreenSystem, mode=args.mode)
+        stock_signal = YcBuyAdapter(engine).analyze(code, name, bars, trade_date=end_date)
+        result = stock_signal.raw
+        buy_points = [str(item) for item in result.get("buy_points", [])]
+        signal, trend, position, breakout = summarize_triple(result.get("triple") or None)
         price = f"{data['close'].iloc[-1]:.2f}"
         reasons = "; ".join(buy_points) if buy_points else "-"
 
         if buy_points or signal in {"buy", "wait_breakout", "consider_buy"}:
             print(f"{code} {name}: price={price}, buy_points={len(buy_points)}, triple={signal}, reasons={reasons}")
-            rows.append({
+            row = {
                 "股票代码": code,
                 "股票名称": name,
                 "最新价格": price,
@@ -105,7 +142,10 @@ def main() -> int:
                 "中周期位置": position,
                 "短周期突破": breakout,
                 "分析日期": end_date,
-            })
+            }
+            row["domain_signal_direction"] = stock_signal.direction.value
+            row["domain_signal_score"] = f"{stock_signal.score:.1f}"
+            rows.append(row)
 
     if args.output:
         output = Path(args.output)

@@ -25,3 +25,33 @@ python ..\..\skills\stock-selection\a-share-market-flow-analyst\scripts\generate
 ```
 
 Run these from `tests/smoke`.
+
+## Trading System Foundation
+
+Run these from the repository root:
+
+```powershell
+python tests\smoke\test_shared_schemas.py
+python tests\smoke\test_evaluation_harness.py
+python tests\smoke\test_market_data_file_provider.py
+python tests\smoke\test_market_data_quality.py
+python tests\smoke\test_trading_calendar.py
+python tests\smoke\test_ftshare_provider.py
+python tests\smoke\test_market_analysis.py
+python tests\smoke\test_tomorrow_plan_pipeline.py
+python tests\smoke\test_daily_review_pipeline.py
+python tests\smoke\test_daily_org_analysis_cli.py
+python tests\smoke\test_evaluation_dataset_runner.py
+python tests\smoke\test_harness_cli.py
+python tests\smoke\test_decision_journal.py
+python tests\smoke\test_watchlist.py
+python tests\smoke\test_yc_buy_adapter.py
+python tests\smoke\test_backtesting_adapter.py
+```
+
+Minimal Harness CLI:
+
+```powershell
+python tools\run_harness_eval.py --dataset examples\evals\datasets\tomorrow_plan\sample.jsonl --target-version smoke
+python tools\run_harness_eval.py --dataset examples\evals\datasets\daily_review\sample.jsonl --target-version smoke
+```
