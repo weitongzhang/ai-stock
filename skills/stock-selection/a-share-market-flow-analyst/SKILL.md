@@ -50,12 +50,19 @@ Generate a next-day market-flow plan:
 python skills\stock-selection\a-share-market-flow-analyst\scripts\analyze_market_flow.py --date 2026-06-04 --cls-plan examples\market\cls-market-plan-kpl\2026-06-04-cls-market-plan.csv --kpl examples\market\tushare-kpl\sample-tushare-kpl.csv --lhb examples\market\dragon-tiger\20260604-eastmoney-lhb.csv --market examples\market\market-breadth\2026-06-04-market-breadth.csv --out-dir examples\market\market-flow
 ```
 
+Generate a post-market daily review:
+
+```powershell
+python skills\stock-selection\a-share-market-flow-analyst\scripts\generate_daily_review.py --date 2026-06-04 --market-breadth examples\market\market-breadth\2026-06-04-market-breadth.csv --theme-plan examples\market\market-flow\2026-06-04-market-flow.csv --kpl examples\market\tushare-kpl\sample-tushare-kpl.csv --out-dir examples\market\daily-review
+```
+
 The script writes:
 
 - `<date>-market-breadth.csv`: market breadth metrics, including turnover, advancing/declining counts when available, limit-up count, failed-limit count, limit-down count, seal rate, failed-limit rate, and recent trend deltas.
 - `<date>-market-breadth-history.csv`: recent daily limit-pool history used as context.
 - `<date>-market-flow.csv`: theme score table.
 - `<date>-market-flow.md`: readable market state and next-day observation plan.
+- `<date>-daily-review.md`: post-market review with breadth, fragmentation, leading theme internal movement, tomorrow attack plan, and risk warnings.
 
 ## Reading The Result
 
