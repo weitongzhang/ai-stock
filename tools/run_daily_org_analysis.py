@@ -21,6 +21,8 @@ from skill_lab.market_data.file_provider import FileProvider
 from skill_lab.planning.daily_review import build_daily_review
 from skill_lab.planning.renderers import render_daily_review_markdown, render_tomorrow_plan_markdown
 from skill_lab.planning.tomorrow_plan import build_tomorrow_plan
+from skill_lab.sector_analysis.leaders import extract_all_theme_leaders
+from skill_lab.sector_analysis.reports import render_theme_battle_cards
 from skill_lab.sector_analysis.strength import summarize_theme_strength
 
 
@@ -32,6 +34,8 @@ def main() -> int:
     parser.add_argument("--json", action="store_true", help="Print compact JSON summary instead of Markdown.")
     parser.add_argument("--allow-quality-warnings", action="store_true", help="Continue when quality warnings exist.")
     parser.add_argument("--require-trade-date", action="store_true", help="Fail when --date is not a trade date.")
+    parser.add_argument("--kpl", default="", help="Optional KPL/limit-up CSV for leader extraction.")
+    parser.add_argument("--lhb", default="", help="Optional dragon-tiger CSV for leader extraction.")
     args = parser.parse_args()
 
     root = Path(args.root)
@@ -53,8 +57,12 @@ def main() -> int:
     indexes = summarize_index_environment(provider.get_index_environment(args.date))
     market = classify_market_regime(breadth, indexes)
     themes = summarize_theme_strength(provider.get_theme_scores(args.date))
+    kpl_rows = read_optional_csv(args.kpl)
+    lhb_rows = read_optional_csv(args.lhb)
+    leader_summaries = extract_all_theme_leaders(themes.ranked, kpl_rows=kpl_rows, lhb_rows=lhb_rows)
     plan = build_tomorrow_plan(args.date, market, themes)
     review = build_daily_review(args.date, market, themes, plan)
+    battle_cards_md = render_theme_battle_cards(themes, leader_summaries)
 
     summary = {
         "trade_date": args.date,
@@ -68,11 +76,23 @@ def main() -> int:
         "plan_items": len(plan.items),
         "review_findings": len(review.findings),
         "quality_issue_count": len(quality.issues),
+        "leader_candidate_count": sum(len(item.candidates) for item in leader_summaries),
+        "theme_leaders": [
+            {
+                "theme": item.theme,
+                "candidate_count": len(item.candidates),
+                "front_row_count": len(item.front_row),
+                "capacity_core_count": len(item.capacity_core),
+                "risk_sample_count": len(item.risk_samples),
+            }
+            for item in leader_summaries[:5]
+        ],
     }
 
     if args.out_dir:
         out_dir = Path(args.out_dir)
         out_dir.mkdir(parents=True, exist_ok=True)
+        (out_dir / f"{args.date}-theme-battle-cards.md").write_text(battle_cards_md, encoding="utf-8")
         (out_dir / f"{args.date}-tomorrow-plan.md").write_text(render_tomorrow_plan_markdown(plan), encoding="utf-8")
         (out_dir / f"{args.date}-daily-review.md").write_text(render_daily_review_markdown(review), encoding="utf-8")
         (out_dir / f"{args.date}-summary.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
@@ -87,6 +107,9 @@ def main() -> int:
         print(f"- Themes: {len(themes.ranked)} ranked, {len(themes.watchable)} watchable, {len(themes.rejected)} rejected")
         print(f"- Plan items: {len(plan.items)}")
         print(f"- Review findings: {len(review.findings)}")
+        print(f"- Leader candidates: {summary['leader_candidate_count']}")
+        print("")
+        print(battle_cards_md)
         print("")
         print(render_tomorrow_plan_markdown(plan))
         print("")
@@ -98,6 +121,14 @@ def print_quality(report) -> None:
     print(f"Data quality failed for {report.subject}:")
     for issue in report.issues:
         print(f"- [{issue.severity}] {issue.code}: {issue.message}")
+
+
+def read_optional_csv(path: str):
+    if not path:
+        return []
+    from skill_lab.market_data.file_provider import read_csv
+
+    return read_csv(Path(path))
 
 
 if __name__ == "__main__":

@@ -69,6 +69,14 @@ class ThemeStance(StrEnum):
     UNKNOWN = "unknown"
 
 
+class ThemeLeaderRole(StrEnum):
+    FRONT_ROW = "front_row"
+    CAPACITY_CORE = "capacity_core"
+    FOLLOWER = "follower"
+    RISK_SAMPLE = "risk_sample"
+    UNKNOWN = "unknown"
+
+
 class ActionLevel(StrEnum):
     MAIN_ATTACK = "main_attack"
     CORE_DIP = "core_dip"

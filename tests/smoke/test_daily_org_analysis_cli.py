@@ -16,6 +16,10 @@ def test_daily_org_analysis_cli_json_summary():
             "2026-06-04",
             "--json",
             "--allow-quality-warnings",
+            "--kpl",
+            "examples/market/tushare-kpl/sample-tushare-kpl.csv",
+            "--lhb",
+            "examples/market/dragon-tiger/20260604-eastmoney-lhb.csv",
         ],
         cwd=ROOT,
         check=True,
@@ -28,6 +32,7 @@ def test_daily_org_analysis_cli_json_summary():
     assert data["theme_count"] >= 3
     assert data["plan_items"] >= 3
     assert data["review_findings"] >= 3
+    assert data["leader_candidate_count"] >= 1
 
 
 def test_daily_org_analysis_cli_rejects_non_trade_date():

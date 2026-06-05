@@ -38,6 +38,7 @@ python tests\smoke\test_market_data_quality.py
 python tests\smoke\test_trading_calendar.py
 python tests\smoke\test_ftshare_provider.py
 python tests\smoke\test_market_analysis.py
+python tests\smoke\test_sector_leaders.py
 python tests\smoke\test_tomorrow_plan_pipeline.py
 python tests\smoke\test_daily_review_pipeline.py
 python tests\smoke\test_daily_org_analysis_cli.py
