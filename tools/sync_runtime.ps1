@@ -10,6 +10,7 @@ $skills = @{
   "ftshare-market-data" = "skills\market-data\ftshare-market-data"
   "yc-buy-selector" = "skills\stock-selection\yc-buy-selector"
   "a-share-market-flow-analyst" = "skills\stock-selection\a-share-market-flow-analyst"
+  "qiushi-stock-analysis" = "skills\methodology\qiushi-stock-analysis"
   "watchlist-tracker" = "skills\tracking\watchlist-tracker"
   "wechat-official-collector" = "skills\content-collection\wechat-official-collector"
   "cls-telegraph-collector" = "skills\content-collection\cls-telegraph-collector"
@@ -27,6 +28,7 @@ foreach ($name in $selected) {
     throw "Missing source: $src"
   }
   New-Item -ItemType Directory -Force -Path $RuntimeRoot | Out-Null
-  Copy-Item -Recurse -Force -LiteralPath $src -Destination $dst
+  New-Item -ItemType Directory -Force -Path $dst | Out-Null
+  Get-ChildItem -LiteralPath $src -Force | Copy-Item -Recurse -Force -Destination $dst
   Write-Host "Synced $name -> $dst"
 }

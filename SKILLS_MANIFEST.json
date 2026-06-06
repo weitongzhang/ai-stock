@@ -19,6 +19,10 @@
     {
       "name": "content-collection",
       "purpose": "内容采集层，负责公众号文章、财联社电报、图片、评论与摘要归档"
+    },
+    {
+      "name": "methodology",
+      "purpose": "方法论编排层，负责把求是等思考框架转化为数据查询计划、主要矛盾判断、仓位纪律和实践验证流程"
     }
   ],
   "skills": [
@@ -124,6 +128,33 @@
         "tushare-kpl-list",
         "theme-market-plan",
         "candidate-watchlist"
+      ]
+    },
+    {
+      "name": "qiushi-stock-analysis",
+      "domain": "methodology",
+      "type": "analysis-orchestrator",
+      "path": "skills/methodology/qiushi-stock-analysis",
+      "runtime_path": "$USERPROFILE/.codex/skills/qiushi-stock-analysis",
+      "purpose": "用求是方法作为股票、板块、持仓、仓位和交易计划分析的大脑，先规划数据查询，再做矛盾分析、集中兵力和实践验证",
+      "consumes": [
+        "stock-quotes",
+        "stock-ohlcv",
+        "market-flow-report",
+        "market-breadth",
+        "index-environment"
+      ],
+      "coordinates": [
+        "ftshare-market-data",
+        "a-share-market-flow-analyst",
+        "a-share-bsa-lift-analyst",
+        "watchlist-tracker"
+      ],
+      "provides": [
+        "qiushi-investigation-plan",
+        "principal-contradiction-analysis",
+        "position-action-plan",
+        "next-day-validation-triggers"
       ]
     }
   ],
