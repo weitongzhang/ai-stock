@@ -5,6 +5,7 @@ from __future__ import annotations
 from datetime import datetime
 
 from skill_lab.market_analysis.position import suggest_position_bias
+from skill_lab.planning.perspectives import build_methodology_perspectives
 from skill_lab.sector_analysis.strength import ThemeStrengthSummary
 from skill_lab.shared.enums import ActionLevel, MarketRegime, ThemeStance
 from skill_lab.shared.schemas import MarketRegimeResult, ThemeScore, TomorrowPlan, TomorrowPlanItem
@@ -20,6 +21,12 @@ def build_tomorrow_plan(
         plan_item_from_theme(index + 1, theme, market.regime)
         for index, theme in enumerate(themes.ranked[:max_items])
     ]
+    perspectives = build_methodology_perspectives(market, themes)
+    perspective_conflicts = [
+        conflict
+        for perspective in perspectives
+        for conflict in perspective.conflicts
+    ]
     return TomorrowPlan(
         trade_date=trade_date,
         generated_at=datetime.now().isoformat(timespec="seconds"),
@@ -30,6 +37,8 @@ def build_tomorrow_plan(
         raw={
             "market": market,
             "theme_count": len(themes.ranked),
+            "perspectives": perspectives,
+            "perspective_conflicts": perspective_conflicts,
         },
     )
 
@@ -72,4 +81,3 @@ def theme_reasons(theme: ThemeScore) -> list[str]:
 def build_summary(market: MarketRegimeResult, themes: ThemeStrengthSummary) -> str:
     top = themes.ranked[0].theme if themes.ranked else "no theme"
     return f"market={market.regime.value}; top_theme={top}; position={suggest_position_bias(market.regime)}"
-

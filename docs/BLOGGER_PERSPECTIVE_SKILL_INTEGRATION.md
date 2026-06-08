@@ -63,3 +63,20 @@ Until then, the domains should call the skills as tools:
 3. Perspective skills transform facts into checklists, contradiction framing and
    validation boundaries.
 4. Harness judges whether the framing improved review and planning quality.
+
+## Conflict Policy
+
+Perspective outputs must not overwrite market data, sector scores or planning
+actions. When methods disagree, the system records the disagreement explicitly:
+
+| Conflict | Handling |
+|---|---|
+| Strong theme score while market is defensive | Keep market risk constraint visible and require validation trigger |
+| Theme attack stance without leader evidence | Downgrade confidence and require leader/turnover confirmation |
+| Long-term thesis versus short-term chart cycle | Separate thesis validity from execution timing |
+| Any method lacks current facts | Mark data limit; do not upgrade action level |
+
+The current engineering entry is `src/skill_lab/planning/perspectives.py`.
+It produces `PerspectiveAnalysis` records for Chen Xiaoqun, Model Xiansheng
+and Qiushi coordination, then embeds them into tomorrow plans and daily reviews
+through `raw["perspectives"]`.

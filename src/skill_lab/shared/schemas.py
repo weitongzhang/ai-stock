@@ -178,6 +178,19 @@ class TomorrowPlanItem(Serializable):
 
 
 @dataclass(slots=True)
+class PerspectiveAnalysis(Serializable):
+    source: str
+    focus: str = ""
+    summary: str = ""
+    supports: list[str] = field(default_factory=list)
+    cautions: list[str] = field(default_factory=list)
+    conflicts: list[str] = field(default_factory=list)
+    required_evidence: list[str] = field(default_factory=list)
+    confidence: float = 0.0
+    raw: dict[str, Any] = field(default_factory=dict)
+
+
+@dataclass(slots=True)
 class TomorrowPlan(Serializable):
     trade_date: str
     generated_at: str = ""

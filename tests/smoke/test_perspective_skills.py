@@ -56,9 +56,12 @@ def test_blogger_perspective_skills_are_registered_and_searchable() -> None:
 
     chen_output = _run_search(expected["chen-xiaoqun-perspective"], "龙头 题材")
     model_output = _run_search(expected["model-xiansheng-perspective"], "主要矛盾 质变")
+    sync_script = (ROOT / "tools" / "sync_runtime.ps1").read_text(encoding="utf-8")
 
     assert "CX-" in chen_output
     assert "MX-" in model_output
+    assert '"chen-xiaoqun-perspective"' in sync_script
+    assert '"model-xiansheng-perspective"' in sync_script
 
 
 if __name__ == "__main__":

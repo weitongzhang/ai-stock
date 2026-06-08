@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from skill_lab.planning.perspectives import build_methodology_perspectives
 from skill_lab.sector_analysis.strength import ThemeStrengthSummary
 from skill_lab.shared.schemas import DailyReview, MarketRegimeResult, TomorrowPlan
 
@@ -13,7 +14,9 @@ def build_daily_review(
     tomorrow_plan: TomorrowPlan | None = None,
     data_limits: list[str] | None = None,
 ) -> DailyReview:
+    perspectives = build_methodology_perspectives(market, themes)
     findings = build_findings(market, themes, tomorrow_plan)
+    findings.extend(build_perspective_findings(perspectives))
     return DailyReview(
         trade_date=trade_date,
         summary=build_summary(market, themes),
@@ -24,6 +27,7 @@ def build_daily_review(
         raw={
             "market": market,
             "theme_count": len(themes.ranked),
+            "perspectives": perspectives,
         },
     )
 
@@ -58,3 +62,13 @@ def build_findings(
         findings.append(f"risk constraint: {constraint}")
     return findings
 
+
+def build_perspective_findings(perspectives) -> list[str]:
+    findings: list[str] = []
+    for perspective in perspectives:
+        findings.append(
+            f"{perspective.source}: {perspective.summary}"
+        )
+        for conflict in perspective.conflicts[:2]:
+            findings.append(f"methodology conflict: {conflict}")
+    return findings

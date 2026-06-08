@@ -27,6 +27,7 @@ def test_tomorrow_plan_pipeline_from_examples():
     assert len(data["items"]) >= 3
     assert data["items"][0]["theme"] == "能源/煤炭/油气"
     assert data["items"][0]["confirm_signal"]
+    assert len(data["raw"]["perspectives"]) == 3
 
 
 if __name__ == "__main__":

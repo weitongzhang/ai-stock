@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Any
+
 from skill_lab.shared.schemas import DailyReview, TomorrowPlan
 
 
@@ -24,6 +26,11 @@ def render_tomorrow_plan_markdown(plan: TomorrowPlan) -> str:
     if plan.data_limits:
         lines.extend(["", "## Data Limits", ""])
         lines.extend(f"- {item}" for item in plan.data_limits)
+    perspectives = plan.raw.get("perspectives") if isinstance(plan.raw, dict) else None
+    if perspectives:
+        lines.extend(["", "## Methodology Perspectives", ""])
+        for perspective in perspectives:
+            lines.append(render_perspective_line(perspective))
     return "\n".join(lines)
 
 
@@ -49,5 +56,24 @@ def render_daily_review_markdown(review: DailyReview) -> str:
     if review.data_limits:
         lines.extend(["", "## Data Limits", ""])
         lines.extend(f"- {item}" for item in review.data_limits)
+    perspectives = review.raw.get("perspectives") if isinstance(review.raw, dict) else None
+    if perspectives:
+        lines.extend(["", "## Methodology Perspectives", ""])
+        for perspective in perspectives:
+            lines.append(render_perspective_line(perspective))
     return "\n".join(lines)
 
+
+def render_perspective_line(perspective: Any) -> str:
+    if isinstance(perspective, dict):
+        source = str(perspective.get("source", "unknown"))
+        summary = str(perspective.get("summary", ""))
+        conflicts_list = list(perspective.get("conflicts") or [])
+        confidence = float(perspective.get("confidence") or 0.0)
+    else:
+        source = perspective.source
+        summary = perspective.summary
+        conflicts_list = list(perspective.conflicts)
+        confidence = float(perspective.confidence)
+    conflicts = "; ".join(str(item) for item in conflicts_list) if conflicts_list else "none"
+    return f"- {source}: {summary} (confidence={confidence:.2f}; conflicts={conflicts})"

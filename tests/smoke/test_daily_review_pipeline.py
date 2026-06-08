@@ -32,6 +32,8 @@ def test_daily_review_pipeline_from_examples():
     assert review.findings
     assert "Daily Review" in review_md
     assert "Tomorrow Plan" in plan_md
+    assert "Methodology Perspectives" in review_md
+    assert "chen-xiaoqun-perspective" in review_md
 
 
 if __name__ == "__main__":
