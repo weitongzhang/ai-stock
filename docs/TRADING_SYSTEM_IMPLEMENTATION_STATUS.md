@@ -15,8 +15,9 @@ the next engineering entry point should be.
 | 7 Tracking/journal | P1 | Started | watchlist helpers, decision journal JSONL | Add next-day outcome updater |
 | 8 Backtesting adapter | P1 | Started | backtest schemas, signal bridge, adapter protocol, metrics, simple engine | Wrap user's existing backtest code |
 | 9 Harness | P1 | Started | eval schemas, datasets, judges, runner, reports, CLI | Add domain-specific judge prompts and datasets |
-| 10 Daily scripts | P2 | Not started | none | Add pre-market, post-market, backtest scripts |
-| 11 Visualization | P3 | Not started | none | Consume JSON/CSV/Markdown only |
+| 10 Perspective skills | P1 | Started | Qiushi methodology, Chen Xiaoqun theme/leader perspective, Model Xiansheng dialectical finance perspective | Convert perspectives into Harness judge dimensions and optional domain agents |
+| 11 Daily scripts | P2 | Not started | none | Add pre-market, post-market, backtest scripts |
+| 12 Visualization | P3 | Not started | none | Consume JSON/CSV/Markdown only |
 
 ## Current Smoke Coverage
 
@@ -35,6 +36,7 @@ the next engineering entry point should be.
 | Journal and watchlist | `tests/smoke/test_decision_journal.py`, `tests/smoke/test_watchlist.py` |
 | YC-buy adapter | `tests/smoke/test_yc_buy_adapter.py` |
 | Backtesting adapter | `tests/smoke/test_backtesting_adapter.py` |
+| Blogger perspective skills | `tests/smoke/test_perspective_skills.py` |
 
 ## Near-Term Build Order
 
@@ -45,3 +47,4 @@ the next engineering entry point should be.
 | 3 | Add rotation state and lifecycle classification | Turns sector analysis into a multi-day tracking model |
 | 4 | Add pre-market and post-market script variants | Turns modules into repeatable workflows |
 | 5 | Add domain-specific Harness judge datasets | Turns methodology into regression samples |
+| 6 | Add perspective-specific Harness evals | Tests whether blogger frameworks improve review and planning quality |

@@ -156,6 +156,61 @@
         "position-action-plan",
         "next-day-validation-triggers"
       ]
+    },
+    {
+      "name": "chen-xiaoqun-perspective",
+      "domain": "stock-selection",
+      "type": "methodology-perspective",
+      "path": "skills/stock-selection/chen-xiaoqun-perspective",
+      "runtime_path": "$USERPROFILE/.codex/skills/chen-xiaoqun-perspective",
+      "purpose": "基于陈小群相关交易教学材料提炼题材主线、龙头、情绪周期、换手承接与图形结构分析视角",
+      "consumes": [
+        "market-flow-report",
+        "market-breadth",
+        "index-environment",
+        "tushare-kpl-list",
+        "dragon-tiger-list",
+        "stock-ohlcv"
+      ],
+      "coordinates": [
+        "a-share-market-flow-analyst",
+        "watchlist-tracker"
+      ],
+      "provides": [
+        "theme-mainline-analysis",
+        "leader-candidate-review",
+        "sentiment-cycle-review",
+        "chart-structure-checklist",
+        "next-day-observation-boundary"
+      ]
+    },
+    {
+      "name": "model-xiansheng-perspective",
+      "domain": "methodology",
+      "type": "methodology-perspective",
+      "path": "skills/methodology/model-xiansheng-perspective",
+      "runtime_path": "$USERPROFILE/.codex/skills/model-xiansheng-perspective",
+      "purpose": "基于模型先生语料提炼辩证金融思维、主要矛盾、质变公司、周期节奏、风险与执行系统分析视角",
+      "consumes": [
+        "stock-quotes",
+        "stock-ohlcv",
+        "market-flow-report",
+        "market-breadth",
+        "index-environment"
+      ],
+      "coordinates": [
+        "ftshare-market-data",
+        "a-share-market-flow-analyst",
+        "qiushi-stock-analysis",
+        "watchlist-tracker"
+      ],
+      "provides": [
+        "principal-contradiction-analysis",
+        "qualitative-change-thesis",
+        "dialectical-market-review",
+        "risk-and-execution-boundary",
+        "methodology-reflection"
+      ]
     }
   ],
   "sources": [

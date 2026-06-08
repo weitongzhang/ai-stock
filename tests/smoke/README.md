@@ -48,6 +48,7 @@ python tests\smoke\test_decision_journal.py
 python tests\smoke\test_watchlist.py
 python tests\smoke\test_yc_buy_adapter.py
 python tests\smoke\test_backtesting_adapter.py
+python tests\smoke\test_perspective_skills.py
 ```
 
 Minimal Harness CLI:

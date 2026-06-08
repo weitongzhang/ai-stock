@@ -1,0 +1,4 @@
+interface:
+  display_name: "陈小群交易视角"
+  short_description: "用题材、龙头、情绪周期与K线框架复盘市场"
+  default_prompt: "用陈小群交易视角分析这个题材或标的，并明确证据、反方论据与失效条件。"
