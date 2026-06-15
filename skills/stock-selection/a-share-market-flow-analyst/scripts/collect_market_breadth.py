@@ -57,22 +57,36 @@ def add_metric(rows: list[dict[str, Any]], metric: str, value: Any, source: str,
     rows.append({"metric": metric, "value": value, "source": source, "note": note})
 
 
-def collect_spot(ak: Any, rows: list[dict[str, Any]], errors: list[str], retries: int, sleep_seconds: float) -> None:
-    df = call_with_retry("stock_zh_a_spot_em", ak.stock_zh_a_spot_em, retries, sleep_seconds, errors)
-    if df is None:
-        return
+def append_spot_metrics(df: Any, rows: list[dict[str, Any]], source: str) -> None:
     if "涨跌幅" not in df.columns or "成交额" not in df.columns:
-        errors.append(f"stock_zh_a_spot_em: missing expected columns, got {list(df.columns)}")
-        return
-
+        raise ValueError(f"missing expected columns, got {list(df.columns)}")
     pct = df["涨跌幅"].map(number)
     amount = df["成交额"].map(number)
     total_amount_yi = round(float(amount.sum()) / 100_000_000, 2)
-    add_metric(rows, "两市成交额", total_amount_yi, "eastmoney:stock_zh_a_spot_em", "亿元")
-    add_metric(rows, "上涨家数", int((pct > 0).sum()), "eastmoney:stock_zh_a_spot_em")
-    add_metric(rows, "下跌家数", int((pct < 0).sum()), "eastmoney:stock_zh_a_spot_em")
-    add_metric(rows, "平盘家数", int((pct == 0).sum()), "eastmoney:stock_zh_a_spot_em")
-    add_metric(rows, "全A股票数", int(len(df)), "eastmoney:stock_zh_a_spot_em")
+    add_metric(rows, "两市成交额", total_amount_yi, source, "亿元")
+    add_metric(rows, "上涨家数", int((pct > 0).sum()), source)
+    add_metric(rows, "下跌家数", int((pct < 0).sum()), source)
+    add_metric(rows, "平盘家数", int((pct == 0).sum()), source)
+    add_metric(rows, "全A股票数", int(len(df)), source)
+
+
+def collect_spot(ak: Any, rows: list[dict[str, Any]], errors: list[str], retries: int, sleep_seconds: float) -> None:
+    df = call_with_retry("stock_zh_a_spot_em", ak.stock_zh_a_spot_em, retries, sleep_seconds, errors)
+    if df is not None:
+        try:
+            append_spot_metrics(df, rows, "eastmoney:stock_zh_a_spot_em")
+            return
+        except ValueError as exc:
+            errors.append(f"stock_zh_a_spot_em: {exc}")
+
+    fallback = call_with_retry("stock_zh_a_spot", ak.stock_zh_a_spot, retries, sleep_seconds, errors)
+    if fallback is None:
+        return
+    try:
+        append_spot_metrics(fallback, rows, "sina:stock_zh_a_spot")
+        add_metric(rows, "全A行情降级状态", "已使用新浪备用源", "derived:spot_fallback")
+    except ValueError as exc:
+        errors.append(f"stock_zh_a_spot: {exc}")
 
 
 def collect_limit_pools(ak: Any, trade_date: str, rows: list[dict[str, Any]], errors: list[str], retries: int, sleep_seconds: float) -> None:

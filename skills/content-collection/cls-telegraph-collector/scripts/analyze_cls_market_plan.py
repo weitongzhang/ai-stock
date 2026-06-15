@@ -25,7 +25,7 @@ THEME_RULES = [
     },
     {
         "theme": "半导体/国产替代",
-        "keywords": ["半导体", "芯片", "出口管制", "先进封装", "EDA", "光刻", "晶圆", "存储", "HBM", "设备", "材料"],
+        "keywords": ["半导体", "芯片", "GPU", "出口管制", "先进封装", "EDA", "光刻", "晶圆", "存储", "HBM", "设备", "材料"],
         "sectors": ["半导体设备", "材料", "先进封装", "存储芯片", "国产替代"],
         "candidates": ["中芯国际", "北方华创", "中微公司", "华海清科", "拓荆科技", "寒武纪", "兆易创新"],
     },
@@ -70,6 +70,20 @@ THEME_RULES = [
 MARKET_KEYWORDS = ["涨停", "跌停", "封板", "炸板", "连板", "成交额", "收评", "午评", "竞价", "龙虎榜"]
 POLICY_KEYWORDS = ["国务院", "发改委", "工信部", "商务部", "财政部", "央行", "证监会", "政策", "试点", "规划", "通知", "关税", "反倾销"]
 RISK_KEYWORDS = ["监管", "禁令", "制裁", "调查", "下跌", "跌破", "冲突", "风险", "退潮", "缩量", "补跌"]
+WEAK_KEYWORDS = {"AI", "终端", "设备", "材料", "存储", "通信", "卫星", "无人机", "游戏"}
+THEME_CONTEXT_KEYWORDS = {
+    "AI算力/数据中心": ["人工智能", "算力", "数据中心", "服务器", "液冷", "光模块", "光通信", "GPU", "CPO"],
+    "半导体/国产替代": ["半导体", "芯片", "晶圆", "光刻", "封装", "国产替代", "GPU"],
+    "机器人/具身智能": ["机器人", "具身", "减速器", "伺服", "灵巧手"],
+    "6G/通信/卫星互联网": ["6G", "通信设备", "基站", "射频", "卫星互联网", "商业航天", "光通信"],
+    "低空经济/商业航天": ["低空经济", "eVTOL", "通航", "商业航天", "卫星应用", "空管"],
+    "消费/旅游/短剧": ["消费", "旅游", "零售", "白酒", "食品", "短剧", "影视", "游戏公司", "促消费"],
+}
+THEME_EXCLUSIONS = {
+    "低空经济/商业航天": ["袭击", "击毁", "战争", "拦截", "军用无人机"],
+    "消费/旅游/短剧": ["停运", "收购", "固态存储"],
+    "机器人/具身智能": ["MPO", "CPO", "光纤", "光通信"],
+}
 
 
 def clean_text(value: Any) -> str:
@@ -184,8 +198,13 @@ def themes_for_item(item: dict[str, Any]) -> list[dict[str, Any]]:
 def themes_for_text(text: str, item: dict[str, Any] | None = None) -> list[dict[str, Any]]:
     matched: list[dict[str, Any]] = []
     for rule in THEME_RULES:
+        theme = rule["theme"]
+        if any(keyword_in_text(term, text) for term in THEME_EXCLUSIONS.get(theme, [])):
+            continue
         keywords = [kw for kw in rule["keywords"] if keyword_in_text(kw, text)]
-        if keywords:
+        strong_keywords = [kw for kw in keywords if kw not in WEAK_KEYWORDS]
+        has_context = any(keyword_in_text(term, text) for term in THEME_CONTEXT_KEYWORDS.get(theme, []))
+        if strong_keywords or (keywords and has_context):
             matched.append({"rule": rule, "keywords": keywords, "item_score": score_item(item or {}, keywords)})
     return matched
 
@@ -337,7 +356,7 @@ def build_theme_rows(items: list[dict[str, Any]], kpl_rows: list[dict[str, Any]]
         score = int(bucket["score"])
         if bucket["kpl_count"] and (bucket["red_count"] or bucket["policy_count"]):
             stance = "重点观察"
-        elif bucket["red_count"] and bucket["policy_count"]:
+        elif score >= 40 and bucket["red_count"] and bucket["policy_count"]:
             stance = "重点观察"
         elif bucket["kpl_count"] and score >= 12:
             stance = "盘面验证后参与"

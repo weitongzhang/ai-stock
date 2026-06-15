@@ -131,6 +131,12 @@ def kpl_tag(row: dict[str, Any]) -> str:
     return str(row.get("tag") or row.get("标签") or row.get("status") or row.get("状态") or "")
 
 
+def kpl_evidence_weight(row: dict[str, Any]) -> float:
+    text = norm_text(row)
+    has_reason = any(row.get(key) for key in ("theme", "题材", "lu_desc", "涨停原因"))
+    return 1.0 if has_reason else 0.5 if any(word in text for words in THEME_KEYWORDS.values() for word in words) else 0.25
+
+
 def attach_kpl(themes: dict[str, dict[str, Any]], rows: list[dict[str, Any]]) -> None:
     for item in themes.values():
         item["kpl_rows"] = []
@@ -169,7 +175,18 @@ def lhb_net(row: dict[str, Any]) -> float:
     return 0.0
 
 
+def format_money(value: Any) -> str:
+    amount = num(value)
+    absolute = abs(amount)
+    if absolute >= 100_000_000:
+        return f"{amount / 100_000_000:.2f}亿"
+    if absolute >= 10_000:
+        return f"{amount / 10_000:.2f}万"
+    return f"{amount:.0f}元"
+
+
 def attach_lhb(themes: dict[str, dict[str, Any]], rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    rows = aggregate_lhb_rows(rows)
     top = sorted(rows, key=lhb_net, reverse=True)[:10]
     for item in themes.values():
         names = set(item.get("candidates", [])) | set(item.get("kpl_stocks", []))
@@ -178,6 +195,26 @@ def attach_lhb(themes: dict[str, dict[str, Any]], rows: list[dict[str, Any]]) ->
         item["lhb_net_buy"] = sum(lhb_net(row) for row in hits)
         item["lhb_stocks"] = [stock_name(row) for row in sorted(hits, key=lhb_net, reverse=True) if stock_name(row)]
     return top
+
+
+def aggregate_lhb_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    by_name: dict[str, dict[str, Any]] = {}
+    for row in rows:
+        name = stock_name(row)
+        if not name:
+            continue
+        current = by_name.get(name)
+        if current is None or abs(lhb_net(row)) > abs(lhb_net(current)):
+            merged = dict(row)
+            merged["上榜原因"] = "；".join(
+                dict.fromkeys(
+                    str(item.get("上榜原因") or item.get("reason") or "")
+                    for item in rows
+                    if stock_name(item) == name and (item.get("上榜原因") or item.get("reason"))
+                )
+            )
+            by_name[name] = merged
+    return list(by_name.values())
 
 
 def read_market_overview(paths: list[Path]) -> dict[str, float]:
@@ -196,11 +233,13 @@ def score_theme(item: dict[str, Any], overview: dict[str, float]) -> dict[str, A
     flow = min(35.0, item.get("cls_score", 0.0) * 0.35 + item.get("red_count", 0.0) * 3.0)
     kpl_rows = item.get("kpl_rows", [])
     kpl_count = len(kpl_rows)
+    weighted_kpl_count = sum(kpl_evidence_weight(row) for row in kpl_rows)
     failed_count = sum(1 for row in kpl_rows if "炸" in kpl_tag(row))
     limit_count = sum(1 for row in kpl_rows if "涨停" in kpl_tag(row) or "连板" in kpl_tag(row))
-    map_score = min(25.0, item.get("news_count", 0.0) * 2.0 + kpl_count * 5.0 + len(item.get("sectors", [])) * 0.8)
+    map_score = min(25.0, item.get("news_count", 0.0) * 2.0 + weighted_kpl_count * 5.0 + len(item.get("sectors", [])) * 0.8)
     lhb_net_buy = item.get("lhb_net_buy", 0.0)
-    core = min(25.0, limit_count * 5.0 + len(item.get("lhb_rows", [])) * 3.0 + max(0.0, lhb_net_buy) / 100_000_000 * 2.0)
+    weighted_limit_count = sum(kpl_evidence_weight(row) for row in kpl_rows if "涨停" in kpl_tag(row) or "连板" in kpl_tag(row))
+    core = min(25.0, weighted_limit_count * 5.0 + len(item.get("lhb_rows", [])) * 3.0 + max(0.0, lhb_net_buy) / 100_000_000 * 2.0)
     timing = 10.0 if limit_count else 5.0
     timing -= failed_count * 2.0
     if overview:
@@ -251,7 +290,8 @@ def classify_market(rows: list[dict[str, Any]], overview: dict[str, float], has_
         down = overview.get("下跌家数") or overview.get("decliners")
         if up and down and up < down * 0.7 and top < 55:
             return "防守观察"
-    if top >= 68 and strong >= 2 and has_kpl:
+    has_high_quality_kpl = any(row.get("kpl_count", 0) and row.get("core_score", 0) >= 12 for row in rows)
+    if top >= 68 and strong >= 2 and has_kpl and has_high_quality_kpl:
         return "局部进攻"
     if top >= 50:
         return "结构性轮动"
@@ -446,7 +486,7 @@ def write_markdown(
     if top_lhb:
         lines.extend(["## 龙虎榜净买额前列", ""])
         for row in top_lhb[:10]:
-            lines.append(f"- {stock_name(row)}：净买额 {lhb_net(row):.0f}，原因：{row.get('上榜原因') or row.get('reason') or ''}")
+            lines.append(f"- {stock_name(row)}：净买额 {format_money(lhb_net(row))}，原因：{row.get('上榜原因') or row.get('reason') or ''}")
         lines.append("")
     if limits:
         lines.extend(["## 数据限制", ""])

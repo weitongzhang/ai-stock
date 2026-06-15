@@ -36,6 +36,33 @@ Use any available combination:
 
 The workflow is designed to run even when some inputs are missing. Missing data is written into the report as a limitation.
 
+## Primary Entry Point
+
+Use the single Skill entrypoint instead of manually chaining scripts:
+
+```powershell
+# Collect live inputs, analyze, and write an audited result.
+python scripts\run_market_flow_skill.py --date 2026-06-15 --collect --out-dir examples\market\market-flow-skill\2026-06-15
+
+# Re-run deterministically from existing local inputs.
+python scripts\run_market_flow_skill.py --date 2026-06-15 --offline --out-dir examples\market\market-flow-skill\2026-06-15-offline
+```
+
+The entrypoint writes:
+
+- `skill-result.json`: machine-readable status, input quality, top themes, quality issues, artifacts, and executed steps.
+- `skill-result.md`: concise human-readable quality audit.
+- `report/<date>-market-flow.csv`: structured theme scores.
+- `report/<date>-market-flow.md`: readable market-flow report.
+
+Status semantics:
+
+- `completed`: required inputs exist and no material quality issue was found.
+- `degraded`: report was generated, but quality issues require caution.
+- `blocked`: required inputs are missing.
+
+This Skill narrows the research scope and produces observation priorities. It does not make the final trading decision.
+
 ## Commands
 
 Collect market breadth from Eastmoney/AkShare:
