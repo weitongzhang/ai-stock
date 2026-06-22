@@ -92,6 +92,18 @@ FTShare provider
 6. 在 `tools/` 完善同步运行副本、技能校验和脚手架命令。
 7. 后续新增技能时，先归入领域目录；若出现跨技能复用，再下沉到 `src/skill_lab/`。
 
+## Research Agent
+
+首版确定性研究 Agent 已提供三个任务入口：
+
+```powershell
+python tools\run_research_agent.py tomorrow-plan --date 2026-06-04 --allow-quality-warnings --offline
+python tools\run_research_agent.py post-market-review --date 2026-06-04 --allow-quality-warnings --offline
+python tools\run_research_agent.py holding-analysis --symbol 600580.SH --name 卧龙电驱 --cost 42.5 --position-pct 60
+```
+
+Agent 控制器位于 `src/skill_lab/agent/`。它只编排经过测试的确定性领域工具，不包含券商登录、下单或自动交易能力。
+
 ## Safety Notes
 
 - 股票筛选结果仅供技术研究，不构成投资建议。

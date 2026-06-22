@@ -23,6 +23,10 @@
     {
       "name": "methodology",
       "purpose": "方法论编排层，负责把求是等思考框架转化为数据查询计划、主要矛盾判断、仓位纪律和实践验证流程"
+    },
+    {
+      "name": "institutional-research",
+      "purpose": "机构研究增强层，负责接入基金、基金经理、资产配置、行业打分、量化策略卡片等外部研究证据"
     }
   ],
   "skills": [
@@ -76,6 +80,61 @@
         "daily-review-report",
         "sector-priority-list",
         "next-day-observation-plan"
+      ]
+    },
+    {
+      "name": "sector-money-flow-chart",
+      "domain": "stock-selection",
+      "type": "market-flow-visualization",
+      "path": "skills/stock-selection/sector-money-flow-chart",
+      "runtime_path": "$USERPROFILE/.codex/skills/sector-money-flow-chart",
+      "purpose": "生成A股板块分钟资金流/强弱代理竖屏复盘图，输出SVG、HTML动图、CSV和数据质量说明，用于识别板块全天流入、尾盘抢筹、冲高回落和高低切",
+      "consumes": [
+        "sector-minute-money-flow",
+        "sector-board-minute-data",
+        "market-flow-report"
+      ],
+      "coordinates": [
+        "a-share-market-flow-analyst",
+        "a-share-halfway-trade-screener",
+        "qiushi-stock-analysis"
+      ],
+      "provides": [
+        "sector-money-flow-svg",
+        "sector-money-flow-html-replay",
+        "sector-money-flow-fullscreen-player",
+        "sector-money-flow-trading-day-selector",
+        "sector-money-flow-csv",
+        "sector-money-flow-quality-report",
+        "sector-intraday-replay-chart"
+      ]
+    },
+    {
+      "name": "a-share-halfway-trade-screener",
+      "domain": "stock-selection",
+      "type": "intraday-trading-strategy",
+      "path": "skills/stock-selection/a-share-halfway-trade-screener",
+      "runtime_path": "$USERPROFILE/.codex/skills/a-share-halfway-trade-screener",
+      "purpose": "A股盘中半路模式候选筛选，结合市场环境、板块主线、前排确认、个股分时承接、量能结构和止损距离，输出今日可半路标的优先级与触发条件",
+      "consumes": [
+        "stock-quotes",
+        "stock-ohlcv",
+        "market-flow-report",
+        "market-breadth",
+        "index-environment",
+        "sector-priority-list"
+      ],
+      "coordinates": [
+        "ftshare-market-data",
+        "a-share-market-flow-analyst",
+        "qiushi-stock-analysis",
+        "a-share-bsa-lift-analyst"
+      ],
+      "provides": [
+        "halfway-candidate-list",
+        "intraday-sector-front-row-review",
+        "halfway-entry-trigger-plan",
+        "halfway-stop-loss-plan"
       ]
     },
     {
@@ -211,6 +270,36 @@
         "risk-and-execution-boundary",
         "methodology-reflection"
       ]
+    },
+    {
+      "name": "csc-juzi-mcp",
+      "domain": "institutional-research",
+      "type": "mcp-research-adapter",
+      "path": "skills/institutional-research/csc-juzi-mcp",
+      "runtime_path": "$USERPROFILE/.codex/skills/csc-juzi-mcp",
+      "purpose": "中信建投 Juzi MCP 机构研究能力路由，覆盖基金、基金经理、资产配置、行业打分、量化策略和策略卡片外部证据",
+      "consumes": [
+        "juzi-fund-mcp-output",
+        "juzi-manager-mcp-output",
+        "juzi-stratos-mcp-output",
+        "juzi-report-mcp-output"
+      ],
+      "coordinates": [
+        "ftshare-market-data",
+        "a-share-market-flow-analyst",
+        "qiushi-stock-analysis",
+        "watchlist-tracker"
+      ],
+      "provides": [
+        "institutional-research-context",
+        "fund-research-evidence",
+        "manager-research-evidence",
+        "asset-allocation-context",
+        "strategy-card-evidence"
+      ],
+      "security": {
+        "credential_policy": "MCP tokens and live authentication headers must stay in local client config and must never be committed"
+      }
     }
   ],
   "sources": [

@@ -16,8 +16,10 @@ the next engineering entry point should be.
 | 8 Backtesting adapter | P1 | Started | backtest schemas, signal bridge, adapter protocol, metrics, simple engine | Wrap user's existing backtest code |
 | 9 Harness | P1 | Started | eval schemas, datasets, judges, runner, reports, CLI | Add domain-specific judge prompts and datasets |
 | 10 Perspective skills | P1 | Started | Qiushi methodology, Chen Xiaoqun theme/leader perspective, Model Xiansheng dialectical finance perspective | Convert perspectives into Harness judge dimensions and optional domain agents |
-| 11 Daily scripts | P2 | Not started | none | Add pre-market, post-market, backtest scripts |
-| 12 Visualization | P3 | Not started | none | Consume JSON/CSV/Markdown only |
+| 11 Institutional research | P1 | Started | CSCI Juzi MCP routing skill, institutional research schemas, context normalizer, review/plan attachment, secret hygiene smoke test | Add Harness judge and real MCP output samples |
+| 12 Daily scripts | P2 | Not started | none | Add pre-market, post-market, backtest scripts |
+| 13 Visualization | P3 | Not started | none | Consume JSON/CSV/Markdown only |
+| 14 Research agent runtime | P1 | Started | deterministic controller, state, tool registry, safety policy, three-task CLI | Add journal persistence, lifecycle state and scheduled runners |
 
 ## Current Smoke Coverage
 
@@ -37,6 +39,8 @@ the next engineering entry point should be.
 | YC-buy adapter | `tests/smoke/test_yc_buy_adapter.py` |
 | Backtesting adapter | `tests/smoke/test_backtesting_adapter.py` |
 | Blogger perspective skills | `tests/smoke/test_perspective_skills.py` |
+| Institutional research context | `tests/smoke/test_institutional_research_context.py` |
+| Research agent runtime | `tests/smoke/test_research_agent.py` |
 
 ## Near-Term Build Order
 
@@ -48,3 +52,4 @@ the next engineering entry point should be.
 | 4 | Add pre-market and post-market script variants | Turns modules into repeatable workflows |
 | 5 | Add domain-specific Harness judge datasets | Turns methodology into regression samples |
 | 6 | Add perspective-specific Harness evals | Tests whether blogger frameworks improve review and planning quality |
+| 7 | Add institutional research Harness samples | Lets MCP evidence quality and conflict handling become regressions |

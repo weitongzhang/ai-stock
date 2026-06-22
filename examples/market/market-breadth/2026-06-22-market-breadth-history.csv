@@ -1,0 +1,6 @@
+﻿date,trade_date,limit_up_count,failed_limit_up_count,limit_down_count,seal_rate,failed_limit_up_rate,limit_up_down_ratio,limit_up_seal_amount_yi,double_limit_up_count,highest_limit_streak
+2026-06-15,20260615,145,43,3,77.13,22.87,48.33,125.58,11,3
+2026-06-16,20260616,117,38,7,75.48,24.52,16.71,104.0,29,4
+2026-06-17,20260617,86,28,1,75.44,24.56,86.0,107.87,19,3
+2026-06-18,20260618,91,42,12,68.42,31.58,7.58,75.84,12,4
+2026-06-22,20260622,110,28,4,79.71,20.29,27.5,229.41,19,5

@@ -50,6 +50,9 @@ python tests\smoke\test_yc_buy_adapter.py
 python tests\smoke\test_backtesting_adapter.py
 python tests\smoke\test_perspective_skills.py
 python tests\smoke\test_methodology_perspective_coordination.py
+python tests\smoke\test_institutional_research_context.py
+python tests\smoke\test_research_agent.py
+python tests\smoke\test_sector_money_flow_chart.py
 ```
 
 Minimal Harness CLI:

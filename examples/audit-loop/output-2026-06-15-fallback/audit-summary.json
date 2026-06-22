@@ -1,0 +1,84 @@
+{
+  "run_id": "daily:2026-06-15",
+  "plan_id": "plan:2026-06-15",
+  "state": "EVALUATED_WITH_GAPS",
+  "journal_event_count": 3,
+  "journal_events": [
+    "plan_created",
+    "plan_outcome",
+    "plan_evaluated"
+  ],
+  "plan_summary": "market=attack; top_theme=能源/煤炭/油气; position=medium position; add only after theme spread confirms",
+  "outcome_summary": "Example outcome: first priority triggered; lowest priority invalidated; human review required.",
+  "closure": {
+    "resolved_items": 2,
+    "total_items": 5,
+    "coverage_pct": 40.0
+  },
+  "evaluation": {
+    "sample_id": "audit:2026-06-04",
+    "domain": "tomorrow_plan",
+    "target_version": "audit-loop-example-v1",
+    "judge_version": "deterministic-closure-v1",
+    "format_ok": true,
+    "field_complete": true,
+    "score": 70.0,
+    "passed": false,
+    "error_types": [],
+    "evidence_quality": 40.0,
+    "actionability": 100,
+    "risk_control": 100,
+    "notes": "resolved 2/5 plan items",
+    "suggested_fix": "Record an outcome for every unresolved plan item.",
+    "raw": {
+      "trade_date": "2026-06-16",
+      "run_id": "daily:2026-06-15",
+      "closure_coverage": 0.4
+    }
+  },
+  "items": [
+    {
+      "item_id": "plan:2026-06-15:item:1",
+      "theme": "能源/煤炭/油气",
+      "action": "core_dip",
+      "confirm_signal": "能源/煤炭/油气前排竞价/开盘强于板块，容量核心放量不破分时均线，后排出现扩散。",
+      "give_up_signal": "能源/煤炭/油气核心低开低走、冲高回落，或消息强但板块无量无扩散。",
+      "closure": "triggered"
+    },
+    {
+      "item_id": "plan:2026-06-15:item:2",
+      "theme": "AI算力/数据中心",
+      "action": "core_dip",
+      "confirm_signal": "AI算力/数据中心前排竞价/开盘强于板块，容量核心放量不破分时均线，后排出现扩散。",
+      "give_up_signal": "AI算力/数据中心核心低开低走、冲高回落，或消息强但板块无量无扩散。",
+      "closure": "unresolved"
+    },
+    {
+      "item_id": "plan:2026-06-15:item:3",
+      "theme": "6G/通信/卫星互联网",
+      "action": "watch",
+      "confirm_signal": "6G/通信/卫星互联网前排竞价/开盘强于板块，容量核心放量不破分时均线，后排出现扩散。",
+      "give_up_signal": "6G/通信/卫星互联网核心低开低走、冲高回落，或消息强但板块无量无扩散。",
+      "closure": "unresolved"
+    },
+    {
+      "item_id": "plan:2026-06-15:item:4",
+      "theme": "半导体/国产替代",
+      "action": "watch",
+      "confirm_signal": "半导体/国产替代前排竞价/开盘强于板块，容量核心放量不破分时均线，后排出现扩散。",
+      "give_up_signal": "半导体/国产替代核心低开低走、冲高回落，或消息强但板块无量无扩散。",
+      "closure": "unresolved"
+    },
+    {
+      "item_id": "plan:2026-06-15:item:5",
+      "theme": "消费/旅游/短剧",
+      "action": "give_up",
+      "confirm_signal": "消费/旅游/短剧前排竞价/开盘强于板块，容量核心放量不破分时均线，后排出现扩散。",
+      "give_up_signal": "消费/旅游/短剧核心低开低走、冲高回落，或消息强但板块无量无扩散。",
+      "closure": "invalidated"
+    }
+  ],
+  "requested_date": "2026-06-15",
+  "data_date": "2026-06-04",
+  "used_fallback": true
+}

@@ -1,0 +1,171 @@
+{
+  "skill": "a-share-market-flow-analyst",
+  "version": "2",
+  "trade_date": "2026-06-15",
+  "status": "degraded",
+  "market_state": "局部进攻",
+  "input_quality": {
+    "breadth_source": "已使用新浪备用源",
+    "breadth_complete": true,
+    "news": "complete",
+    "limit_pool": "degraded-no-limit-up-reason",
+    "dragon_tiger": "complete"
+  },
+  "top_themes": [
+    {
+      "theme": "能源/煤炭/油气",
+      "total_score": "87.3",
+      "stance": "重点进攻",
+      "flow_score": "31.8",
+      "map_score": "25.0",
+      "core_score": "20.5",
+      "timing_score": "10.0",
+      "news_count": "8",
+      "red_count": "4",
+      "kpl_count": "7",
+      "failed_count": "1",
+      "lhb_net_buy": "125114150.0",
+      "core_names": "中远海能、招商南油、招商轮船、宁波远洋、南 京 港、凤凰航运、宁波海运",
+      "lhb_stocks": "招商南油",
+      "confirm_signal": "能源/煤炭/油气前排竞价/开盘强于板块，容量核心放量不破分时均线，后排出现扩散。",
+      "give_up_signal": "能源/煤炭/油气核心低开低走、冲高回落，或消息强但板块无量无扩散。"
+    },
+    {
+      "theme": "半导体/国产替代",
+      "total_score": "81.5",
+      "stance": "积极观察",
+      "flow_score": "38.0",
+      "map_score": "25.0",
+      "core_score": "10.5",
+      "timing_score": "8.0",
+      "news_count": "13",
+      "red_count": "10",
+      "kpl_count": "5",
+      "failed_count": "2",
+      "lhb_net_buy": "-152846888.82",
+      "core_names": "士兰微、炬光科技、新洁能、先导基电、有研硅",
+      "lhb_stocks": "炬光科技",
+      "confirm_signal": "半导体/国产替代前排竞价/开盘强于板块，容量核心放量不破分时均线，后排出现扩散。",
+      "give_up_signal": "半导体/国产替代核心低开低走、冲高回落，或消息强但板块无量无扩散。"
+    },
+    {
+      "theme": "6G/通信/卫星互联网",
+      "total_score": "76.0",
+      "stance": "重点进攻",
+      "flow_score": "16.0",
+      "map_score": "25.0",
+      "core_score": "25.0",
+      "timing_score": "10.0",
+      "news_count": "3",
+      "red_count": "2",
+      "kpl_count": "7",
+      "failed_count": "1",
+      "lhb_net_buy": "2988438829.33",
+      "core_names": "意华股份、太辰光、长芯博创、光迅科技、特发信息、剑桥科技、光库科技",
+      "lhb_stocks": "光库科技、长芯博创、太辰光",
+      "confirm_signal": "6G/通信/卫星互联网前排竞价/开盘强于板块，容量核心放量不破分时均线，后排出现扩散。",
+      "give_up_signal": "6G/通信/卫星互联网核心低开低走、冲高回落，或消息强但板块无量无扩散。"
+    },
+    {
+      "theme": "AI算力/数据中心",
+      "total_score": "70.0",
+      "stance": "积极观察",
+      "flow_score": "38.0",
+      "map_score": "25.0",
+      "core_score": "0.0",
+      "timing_score": "7.0",
+      "news_count": "14",
+      "red_count": "9",
+      "kpl_count": "0",
+      "failed_count": "0",
+      "lhb_net_buy": "0",
+      "core_names": "中际旭创、新易盛、天孚通信、工业富联、浪潮信息、润泽科技、曙光数创",
+      "lhb_stocks": "",
+      "confirm_signal": "AI算力/数据中心前排竞价/开盘强于板块，容量核心放量不破分时均线，后排出现扩散。",
+      "give_up_signal": "AI算力/数据中心核心低开低走、冲高回落，或消息强但板块无量无扩散。"
+    },
+    {
+      "theme": "消费/旅游/短剧",
+      "total_score": "58.5",
+      "stance": "积极观察",
+      "flow_score": "11.9",
+      "map_score": "25.0",
+      "core_score": "17.5",
+      "timing_score": "4.0",
+      "news_count": "4",
+      "red_count": "1",
+      "kpl_count": "11",
+      "failed_count": "4",
+      "lhb_net_buy": "0",
+      "core_names": "光大同创、游族网络、胜利精密、福蓉科技、利通电子、安洁科技、可川科技、茂业商业",
+      "lhb_stocks": "",
+      "confirm_signal": "消费/旅游/短剧前排竞价/开盘强于板块，容量核心放量不破分时均线，后排出现扩散。",
+      "give_up_signal": "消费/旅游/短剧核心低开低走、冲高回落，或消息强但板块无量无扩散。"
+    }
+  ],
+  "quality_issues": [
+    {
+      "severity": "medium",
+      "code": "HIGH_SCORE_WEAK_CORE",
+      "detail": "半导体/国产替代"
+    },
+    {
+      "severity": "medium",
+      "code": "HIGH_SCORE_WEAK_CORE",
+      "detail": "AI算力/数据中心"
+    },
+    {
+      "severity": "high",
+      "code": "THEME_CORE_MISMATCH",
+      "detail": "消费/旅游/短剧: 光大同创、游族网络、胜利精密、福蓉科技、利通电子、安洁科技、可川科技、茂业商业"
+    }
+  ],
+  "artifacts": {
+    "market_flow_csv": "examples\\market\\market-flow-skill\\2026-06-15-live\\report\\2026-06-15-market-flow.csv",
+    "market_flow_markdown": "examples\\market\\market-flow-skill\\2026-06-15-live\\report\\2026-06-15-market-flow.md"
+  },
+  "steps": [
+    {
+      "name": "collect-market-breadth",
+      "status": "completed",
+      "returncode": 0,
+      "stdout": "{\n  \"status\": \"partial\",\n  \"metrics\": 26,\n  \"history_days\": 5,\n  \"errors\": [\n    \"stock_zh_a_spot_em: ConnectionError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))\",\n    \"stock_market_fund_flow: ConnectionError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))\"\n  ],\n  \"csv\": \"C:\\\\Users\\\\wtzhang12\\\\Documents\\\\Codex\\\\2026-06-03\\\\pinarocko346-creator-yc-buy-git-https\\\\skills-engineering-workspace\\\\examples\\\\market\\\\market-flow-skill-live-inputs\\\\market-breadth\\\\2026-06-15-market-breadth.csv\",\n  \"history_csv\": \"C:\\\\Users\\\\wtzhang12\\\\Documents\\\\Codex\\\\2026-06-03\\\\pinarocko346-creator-yc-buy-git-https\\\\skills-engineering-workspace\\\\examples\\\\market\\\\market-flow-skill-live-inputs\\\\market-breadth\\\\2026-06-15-market-breadth-history.csv\",\n  \"json\": \"C:\\\\Users\\\\wtzhang12\\\\Documents\\\\Codex\\\\2026-06-03\\\\pinarocko346-creator-yc-buy-git-https\\\\skills-engineering-workspace\\\\examples\\\\market\\\\market-flow-skill-live-inputs\\\\market-breadth\\\\2026-06-15-market-breadth.json\",\n  \"markdown\": \"C:\\\\Users\\\\wtzhang12\\\\Documents\\\\Codex\\\\2026-06-03\\\\pinarocko346-creator-yc-buy-git-https\\\\skills-engineering-workspace\\\\examples\\\\market\\\\market-flow-skill-live-inputs\\\\market-breadth\\\\2026-06-15-market-breadth.md\"\n}",
+      "stderr": "Please wait for a moment:   0%|          | 0/70 [00:00<?, ?it/s]\nPlease wait for a moment:   1%|▏         | 1/70 [00:00<00:17,  3.91it/s]\nPlease wait for a moment:   3%|▎         | 2/70 [00:00<00:20,  3.32it/s]\nPlease wait for a moment:   4%|▍         | 3/70 [00:00<00:20,  3.26it/s]\nPlease wait for a moment:   6%|▌         | 4/70 [00:01<00:22,  2.89it/s]\nPlease wait for a moment:   7%|▋         | 5/70 [00:01<00:23,  2.74it/s]\nPlease wait for a moment:   9%|▊         | 6/70 [00:02<00:33,  1.93it/s]\nPlease wait for a moment:  10%|█         | 7/70 [00:02<00:28,  2.19it/s]\nPlease wait for a moment:  11%|█▏        | 8/70 [00:03<00:24,  2.50it/s]\nPlease wait for a moment:  13%|█▎        | 9/70 [00:03<00:22,  2.77it/s]\nPlease wait for a moment:  14%|█▍        | 10/70 [00:03<00:20,  2.87it/s]\nPlease wait for a moment:  16%|█▌        | 11/70 [00:04<00:20,  2.90it/s]\nPlease wait for a moment:  17%|█▋        | 12/70 [00:04<00:19,  3.05it/s]\nPlease wait for a moment:  19%|█▊        | 13/70 [00:05<00:26,  2.18it/s]\nPlease wait for a moment:  20%|██        | 14/70 [00:05<00:22,  2.48it/s]\nPlease wait for a moment:  21%|██▏       | 15/70 [00:05<00:21,  2.57it/s]\nPlease wait for a moment:  23%|██▎       | 16/70 [00:06<00:19,  2.82it/s]\nPlease wait for a moment:  24%|██▍       | 17/70 [00:06<00:18,  2.82it/s]\nPlease wait for a moment:  26%|██▌       | 18/70 [00:06<00:18,  2.78it/s]\nPlease wait for a moment:  27%|██▋       | 19/70 [00:07<00:17,  2.92it/s]\nPlease wait for a moment:  29%|██▊       | 20/70 [00:07<00:16,  3.02it/s]\nPlease wait for a moment:  30%|███       | 21/70 [00:07<00:17,  2.83it/s]\nPlease wait for a moment:  31%|███▏      | 22/70 [00:08<00:15,  3.11it/s]\nPlease wait for a moment:  33%|███▎      | 23/70 [00:08<00:15,  3.13it/s]\nPlease wait for a moment:  34%|███▍      | 24/70 [00:08<00:14,  3.20it/s]\nPlease wait for a moment:  36%|███▌      | 25/70 [00:08<00:14,  3.14it/s]\nPlease wait for a moment:  37%|███▋      | 26/70 [00:09<00:15,  2.93it/s]\nPlease wait for a moment:  39%|███▊      | 27/70 [00:09<00:14,  3.00it/s]\nPlease wait for a moment:  40%|████      | 28/70 [00:09<00:14,  2.98it/s]\nPlease wait for a moment:  41%|████▏     | 29/70 [00:10<00:15,  2.70it/s]\nPlease wait for a moment:  43%|████▎     | 30/70 [00:10<00:15,  2.52it/s]\nPlease wait for a moment:  44%|████▍     | 31/70 [00:11<00:15,  2.51it/s]\nPlease wait for a moment:  46%|████▌     | 32/70 [00:11<00:14,  2.62it/s]\nPlease wait for a moment:  47%|████▋     | 33/70 [00:11<00:13,  2.83it/s]\nPlease wait for a moment:  49%|████▊     | 34/70 [00:12<00:12,  2.79it/s]\nPlease wait for a moment:  50%|█████     | 35/70 [00:12<00:12,  2.83it/s]\nPlease wait for a moment:  51%|█████▏    | 36/70 [00:12<00:11,  3.08it/s]\nPlease wait for a moment:  53%|█████▎    | 37/70 [00:13<00:10,  3.15it/s]\nPlease wait for a moment:  54%|█████▍    | 38/70 [00:13<00:10,  3.15it/s]\nPlease wait for a moment:  56%|█████▌    | 39/70 [00:13<00:09,  3.16it/s]\nPlease wait for a moment:  57%|█████▋    | 40/70 [00:14<00:08,  3.34it/s]\nPlease wait for a moment:  59%|█████▊    | 41/70 [00:14<00:08,  3.39it/s]\nPlease wait for a moment:  60%|██████    | 42/70 [00:14<00:08,  3.40it/s]\nPlease wait for a moment:  61%|██████▏   | 43/70 [00:15<00:08,  3.25it/s]\nPlease wait for a moment:  63%|██████▎   | 44/70 [00:15<00:07,  3.33it/s]\nPlease wait for a moment:  64%|██████▍   | 45/70 [00:15<00:08,  3.06it/s]\nPlease wait for a moment:  66%|██████▌   | 46/70 [00:16<00:08,  2.97it/s]\nPlease wait for a moment:  67%|██████▋   | 47/70 [00:16<00:07,  3.05it/s]\nPlease wait for a moment:  69%|██████▊   | 48/70 [00:16<00:07,  3.14it/s]\nPlease wait for a moment:  70%|███████   | 49/70 [00:17<00:06,  3.01it/s]\nPlease wait for a moment:  71%|███████▏  | 50/70 [00:17<00:06,  3.11it/s]\nPlease wait for a moment:  73%|███████▎  | 51/70 [00:17<00:06,  3.03it/s]\nPlease wait for a moment:  74%|███████▍  | 52/70 [00:18<00:06,  2.84it/s]\nPlease wait for a moment:  76%|███████▌  | 53/70 [00:18<00:06,  2.82it/s]\nPlease wait for a moment:  77%|███████▋  | 54/70 [00:18<00:05,  2.87it/s]\nPlease wait for a moment:  79%|███████▊  | 55/70 [00:19<00:05,  2.99it/s]\nPlease wait for a moment:  80%|████████  | 56/70 [00:19<00:04,  3.04it/s]\nPlease wait for a moment:  81%|████████▏ | 57/70 [00:19<00:04,  2.97it/s]\nPlease wait for a moment:  83%|████████▎ | 58/70 [00:20<00:03,  3.04it/s]\nPlease wait for a moment:  84%|████████▍ | 59/70 [00:20<00:03,  3.08it/s]\nPlease wait for a moment:  86%|████████▌ | 60/70 [00:20<00:03,  3.03it/s]\nPlease wait for a moment:  87%|████████▋ | 61/70 [00:21<00:02,  3.02it/s]\nPlease wait for a moment:  89%|████████▊ | 62/70 [00:21<00:02,  3.20it/s]\nPlease wait for a moment:  90%|█████████ | 63/70 [00:21<00:02,  3.36it/s]\nPlease wait for a moment:  91%|█████████▏| 64/70 [00:21<00:01,  3.54it/s]\nPlease wait for a moment:  93%|█████████▎| 65/70 [00:22<00:02,  2.35it/s]\nPlease wait for a moment:  94%|█████████▍| 66/70 [00:22<00:01,  2.64it/s]\nPlease wait for a moment:  96%|█████████▌| 67/70 [00:23<00:01,  2.72it/s]\nPlease wait for a moment:  97%|█████████▋| 68/70 [00:23<00:00,  2.66it/s]\nPlease wait for a moment:  99%|█████████▊| 69/70 [00:23<00:00,  2.71it/s]\nPlease wait for a moment: 100%|██████████| 70/70 [00:24<00:00,  2.41it/s]"
+    },
+    {
+      "name": "collect-market-evidence",
+      "status": "completed",
+      "returncode": 0,
+      "stdout": "{\n  \"status\": \"ok\",\n  \"date\": \"2026-06-15\",\n  \"limit_up\": 145,\n  \"failed_limit_up\": 43,\n  \"dragon_tiger_rows\": 85,\n  \"limit_pool_csv\": \"C:\\\\Users\\\\wtzhang12\\\\Documents\\\\Codex\\\\2026-06-03\\\\pinarocko346-creator-yc-buy-git-https\\\\skills-engineering-workspace\\\\examples\\\\market\\\\market-flow-skill-live-inputs\\\\limit-pool\\\\20260615-akshare-limit-pool.csv\",\n  \"dragon_tiger_csv\": \"C:\\\\Users\\\\wtzhang12\\\\Documents\\\\Codex\\\\2026-06-03\\\\pinarocko346-creator-yc-buy-git-https\\\\skills-engineering-workspace\\\\examples\\\\market\\\\market-flow-skill-live-inputs\\\\dragon-tiger\\\\20260615-eastmoney-lhb.csv\",\n  \"limitations\": [\n    \"AkShare limit-pool rows do not include KPL theme or limit-up-reason fields; downstream scoring discounts them.\"\n  ]\n}",
+      "stderr": "0%|          | 0/1 [00:00<?, ?it/s]\n100%|██████████| 1/1 [00:01<00:00,  1.22s/it]"
+    },
+    {
+      "name": "collect-cls",
+      "status": "completed",
+      "returncode": 0,
+      "stdout": "{\n  \"status\": \"ok\",\n  \"count\": 50,\n  \"csv\": \"C:\\\\Users\\\\wtzhang12\\\\Documents\\\\Codex\\\\2026-06-03\\\\pinarocko346-creator-yc-buy-git-https\\\\skills-engineering-workspace\\\\examples\\\\market\\\\market-flow-skill-live-inputs\\\\cls-telegraph\\\\2026-06-15-cls-telegraph.csv\",\n  \"json\": \"C:\\\\Users\\\\wtzhang12\\\\Documents\\\\Codex\\\\2026-06-03\\\\pinarocko346-creator-yc-buy-git-https\\\\skills-engineering-workspace\\\\examples\\\\market\\\\market-flow-skill-live-inputs\\\\cls-telegraph\\\\2026-06-15-cls-telegraph.json\",\n  \"markdown\": \"C:\\\\Users\\\\wtzhang12\\\\Documents\\\\Codex\\\\2026-06-03\\\\pinarocko346-creator-yc-buy-git-https\\\\skills-engineering-workspace\\\\examples\\\\market\\\\market-flow-skill-live-inputs\\\\cls-telegraph\\\\2026-06-15-cls-telegraph.md\",\n  \"raw\": \"C:\\\\Users\\\\wtzhang12\\\\Documents\\\\Codex\\\\2026-06-03\\\\pinarocko346-creator-yc-buy-git-https\\\\skills-engineering-workspace\\\\examples\\\\market\\\\market-flow-skill-live-inputs\\\\cls-telegraph\\\\raw\\\\2026-06-15\\\\telegraph-response.json\",\n  \"source_url\": \"https://www.cls.cn/v1/roll/get_roll_list?app=CailianpressWeb&category=&os=web&rn=50&sign=ffd1263f3f0499c71938e8b767cf93d2\"\n}",
+      "stderr": ""
+    },
+    {
+      "name": "collect-cls-red",
+      "status": "completed",
+      "returncode": 0,
+      "stdout": "{\n  \"status\": \"ok\",\n  \"count\": 40,\n  \"csv\": \"C:\\\\Users\\\\wtzhang12\\\\Documents\\\\Codex\\\\2026-06-03\\\\pinarocko346-creator-yc-buy-git-https\\\\skills-engineering-workspace\\\\examples\\\\market\\\\market-flow-skill-live-inputs\\\\cls-telegraph-red\\\\2026-06-15-cls-telegraph.csv\",\n  \"json\": \"C:\\\\Users\\\\wtzhang12\\\\Documents\\\\Codex\\\\2026-06-03\\\\pinarocko346-creator-yc-buy-git-https\\\\skills-engineering-workspace\\\\examples\\\\market\\\\market-flow-skill-live-inputs\\\\cls-telegraph-red\\\\2026-06-15-cls-telegraph.json\",\n  \"markdown\": \"C:\\\\Users\\\\wtzhang12\\\\Documents\\\\Codex\\\\2026-06-03\\\\pinarocko346-creator-yc-buy-git-https\\\\skills-engineering-workspace\\\\examples\\\\market\\\\market-flow-skill-live-inputs\\\\cls-telegraph-red\\\\2026-06-15-cls-telegraph.md\",\n  \"raw\": \"C:\\\\Users\\\\wtzhang12\\\\Documents\\\\Codex\\\\2026-06-03\\\\pinarocko346-creator-yc-buy-git-https\\\\skills-engineering-workspace\\\\examples\\\\market\\\\market-flow-skill-live-inputs\\\\cls-telegraph-red\\\\raw\\\\2026-06-15\\\\telegraph-response.json\",\n  \"source_url\": \"https://www.cls.cn/v1/roll/get_roll_list?app=CailianpressWeb&category=red&os=web&rn=50&sign=d4f49ace070dac48e263e7a7a3809fda\"\n}",
+      "stderr": ""
+    },
+    {
+      "name": "analyze-cls-market-plan",
+      "status": "completed",
+      "returncode": 0,
+      "stdout": "{\n  \"themes\": 7,\n  \"items\": 83,\n  \"kpl_rows\": 0,\n  \"csv\": \"C:\\\\Users\\\\wtzhang12\\\\Documents\\\\Codex\\\\2026-06-03\\\\pinarocko346-creator-yc-buy-git-https\\\\skills-engineering-workspace\\\\examples\\\\market\\\\market-flow-skill-live-inputs\\\\cls-market-plan-skill\\\\2026-06-15-cls-market-plan.csv\",\n  \"markdown\": \"C:\\\\Users\\\\wtzhang12\\\\Documents\\\\Codex\\\\2026-06-03\\\\pinarocko346-creator-yc-buy-git-https\\\\skills-engineering-workspace\\\\examples\\\\market\\\\market-flow-skill-live-inputs\\\\cls-market-plan-skill\\\\2026-06-15-cls-market-plan.md\"\n}",
+      "stderr": ""
+    },
+    {
+      "name": "analyze-market-flow",
+      "status": "completed",
+      "returncode": 0,
+      "stdout": "{\n  \"status\": \"ok\",\n  \"market_state\": \"局部进攻\",\n  \"themes\": 7,\n  \"csv\": \"C:\\\\Users\\\\wtzhang12\\\\Documents\\\\Codex\\\\2026-06-03\\\\pinarocko346-creator-yc-buy-git-https\\\\skills-engineering-workspace\\\\examples\\\\market\\\\market-flow-skill\\\\2026-06-15-live\\\\report\\\\2026-06-15-market-flow.csv\",\n  \"markdown\": \"C:\\\\Users\\\\wtzhang12\\\\Documents\\\\Codex\\\\2026-06-03\\\\pinarocko346-creator-yc-buy-git-https\\\\skills-engineering-workspace\\\\examples\\\\market\\\\market-flow-skill\\\\2026-06-15-live\\\\report\\\\2026-06-15-market-flow.md\"\n}",
+      "stderr": ""
+    }
+  ]
+}

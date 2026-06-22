@@ -1,0 +1,3 @@
+display_name: CSCI Juzi MCP
+short_description: Routes CSCI Juzi MCP fund, manager, allocation and strategy evidence into the trading research workspace.
+default_prompt: Use CSCI Juzi MCP outputs as external institutional evidence, preserving source, date, conflicts and safety boundaries without storing credentials.

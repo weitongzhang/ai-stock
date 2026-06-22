@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from skill_lab.institutional_research.schemas import InstitutionalResearchContext
 from skill_lab.planning.perspectives import build_methodology_perspectives
 from skill_lab.sector_analysis.strength import ThemeStrengthSummary
 from skill_lab.shared.schemas import DailyReview, MarketRegimeResult, TomorrowPlan
@@ -13,21 +14,29 @@ def build_daily_review(
     themes: ThemeStrengthSummary,
     tomorrow_plan: TomorrowPlan | None = None,
     data_limits: list[str] | None = None,
+    institutional_context: InstitutionalResearchContext | None = None,
 ) -> DailyReview:
+    if institutional_context is None and tomorrow_plan and isinstance(tomorrow_plan.raw, dict):
+        institutional_context = tomorrow_plan.raw.get("institutional_context")
     perspectives = build_methodology_perspectives(market, themes)
     findings = build_findings(market, themes, tomorrow_plan)
     findings.extend(build_perspective_findings(perspectives))
+    findings.extend(build_institutional_findings(institutional_context))
+    combined_data_limits = list(data_limits or [])
+    if institutional_context:
+        combined_data_limits.extend(institutional_context.data_limits)
     return DailyReview(
         trade_date=trade_date,
         summary=build_summary(market, themes),
         market_regime=market.regime,
         findings=findings,
         tomorrow_plan=tomorrow_plan,
-        data_limits=list(data_limits or []),
+        data_limits=combined_data_limits,
         raw={
             "market": market,
             "theme_count": len(themes.ranked),
             "perspectives": perspectives,
+            "institutional_context": institutional_context,
         },
     )
 
@@ -71,4 +80,15 @@ def build_perspective_findings(perspectives) -> list[str]:
         )
         for conflict in perspective.conflicts[:2]:
             findings.append(f"methodology conflict: {conflict}")
+    return findings
+
+
+def build_institutional_findings(
+    institutional_context: InstitutionalResearchContext | None,
+) -> list[str]:
+    if institutional_context is None or not institutional_context.records:
+        return []
+    findings = [f"institutional context: {institutional_context.summary}"]
+    for conflict in institutional_context.conflicts[:2]:
+        findings.append(f"institutional conflict: {conflict}")
     return findings

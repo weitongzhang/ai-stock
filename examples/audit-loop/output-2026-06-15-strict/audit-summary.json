@@ -1,0 +1,16 @@
+{
+  "run_id": "daily:2026-06-15",
+  "plan_id": "plan:2026-06-15",
+  "requested_date": "2026-06-15",
+  "data_date": "",
+  "used_fallback": false,
+  "state": "BLOCKED",
+  "reason": "required_inputs_missing",
+  "missing_inputs": [
+    "examples\\market\\market-flow\\2026-06-15-market-flow.csv"
+  ],
+  "required_action": "Generate the missing normalized daily input files, then rerun.",
+  "journal_event_count": 0,
+  "journal_events": [],
+  "items": []
+}

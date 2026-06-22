@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from datetime import datetime
 
+from skill_lab.institutional_research.schemas import InstitutionalResearchContext
 from skill_lab.market_analysis.position import suggest_position_bias
 from skill_lab.planning.perspectives import build_methodology_perspectives
 from skill_lab.sector_analysis.strength import ThemeStrengthSummary
@@ -16,6 +17,7 @@ def build_tomorrow_plan(
     market: MarketRegimeResult,
     themes: ThemeStrengthSummary,
     max_items: int = 5,
+    institutional_context: InstitutionalResearchContext | None = None,
 ) -> TomorrowPlan:
     items = [
         plan_item_from_theme(index + 1, theme, market.regime)
@@ -27,18 +29,20 @@ def build_tomorrow_plan(
         for perspective in perspectives
         for conflict in perspective.conflicts
     ]
+    data_limits = list(institutional_context.data_limits) if institutional_context else []
     return TomorrowPlan(
         trade_date=trade_date,
         generated_at=datetime.now().isoformat(timespec="seconds"),
         market_regime=market.regime,
         summary=build_summary(market, themes),
         items=items,
-        data_limits=[],
+        data_limits=data_limits,
         raw={
             "market": market,
             "theme_count": len(themes.ranked),
             "perspectives": perspectives,
             "perspective_conflicts": perspective_conflicts,
+            "institutional_context": institutional_context,
         },
     )
 

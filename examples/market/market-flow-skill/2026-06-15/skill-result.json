@@ -1,0 +1,158 @@
+{
+  "skill": "a-share-market-flow-analyst",
+  "version": "2",
+  "trade_date": "2026-06-15",
+  "status": "degraded",
+  "market_state": "局部进攻",
+  "input_quality": {
+    "breadth_source": "primary-or-unknown",
+    "breadth_complete": false,
+    "news": "complete",
+    "limit_pool": "degraded-no-limit-up-reason",
+    "dragon_tiger": "complete"
+  },
+  "top_themes": [
+    {
+      "theme": "半导体/国产替代",
+      "total_score": "78.5",
+      "stance": "积极观察",
+      "flow_score": "35.0",
+      "map_score": "25.0",
+      "core_score": "10.5",
+      "timing_score": "8.0",
+      "news_count": "7",
+      "red_count": "5",
+      "kpl_count": "5",
+      "failed_count": "2",
+      "lhb_net_buy": "-152846888.82",
+      "core_names": "士兰微、炬光科技、新洁能、先导基电、有研硅",
+      "lhb_stocks": "炬光科技",
+      "confirm_signal": "半导体/国产替代前排竞价/开盘强于板块，容量核心放量不破分时均线，后排出现扩散。",
+      "give_up_signal": "半导体/国产替代核心低开低走、冲高回落，或消息强但板块无量无扩散。"
+    },
+    {
+      "theme": "6G/通信/卫星互联网",
+      "total_score": "73.0",
+      "stance": "重点进攻",
+      "flow_score": "13.0",
+      "map_score": "25.0",
+      "core_score": "25.0",
+      "timing_score": "10.0",
+      "news_count": "3",
+      "red_count": "2",
+      "kpl_count": "7",
+      "failed_count": "1",
+      "lhb_net_buy": "2988438829.33",
+      "core_names": "意华股份、太辰光、长芯博创、光迅科技、特发信息、剑桥科技、光库科技",
+      "lhb_stocks": "光库科技、长芯博创、太辰光",
+      "confirm_signal": "6G/通信/卫星互联网前排竞价/开盘强于板块，容量核心放量不破分时均线，后排出现扩散。",
+      "give_up_signal": "6G/通信/卫星互联网核心低开低走、冲高回落，或消息强但板块无量无扩散。"
+    },
+    {
+      "theme": "能源/煤炭/油气",
+      "total_score": "63.1",
+      "stance": "积极观察",
+      "flow_score": "7.5",
+      "map_score": "25.0",
+      "core_score": "20.5",
+      "timing_score": "10.0",
+      "news_count": "3",
+      "red_count": "1",
+      "kpl_count": "7",
+      "failed_count": "1",
+      "lhb_net_buy": "125114150.0",
+      "core_names": "中远海能、招商南油、招商轮船、宁波远洋、南 京 港、凤凰航运、宁波海运",
+      "lhb_stocks": "招商南油",
+      "confirm_signal": "能源/煤炭/油气前排竞价/开盘强于板块，容量核心放量不破分时均线，后排出现扩散。",
+      "give_up_signal": "能源/煤炭/油气核心低开低走、冲高回落，或消息强但板块无量无扩散。"
+    },
+    {
+      "theme": "AI算力/数据中心",
+      "total_score": "58.1",
+      "stance": "积极观察",
+      "flow_score": "32.3",
+      "map_score": "18.8",
+      "core_score": "0.0",
+      "timing_score": "7.0",
+      "news_count": "7",
+      "red_count": "4",
+      "kpl_count": "0",
+      "failed_count": "0",
+      "lhb_net_buy": "0",
+      "core_names": "中际旭创、新易盛、天孚通信、工业富联、浪潮信息、润泽科技、曙光数创",
+      "lhb_stocks": "",
+      "confirm_signal": "AI算力/数据中心前排竞价/开盘强于板块，容量核心放量不破分时均线，后排出现扩散。",
+      "give_up_signal": "AI算力/数据中心核心低开低走、冲高回落，或消息强但板块无量无扩散。"
+    },
+    {
+      "theme": "消费/旅游/短剧",
+      "total_score": "47.2",
+      "stance": "跟踪等待",
+      "flow_score": "0.7",
+      "map_score": "25.0",
+      "core_score": "17.5",
+      "timing_score": "4.0",
+      "news_count": "1",
+      "red_count": "0",
+      "kpl_count": "11",
+      "failed_count": "4",
+      "lhb_net_buy": "0",
+      "core_names": "光大同创、游族网络、胜利精密、福蓉科技、利通电子、安洁科技、可川科技、茂业商业",
+      "lhb_stocks": "",
+      "confirm_signal": "消费/旅游/短剧前排竞价/开盘强于板块，容量核心放量不破分时均线，后排出现扩散。",
+      "give_up_signal": "消费/旅游/短剧核心低开低走、冲高回落，或消息强但板块无量无扩散。"
+    }
+  ],
+  "quality_issues": [
+    {
+      "severity": "high",
+      "code": "MISSING_BREADTH_METRIC",
+      "detail": "两市成交额"
+    },
+    {
+      "severity": "high",
+      "code": "MISSING_BREADTH_METRIC",
+      "detail": "上涨家数"
+    },
+    {
+      "severity": "high",
+      "code": "MISSING_BREADTH_METRIC",
+      "detail": "下跌家数"
+    },
+    {
+      "severity": "high",
+      "code": "MISSING_BREADTH_METRIC",
+      "detail": "平盘家数"
+    },
+    {
+      "severity": "medium",
+      "code": "HIGH_SCORE_WEAK_CORE",
+      "detail": "半导体/国产替代"
+    },
+    {
+      "severity": "high",
+      "code": "THEME_CORE_MISMATCH",
+      "detail": "消费/旅游/短剧: 光大同创、游族网络、胜利精密、福蓉科技、利通电子、安洁科技、可川科技、茂业商业"
+    }
+  ],
+  "artifacts": {
+    "market_flow_csv": "examples\\market\\market-flow-skill\\2026-06-15\\report\\2026-06-15-market-flow.csv",
+    "market_flow_markdown": "examples\\market\\market-flow-skill\\2026-06-15\\report\\2026-06-15-market-flow.md"
+  },
+  "steps": [
+    {
+      "name": "analyze-cls-market-plan",
+      "status": "completed",
+      "returncode": 0,
+      "stdout": "{\n  \"themes\": 6,\n  \"items\": 65,\n  \"kpl_rows\": 0,\n  \"csv\": \"C:\\\\Users\\\\wtzhang12\\\\Documents\\\\Codex\\\\2026-06-03\\\\pinarocko346-creator-yc-buy-git-https\\\\skills-engineering-workspace\\\\examples\\\\market\\\\cls-market-plan-skill\\\\2026-06-15-cls-market-plan.csv\",\n  \"markdown\": \"C:\\\\Users\\\\wtzhang12\\\\Documents\\\\Codex\\\\2026-06-03\\\\pinarocko346-creator-yc-buy-git-https\\\\skills-engineering-workspace\\\\examples\\\\market\\\\cls-market-plan-skill\\\\2026-06-15-cls-market-plan.md\"\n}",
+      "stderr": ""
+    },
+    {
+      "name": "analyze-market-flow",
+      "status": "completed",
+      "returncode": 0,
+      "stdout": "{\n  \"status\": \"ok\",\n  \"market_state\": \"局部进攻\",\n  \"themes\": 6,\n  \"csv\": \"C:\\\\Users\\\\wtzhang12\\\\Documents\\\\Codex\\\\2026-06-03\\\\pinarocko346-creator-yc-buy-git-https\\\\skills-engineering-workspace\\\\examples\\\\market\\\\market-flow-skill\\\\2026-06-15\\\\report\\\\2026-06-15-market-flow.csv\",\n  \"markdown\": \"C:\\\\Users\\\\wtzhang12\\\\Documents\\\\Codex\\\\2026-06-03\\\\pinarocko346-creator-yc-buy-git-https\\\\skills-engineering-workspace\\\\examples\\\\market\\\\market-flow-skill\\\\2026-06-15\\\\report\\\\2026-06-15-market-flow.md\"\n}",
+      "stderr": ""
+    }
+  ]
+}

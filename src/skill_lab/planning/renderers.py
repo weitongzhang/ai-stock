@@ -31,6 +31,9 @@ def render_tomorrow_plan_markdown(plan: TomorrowPlan) -> str:
         lines.extend(["", "## Methodology Perspectives", ""])
         for perspective in perspectives:
             lines.append(render_perspective_line(perspective))
+    institutional_context = plan.raw.get("institutional_context") if isinstance(plan.raw, dict) else None
+    if institutional_context:
+        lines.extend(render_institutional_context_section(institutional_context))
     return "\n".join(lines)
 
 
@@ -61,6 +64,9 @@ def render_daily_review_markdown(review: DailyReview) -> str:
         lines.extend(["", "## Methodology Perspectives", ""])
         for perspective in perspectives:
             lines.append(render_perspective_line(perspective))
+    institutional_context = review.raw.get("institutional_context") if isinstance(review.raw, dict) else None
+    if institutional_context:
+        lines.extend(render_institutional_context_section(institutional_context))
     return "\n".join(lines)
 
 
@@ -77,3 +83,38 @@ def render_perspective_line(perspective: Any) -> str:
         confidence = float(perspective.confidence)
     conflicts = "; ".join(str(item) for item in conflicts_list) if conflicts_list else "none"
     return f"- {source}: {summary} (confidence={confidence:.2f}; conflicts={conflicts})"
+
+
+def render_institutional_context_section(context: Any) -> list[str]:
+    if isinstance(context, dict):
+        summary = str(context.get("summary", ""))
+        records = list(context.get("records") or [])
+        conflicts = list(context.get("conflicts") or [])
+    else:
+        summary = context.summary
+        records = list(context.records)
+        conflicts = list(context.conflicts)
+    lines = ["", "## Institutional Research Context", "", f"- Summary: {summary}"]
+    if conflicts:
+        lines.append(f"- Conflicts: {'; '.join(str(item) for item in conflicts)}")
+    if records:
+        lines.extend(["", "| Source | Topic | Evidence Date | Confidence | Summary |", "|---|---|---|---:|---|"])
+        for record in records:
+            lines.append(render_institutional_record_row(record))
+    return lines
+
+
+def render_institutional_record_row(record: Any) -> str:
+    if isinstance(record, dict):
+        source = str(record.get("source", ""))
+        topic = str(record.get("topic", ""))
+        evidence_date = str(record.get("evidence_date", ""))
+        confidence = float(record.get("confidence") or 0.0)
+        summary = str(record.get("summary", ""))
+    else:
+        source = record.source
+        topic = record.topic
+        evidence_date = record.evidence_date
+        confidence = float(record.confidence)
+        summary = record.summary
+    return f"| {source} | {topic} | {evidence_date or '-'} | {confidence:.2f} | {summary} |"

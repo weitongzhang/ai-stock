@@ -1,0 +1,4 @@
+interface:
+  display_name: "A股半路候选筛选"
+  short_description: "按主线、板块强度、分时承接和量价结构筛选今日可半路标的。"
+  default_prompt: "筛选今天适合半路模式的A股标的，说明板块、个股强度、买点、止损和仓位。"

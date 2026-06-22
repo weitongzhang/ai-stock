@@ -1,0 +1,232 @@
+{
+  "date": "2026-06-17",
+  "rows": [
+    {
+      "metric": "两市成交额",
+      "value": 31137.66,
+      "source": "sina:stock_zh_a_spot",
+      "note": "亿元"
+    },
+    {
+      "metric": "上涨家数",
+      "value": 1723,
+      "source": "sina:stock_zh_a_spot",
+      "note": ""
+    },
+    {
+      "metric": "下跌家数",
+      "value": 3733,
+      "source": "sina:stock_zh_a_spot",
+      "note": ""
+    },
+    {
+      "metric": "平盘家数",
+      "value": 71,
+      "source": "sina:stock_zh_a_spot",
+      "note": ""
+    },
+    {
+      "metric": "全A股票数",
+      "value": 5527,
+      "source": "sina:stock_zh_a_spot",
+      "note": ""
+    },
+    {
+      "metric": "全A行情降级状态",
+      "value": "已使用新浪备用源",
+      "source": "derived:spot_fallback",
+      "note": ""
+    },
+    {
+      "metric": "涨停数",
+      "value": 86,
+      "source": "eastmoney:stock_zt_pool_em",
+      "note": ""
+    },
+    {
+      "metric": "连板家数",
+      "value": 19,
+      "source": "eastmoney:stock_zt_pool_em",
+      "note": ""
+    },
+    {
+      "metric": "最高连板",
+      "value": 3,
+      "source": "eastmoney:stock_zt_pool_em",
+      "note": ""
+    },
+    {
+      "metric": "涨停封板资金",
+      "value": 107.87,
+      "source": "eastmoney:stock_zt_pool_em",
+      "note": "亿元"
+    },
+    {
+      "metric": "炸板数",
+      "value": 28,
+      "source": "eastmoney:stock_zt_pool_zbgc_em",
+      "note": ""
+    },
+    {
+      "metric": "跌停数",
+      "value": 1,
+      "source": "eastmoney:stock_zt_pool_dtgc_em",
+      "note": ""
+    },
+    {
+      "metric": "炸板率",
+      "value": 24.56,
+      "source": "derived:eastmoney_limit_pools",
+      "note": "%"
+    },
+    {
+      "metric": "封板率",
+      "value": 75.44,
+      "source": "derived:eastmoney_limit_pools",
+      "note": "%"
+    },
+    {
+      "metric": "涨跌停强弱比",
+      "value": 86.0,
+      "source": "derived:eastmoney_limit_pools",
+      "note": ""
+    },
+    {
+      "metric": "近N日样本数",
+      "value": 5,
+      "source": "derived:market_breadth_history",
+      "note": ""
+    },
+    {
+      "metric": "近几日涨停均值",
+      "value": 105.0,
+      "source": "derived:market_breadth_history",
+      "note": ""
+    },
+    {
+      "metric": "近几日炸板率均值",
+      "value": 29.69,
+      "source": "derived:market_breadth_history",
+      "note": "%"
+    },
+    {
+      "metric": "近几日跌停均值",
+      "value": 14.25,
+      "source": "derived:market_breadth_history",
+      "note": ""
+    },
+    {
+      "metric": "近几日最高连板均值",
+      "value": 3.5,
+      "source": "derived:market_breadth_history",
+      "note": ""
+    },
+    {
+      "metric": "近几日涨跌停强弱比均值",
+      "value": 18.28,
+      "source": "derived:market_breadth_history",
+      "note": ""
+    },
+    {
+      "metric": "涨停趋势差",
+      "value": -19.0,
+      "source": "derived:market_breadth_history",
+      "note": ""
+    },
+    {
+      "metric": "炸板率趋势差",
+      "value": -5.13,
+      "source": "derived:market_breadth_history",
+      "note": "%"
+    },
+    {
+      "metric": "跌停趋势差",
+      "value": -13.25,
+      "source": "derived:market_breadth_history",
+      "note": ""
+    },
+    {
+      "metric": "连板高度趋势差",
+      "value": -0.5,
+      "source": "derived:market_breadth_history",
+      "note": ""
+    },
+    {
+      "metric": "涨跌停强弱比趋势差",
+      "value": 67.72,
+      "source": "derived:market_breadth_history",
+      "note": ""
+    }
+  ],
+  "history": [
+    {
+      "date": "2026-06-11",
+      "trade_date": "20260611",
+      "limit_up_count": 69,
+      "failed_limit_up_count": 30,
+      "limit_down_count": 32,
+      "seal_rate": 69.7,
+      "failed_limit_up_rate": 30.3,
+      "limit_up_down_ratio": 2.16,
+      "limit_up_seal_amount_yi": 73.69,
+      "double_limit_up_count": 11,
+      "highest_limit_streak": 3
+    },
+    {
+      "date": "2026-06-12",
+      "trade_date": "20260612",
+      "limit_up_count": 89,
+      "failed_limit_up_count": 62,
+      "limit_down_count": 15,
+      "seal_rate": 58.94,
+      "failed_limit_up_rate": 41.06,
+      "limit_up_down_ratio": 5.93,
+      "limit_up_seal_amount_yi": 69.37,
+      "double_limit_up_count": 10,
+      "highest_limit_streak": 4
+    },
+    {
+      "date": "2026-06-15",
+      "trade_date": "20260615",
+      "limit_up_count": 145,
+      "failed_limit_up_count": 43,
+      "limit_down_count": 3,
+      "seal_rate": 77.13,
+      "failed_limit_up_rate": 22.87,
+      "limit_up_down_ratio": 48.33,
+      "limit_up_seal_amount_yi": 125.58,
+      "double_limit_up_count": 11,
+      "highest_limit_streak": 3
+    },
+    {
+      "date": "2026-06-16",
+      "trade_date": "20260616",
+      "limit_up_count": 117,
+      "failed_limit_up_count": 38,
+      "limit_down_count": 7,
+      "seal_rate": 75.48,
+      "failed_limit_up_rate": 24.52,
+      "limit_up_down_ratio": 16.71,
+      "limit_up_seal_amount_yi": 104.0,
+      "double_limit_up_count": 29,
+      "highest_limit_streak": 4
+    },
+    {
+      "date": "2026-06-17",
+      "trade_date": "20260617",
+      "limit_up_count": 86,
+      "failed_limit_up_count": 28,
+      "limit_down_count": 1,
+      "seal_rate": 75.44,
+      "failed_limit_up_rate": 24.56,
+      "limit_up_down_ratio": 86.0,
+      "limit_up_seal_amount_yi": 107.87,
+      "double_limit_up_count": 19,
+      "highest_limit_streak": 3
+    }
+  ],
+  "errors": [
+    "stock_zh_a_spot_em: ConnectionError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))",
+    "stock_market_fund_flow: ConnectionError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))"
+  ]
+}

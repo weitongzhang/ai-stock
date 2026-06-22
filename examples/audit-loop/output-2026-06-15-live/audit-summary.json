@@ -1,0 +1,33 @@
+{
+  "run_id": "daily:2026-06-15",
+  "plan_id": "plan:2026-06-15",
+  "requested_date": "2026-06-15",
+  "data_date": "2026-06-15",
+  "used_fallback": false,
+  "state": "BLOCKED",
+  "reason": "research_agent_failed",
+  "missing_inputs": [
+    "index environment rows are empty"
+  ],
+  "required_action": "daily input quality rejected",
+  "agent_result": {
+    "task": "tomorrow-plan",
+    "status": "failed",
+    "summary": "daily input quality rejected",
+    "output": {},
+    "steps": [
+      {
+        "name": "check daily inputs",
+        "tool": "daily-quality",
+        "status": "completed",
+        "summary": "daily_inputs:2026-06-15"
+      }
+    ],
+    "data_limits": [
+      "index environment rows are empty"
+    ]
+  },
+  "journal_event_count": 0,
+  "journal_events": [],
+  "items": []
+}
