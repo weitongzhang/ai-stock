@@ -83,6 +83,40 @@
       ]
     },
     {
+      "name": "a-share-mapping-catch-up-selector",
+      "domain": "stock-selection",
+      "type": "mapping-catch-up-strategy",
+      "path": "skills/stock-selection/a-share-mapping-catch-up-selector",
+      "runtime_path": "$USERPROFILE/.codex/skills/a-share-mapping-catch-up-selector",
+      "purpose": "A股热门核心票映射补涨选股：识别高弹性核心，沿母子公司、分拆、股权、同集团、上下游、资源平台和同产业链关系挖掘低位/容量候选，并输出分级观察与触发计划",
+      "consumes": [
+        "stock-quotes",
+        "stock-ohlcv",
+        "market-flow-report",
+        "market-breadth",
+        "index-environment",
+        "sector-priority-list",
+        "theme-market-plan",
+        "company-relationship-evidence"
+      ],
+      "coordinates": [
+        "ftshare-market-data",
+        "a-share-market-flow-analyst",
+        "a-share-halfway-trade-screener",
+        "a-share-stock-trade-operator",
+        "watchlist-tracker",
+        "qiushi-stock-analysis"
+      ],
+      "provides": [
+        "hot-core-stock-map",
+        "relationship-chain-map",
+        "mapping-catch-up-candidate-list",
+        "false-mapping-filter",
+        "candidate-scorecard",
+        "trigger-and-invalidation-plan"
+      ]
+    },
+    {
       "name": "sector-money-flow-chart",
       "domain": "stock-selection",
       "type": "market-flow-visualization",
@@ -107,6 +141,36 @@
         "sector-money-flow-csv",
         "sector-money-flow-quality-report",
         "sector-intraday-replay-chart"
+      ]
+    },
+    {
+      "name": "a-share-fibonacci-trade-planner",
+      "domain": "stock-selection",
+      "type": "technical-trading-planner",
+      "path": "skills/stock-selection/a-share-fibonacci-trade-planner",
+      "runtime_path": "$USERPROFILE/.codex/skills/a-share-fibonacci-trade-planner",
+      "purpose": "A股斐波那契交易位置规划，优先用于指数与板块指数，其次用于流动性好、趋势清晰且有板块共振的个股；输出回撤防守位、扩展进攻位、突破/回踩确认与失效条件",
+      "consumes": [
+        "stock-ohlcv",
+        "index-data",
+        "etf-data",
+        "sector-priority-list",
+        "market-flow-report"
+      ],
+      "coordinates": [
+        "ftshare-market-data",
+        "a-share-market-flow-analyst",
+        "a-share-halfway-trade-screener",
+        "a-share-stock-trade-operator",
+        "yc-buy-selector"
+      ],
+      "provides": [
+        "fibonacci-retracement-levels",
+        "fibonacci-extension-levels",
+        "fibonacci-trade-plan",
+        "fibonacci-attack-map",
+        "fibonacci-defense-map",
+        "index-sector-fibonacci-context"
       ]
     },
     {
