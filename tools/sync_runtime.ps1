@@ -11,6 +11,7 @@ $skills = @{
   "yc-buy-selector" = "skills\stock-selection\yc-buy-selector"
   "a-share-market-flow-analyst" = "skills\stock-selection\a-share-market-flow-analyst"
   "sector-money-flow-chart" = "skills\stock-selection\sector-money-flow-chart"
+  "a-share-fibonacci-trade-planner" = "skills\stock-selection\a-share-fibonacci-trade-planner"
   "a-share-halfway-trade-screener" = "skills\stock-selection\a-share-halfway-trade-screener"
   "qiushi-stock-analysis" = "skills\methodology\qiushi-stock-analysis"
   "chen-xiaoqun-perspective" = "skills\stock-selection\chen-xiaoqun-perspective"

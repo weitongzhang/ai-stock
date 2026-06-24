@@ -53,6 +53,7 @@ python tests\smoke\test_methodology_perspective_coordination.py
 python tests\smoke\test_institutional_research_context.py
 python tests\smoke\test_research_agent.py
 python tests\smoke\test_sector_money_flow_chart.py
+python tests\smoke\test_fibonacci_trade_planner.py
 ```
 
 Minimal Harness CLI:
