@@ -1,6 +1,6 @@
 ---
 name: a-share-mapping-catch-up-selector
-description: Use this skill for A-share "mapping catch-up" stock selection when the user asks to discover hot core stocks and find related lagging candidates through parent-subsidiary, spin-off, equity holding, same-group, upstream/downstream, resource platform, or sector chain relationships. It identifies high-elasticity core stocks, maps relationship chains, filters false concept associations, scores catch-up candidates, and outputs observation or trigger plans. Coordinate with a-share-market-flow-analyst, FTShare-market-data, a-share-halfway-trade-screener, watchlist-tracker, and stock-trade skills when available.
+description: Use this skill for A-share mapping catch-up stock selection when the user asks to discover hot themes, hot core stocks, and related lagging candidates through parent-subsidiary, spin-off, equity holding, same-group, upstream/downstream, resource platform, or sector chain relationships. It applies the "go where the fish are" principle: first judge whether the theme pond has enough liquidity, breadth, recognition, and persistence, then map relationship chains, filter false concepts, maintain long-term watch pools, mark downgrades/removals, and output observation or trigger plans. Coordinate with a-share-market-flow-analyst, FTShare-market-data, a-share-halfway-trade-screener, watchlist-tracker, and stock-trade skills when available.
 ---
 
 # A-Share Mapping Catch-Up Selector
@@ -13,36 +13,39 @@ Default to Chinese output when the user asks in Chinese.
 
 This skill is for research and observation planning. It does not convert relationship logic into a buy signal without price/volume confirmation.
 
-## Core Idea
+## Core Principle
 
-Screen for:
+Apply the Munger-style rule: **先找鱼多的池塘，再找鱼，再等合适下钩点**.
+
+In trading terms:
 
 ```text
-hot elastic core stock
+theme pond quality
+-> hot elastic core stock
 -> clear relationship chain
 -> lower-position or larger-cap mapping candidate
--> market starts to recognize the relationship
--> price/volume confirms catch-up or revaluation
+-> price/volume confirmation
+-> executable trigger or watchlist decision
 ```
 
-Typical examples:
+Do not spend equal effort on every stock. If the pond has no money, no breadth, no recognized core, or no persistence, downgrade the whole chain even if the relationship looks interesting.
 
-- A spin-off or subsidiary surges, then the parent company is revalued.
-- A high-elasticity materials/equipment stock leads, then a resource platform, parent company, or capacity carrier catches up.
-- A small-cap thematic core opens space, then the market looks for larger, liquid, easier-to-hold related stocks.
+Treat relationship mining as a **secondary strategy**, not a standalone buy reason. A stock with a relationship but without pond quality, core-stock validation, and price/volume confirmation should enter the observation pool first, not the trading pool.
 
-Always separate two pools:
+## Two Pools
 
-- **Long-term mapping watch pool**: relationship chains that have already been validated by the market and should be tracked across days/weeks even when they are not today's top gainers.
-- **Daily new discovery pool**: fresh hot cores and newly activated relationship chains found from today's涨幅榜,成交额榜,板块强度, or news.
+Always maintain two pools:
 
-Do not drop a validated mapping chain only because the core stock is down on the day. A high-volume core分歧 plus mapping candidate承接 is often the key observation state.
+- **长期映射观察池**: validated relationship chains tracked across days/weeks, even when they are not today's top gainers.
+- **今日新发现池**: fresh hot cores and newly activated relationship chains found from today's涨幅榜、成交额榜、板块强度 or news.
+
+Do not drop a validated mapping chain only because the core stock is down on the day. A high-volume core分歧 plus mapping candidate承接 is often a key observation state.
 
 ## Required Inputs
 
 Use any available combination:
 
-- Hot stocks from涨幅榜,连板/20cm,成交额榜,换手率榜,近期新高, or market-flow outputs.
+- Theme/sector strength: market-flow output, limit-up clusters, 20cm leaders, turnover leaders, sector breadth.
 - Core stock name/code, if the user already provides one.
 - Relationship evidence: annual report, prospectus, official company profile, equity holding, same controller, supply chain, customer/supplier, same group, sector taxonomy, news.
 - Quotes/OHLC for both core stocks and candidate mapping stocks.
@@ -52,18 +55,23 @@ If data is incomplete, say which layer is missing and downgrade confidence inste
 
 ## Workflow
 
-1. **Load existing mapping watch pool**
+1. **Judge pond quality first**
+   - Use `references/pond-quality.md` to classify the theme as `富矿池`, `活跃池`, `观察池`, or `贫瘠池`.
+   - Reject or downgrade chains in a贫瘠池 even if a single stock rises.
+   - Prefer ponds with repeated money flow, recognized core stocks, breadth, and a simple narrative.
+
+2. **Load existing mapping watch pool**
    - Start from known validated chains before scanning today's new leaders.
-   - Include chains mentioned by the user in recent analysis, such as 铜冠铜箔->铜陵有色 and 大族数控->大族激光 when relevant.
+   - Include chains mentioned by the user in recent analysis, such as `铜冠铜箔 -> 铜陵有色` and `大族数控 -> 大族激光` when relevant.
    - Classify each chain as `活跃`, `核心分歧-映射承接`, `降温`, `降级`, `观察期`, or `失效`.
    - Explicitly mark candidates that no longer fit the strategy; do not silently omit them.
    - Read `references/watch-pool.md` when maintaining a durable mapping list.
 
-2. **Detect hot core stocks**
+3. **Detect hot core stocks**
    - Prefer current market-flow outputs, limit-up clusters, 20cm leaders, high-turnover new highs, and sector front-row stocks.
    - A valid core stock should have both price strength and market recognition. One-day news spikes are not enough.
 
-3. **Classify the core type**
+4. **Classify the core type**
    - Spin-off/subsidiary core.
    - Parent-company asset revaluation core.
    - Industrial chain elastic core.
@@ -71,26 +79,33 @@ If data is incomplete, say which layer is missing and downgrade confidence inste
    - New technology or product validation core.
    - Policy or order catalyst core.
 
-4. **Build the relationship map**
+5. **Build the relationship map**
    - Search for parent company, controlling shareholder, actual controller, subsidiaries, invested companies, same group listed platforms, upstream resources, downstream demand, equipment suppliers, materials suppliers, and close peer companies.
    - Separate strong relationships from weak concept tags.
    - Use `references/relationship-and-scoring.md` for the relationship strength ladder and scorecard.
 
-5. **Filter false mapping**
+6. **Filter false mapping**
    - Reject candidates where the relationship is only同概念 but has no asset, revenue, supply-chain, or market-recognized link.
    - Reject candidates whose market cap/float/liquidity makes catch-up impractical.
    - Reject candidates already more extended than the core or showing high-volume stagnation.
    - Reject candidates if the hot core stock has entered clear退潮.
+   - Downgrade same-group or weak-equity relationships to observation unless the market has already recognized the chain.
 
-6. **Score candidates**
-   - Relationship strength: 30
-   - Core stock strength and persistence: 20
+7. **Apply the secondary-strategy gate**
+   - A relationship candidate can upgrade from `观察池` to `候选观察` only when the pond is at least `活跃池` and the core stock remains recognizable.
+   - It can upgrade to `重点观察` only after the candidate itself confirms with volume, breakout, or controlled pullback承接.
+   - If the relationship is valid but the pond is cold, output `观察池，不交易`.
+
+8. **Score candidates**
+   - Pond quality: 20
+   - Relationship strength: 25
+   - Core stock strength and persistence: 15
    - Candidate position and catch-up room: 15
    - Liquidity/capacity and market acceptance: 10
-   - Price/volume trigger quality: 15
-   - Catalyst clarity and narrative simplicity: 10
+   - Price/volume trigger quality: 10
+   - Catalyst clarity and narrative simplicity: 5
 
-7. **Classify output**
+9. **Classify output**
    - 80-100: `重点观察，可等触发`
    - 65-79: `候选观察，等确认`
    - 50-64: `逻辑观察，暂不交易`
@@ -106,30 +121,39 @@ Do not treat relationship discovery as a buy point. Require at least one:
 - Sector breadth expands from one core into multiple related stocks.
 - News/公告/互动易 confirms the relationship and price reacts positively.
 
-## Invalidation Rules
-
-Downgrade or remove candidates when:
-
-- Core stock breaks down with high volume or enters clear退潮.
-- Candidate cannot rise while the core and sector remain strong.
-- Candidate breaks the mapped support after a failed breakout.
-- Relationship evidence is weak, outdated, or market does not recognize it.
-- The market environment shifts from attack to defensive mode.
+## Negative Marking
 
 For long-term tracking, output one of:
 
 - `保留`: Chain remains valid and should stay in the watch pool.
-- `降级`: Chain still has logic, but current price/volume or sector state is no longer actionable.
+- `降级`: Chain still has logic, but current pond quality, price/volume, or sector state is no longer actionable.
 - `观察期`: Chain failed once but deserves one more review because relationship strength is high.
 - `剔除`: Chain no longer fits; mark the reason and do not keep it in active candidates.
 
-Never hide a removed candidate. State why it failed, such as core退潮, mapping票不承接, relationship weak, repeated failed breakout, or sector失去主线.
+Never hide a removed candidate. State why it failed, such as核心退潮、映射票不承接、关系弱、突破失败、鱼塘退潮 or sector失去主线.
+
+## Relationship Mining Boundary
+
+Use relationship mining to discover candidates, not to justify a trade after the fact.
+
+Default states:
+
+- Strong parent/subsidiary or spin-off relationship: can enter `候选观察` if pond quality is at least活跃池.
+- Same-group/platform relationship: start as `观察池`; upgrade only after market recognition.
+- Same concept without official relationship: usually `逻辑观察` or `剔除`.
+- Interesting but cold pond: `观察池，不交易`.
+
+Example: 有研新材 can be tracked as a同集团央企新材料平台映射 if有研系/新材料/稀土/半导体材料 becomes active, but it should not be treated as a strong子母映射 unless official ownership and market recognition support that conclusion.
 
 ## Output Contract
 
 For automatic discovery:
 
 ```text
+鱼塘质量：
+- 主线/板块：富矿池 / 活跃池 / 观察池 / 贫瘠池
+- 依据：资金、核心票、扩散、持续性、叙事清晰度
+
 长期映射观察池：
 - 链条A：状态 / 今日核心表现 / 映射票表现 / 继续跟踪理由 / 失效条件
 - 链条B：...
@@ -138,7 +162,12 @@ For automatic discovery:
 - 链条C：降级/观察期/剔除 / 失败原因 / 下次恢复条件
 - 标的D：剔除原因 / 是否需要后续复查
 
-当前映射主线：
+二级策略边界：
+- 关系是否足够强：强子母 / 同集团 / 产业链 / 同概念
+- 是否已经被市场认可：是/否
+- 当前状态：观察池 / 候选观察 / 重点观察 / 剔除
+
+今日新发现：
 - 核心票：...
 - 核心类型：...
 - 强度判断：...
@@ -149,31 +178,8 @@ For automatic discovery:
 - 弱关系/剔除：...
 
 候选分级：
-1. 股票A：评分 / 关系 / 位置 / 触发位 / 失效位 / 观察结论
+1. 股票A：评分 / 鱼塘 / 关系 / 位置 / 触发位 / 失效位 / 观察结论
 2. 股票B：...
-
-今日不做的原因：
-- ...
-```
-
-For a core stock provided by the user:
-
-```text
-核心票判断：
-- ...
-
-可映射方向：
-- 母公司/控股平台：...
-- 同集团/参股：...
-- 上游/下游：...
-- 同概念低位：...
-
-优先候选：
-- ...
-
-执行边界：
-- 触发：...
-- 失效：...
 ```
 
 ## Coordination
@@ -183,16 +189,20 @@ For a core stock provided by the user:
 - Use `a-share-halfway-trade-screener` when turning a candidate into intraday execution.
 - Use `a-share-stock-trade-operator` when the user asks whether to buy/sell/add/reduce a specific candidate.
 - Use `watchlist-tracker` to maintain candidates that are logical but not yet triggered.
-- Use the long-term mapping watch pool before daily scanning so validated chains are not missed.
 
 ## More Detail
+
+Read `references/pond-quality.md` when:
+
+- Deciding whether a theme deserves attention before stock selection.
+- Explaining why a stock is not worth tracking despite a relationship.
+- Comparing multiple theme ponds such as Rubin液冷、铜箔、PCB设备、有色资源、金融科技.
 
 Read `references/relationship-and-scoring.md` when:
 
 - Building a relationship map.
 - Scoring multiple candidates.
 - Explaining why a candidate is true mapping or false mapping.
-- Converting examples such as 大族数控->大族激光 or 铜冠铜箔->铜陵有色 into reusable selection logic.
 
 Read `references/watch-pool.md` when:
 

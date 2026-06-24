@@ -1,0 +1,600 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>鱼塘长期跟踪</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f6f7f9;
+      --panel: #ffffff;
+      --panel-soft: #f0f3f7;
+      --text: #1f2933;
+      --muted: #667085;
+      --line: #d9dee7;
+      --blue: #2563eb;
+      --green: #0f8b4c;
+      --amber: #b7791f;
+      --red: #c2413a;
+      --violet: #6d5bd0;
+      --shadow: 0 8px 24px rgba(31, 41, 51, 0.08);
+      font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    header {
+      background: #111827;
+      color: #fff;
+      padding: 22px 28px;
+      border-bottom: 4px solid #d33f2f;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 26px;
+      line-height: 1.25;
+      letter-spacing: 0;
+    }
+
+    header p {
+      margin: 8px 0 0;
+      color: #cbd5e1;
+      font-size: 14px;
+    }
+
+    main {
+      display: grid;
+      grid-template-columns: 300px minmax(0, 1fr);
+      gap: 18px;
+      padding: 18px;
+      max-width: 1480px;
+      margin: 0 auto;
+    }
+
+    aside,
+    section {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      border-radius: 8px;
+    }
+
+    aside {
+      padding: 14px;
+      align-self: start;
+      position: sticky;
+      top: 12px;
+    }
+
+    .toolbar {
+      display: grid;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    input,
+    select {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 10px 11px;
+      font-size: 14px;
+      background: #fff;
+      color: var(--text);
+    }
+
+    .pond-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .pond-button {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 6px;
+      padding: 10px;
+      text-align: left;
+      cursor: pointer;
+      color: var(--text);
+    }
+
+    .pond-button.active {
+      border-color: var(--blue);
+      background: #eff6ff;
+    }
+
+    .pond-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: center;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .pond-meta {
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .content {
+      display: grid;
+      gap: 18px;
+    }
+
+    .summary {
+      padding: 18px;
+    }
+
+    .summary-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 14px;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 22px;
+      letter-spacing: 0;
+    }
+
+    h3 {
+      margin: 0 0 10px;
+      font-size: 16px;
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 4px 9px;
+      font-size: 12px;
+      font-weight: 700;
+      border: 1px solid transparent;
+      white-space: nowrap;
+    }
+
+    .rich { background: #e7f8ef; color: var(--green); border-color: #b7e3ca; }
+    .active-tag { background: #eff6ff; color: var(--blue); border-color: #bfdbfe; }
+    .watch { background: #fff7e6; color: var(--amber); border-color: #f3d38b; }
+    .poor { background: #fff0ef; color: var(--red); border-color: #f3bbb6; }
+    .keep { background: #e8f7ee; color: var(--green); }
+    .probation { background: #f1edff; color: var(--violet); }
+    .downgrade { background: #fff4df; color: var(--amber); }
+    .remove { background: #fff0ef; color: var(--red); }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .metric {
+      background: var(--panel-soft);
+      border-radius: 8px;
+      padding: 11px;
+      min-height: 74px;
+    }
+
+    .metric strong {
+      display: block;
+      font-size: 20px;
+      margin-bottom: 4px;
+    }
+
+    .metric span {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .panel {
+      padding: 16px;
+    }
+
+    .table-wrap {
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 980px;
+      background: #fff;
+    }
+
+    th,
+    td {
+      border-bottom: 1px solid var(--line);
+      padding: 10px;
+      text-align: left;
+      vertical-align: top;
+      font-size: 13px;
+    }
+
+    th {
+      background: #f8fafc;
+      color: #334155;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+
+    tr:last-child td { border-bottom: 0; }
+
+    .code {
+      font-family: Consolas, "Courier New", monospace;
+      color: #475569;
+      white-space: nowrap;
+    }
+
+    .note-list {
+      margin: 0;
+      padding-left: 18px;
+      color: #344054;
+      line-height: 1.65;
+      font-size: 14px;
+    }
+
+    .empty {
+      padding: 28px;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    @media (max-width: 980px) {
+      main {
+        grid-template-columns: 1fr;
+        padding: 12px;
+      }
+
+      aside {
+        position: static;
+      }
+
+      .metrics,
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>鱼塘长期跟踪仪表盘</h1>
+    <p>先判断鱼塘质量，再跟踪核心事件、核心票、映射标的、触发条件与降级剔除。</p>
+  </header>
+
+  <main>
+    <aside>
+      <div class="toolbar">
+        <input id="searchInput" type="search" placeholder="搜索鱼塘、标的、代码" />
+        <select id="statusFilter">
+          <option value="all">全部状态</option>
+          <option value="富矿池">富矿池</option>
+          <option value="活跃池">活跃池</option>
+          <option value="观察池">观察池</option>
+          <option value="贫瘠池">贫瘠池</option>
+        </select>
+      </div>
+      <div id="pondList" class="pond-list"></div>
+    </aside>
+
+    <div class="content">
+      <section class="summary">
+        <div class="summary-top">
+          <div>
+            <h2 id="pondName"></h2>
+            <p id="pondThesis" style="margin:8px 0 0;color:var(--muted);line-height:1.55;"></p>
+          </div>
+          <div id="pondTags" class="tags"></div>
+        </div>
+        <div class="metrics">
+          <div class="metric"><strong id="metricStatus"></strong><span>鱼塘质量</span></div>
+          <div class="metric"><strong id="metricCore"></strong><span>核心事件/核心票</span></div>
+          <div class="metric"><strong id="metricStocks"></strong><span>跟踪标的</span></div>
+          <div class="metric"><strong id="metricNext"></strong><span>下次检查</span></div>
+        </div>
+      </section>
+
+      <div class="grid">
+        <section class="panel">
+          <h3>核心事件</h3>
+          <ul id="eventList" class="note-list"></ul>
+        </section>
+        <section class="panel">
+          <h3>触发与失效</h3>
+          <ul id="ruleList" class="note-list"></ul>
+        </section>
+      </div>
+
+      <section class="panel">
+        <h3>标的分类</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>分类</th>
+                <th>代码</th>
+                <th>标的</th>
+                <th>状态</th>
+                <th>逻辑</th>
+                <th>触发</th>
+                <th>失效</th>
+              </tr>
+            </thead>
+            <tbody id="stockTable"></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    const ponds = [
+      {
+        id: "commercial-space",
+        name: "商业航天可回收火箭",
+        status: "观察池",
+        nextCheck: "2026-06-24",
+        thesis: "事件驱动型长期鱼塘，核心是发射窗口、静态点火、一级回收、复飞与星座发射订单。平时跟踪，节点临近时升级。",
+        core: ["蓝箭航天朱雀三号", "天兵科技天龙三号", "星际荣耀双曲线三号", "长征十号乙", "海南商业航天发射场"],
+        tags: ["事件驱动", "长期观察", "商业航天"],
+        events: [
+          "蓝箭航天、天兵科技、星际荣耀、深蓝航天、星河动力的发射/回收窗口。",
+          "静态点火、发动机试车、一级回收、复飞成功或失败。",
+          "海南商业航天发射场工位进展和任务密度。",
+          "蓝箭、天兵、星际荣耀、深蓝航天、星河动力的融资方、股东穿透、上市公司参股线索。"
+        ],
+        rules: [
+          "升级：官方确认发射窗口，A股航天中军和结构件/材料端放量共振。",
+          "降级：事件推迟且二级市场无承接。",
+          "剔除：只有概念相似，没有订单、客户、技术或集团关系。",
+          "股权映射：投资人关系必须被公告/年报/工商穿透验证，且标的自身放量后才升级。"
+        ],
+        stocks: [
+          ["国家队/航天中军", "600118", "中国卫星", "保留", "卫星制造与空间基础设施中军。", "卫星互联网或国家队任务带动放量突破。", "跌破中期平台且航天军工退潮。"],
+          ["国家队/航天中军", "600879", "航天电子", "保留", "航天电子配套中军。", "航天系放量共振或订单预期强化。", "板块退潮且跌破平台。"],
+          ["国家队/航天中军", "000901", "航天科技", "保留", "航天系上市平台，题材弹性较强。", "商业航天事件催化下放量突破。", "冲高回落且跌破10日线。"],
+          ["动力系统", "600343", "航天动力", "观察期", "动力系统题材映射，需事件验证。", "发动机试车消息带动放量。", "无事件支撑且高位放量滞涨。"],
+          ["结构件/零部件", "688523", "航天环宇", "保留", "航天结构件/复材零部件。", "结构件链条被资金认可并放量突破。", "跌破平台且成交萎缩。"],
+          ["结构件/零部件", "301005", "超捷股份", "保留", "结构件/紧固件弹性标的。", "发射/回收事件前资金提前放量。", "事件兑现后放量回落或跌破10日线。"],
+          ["锻件材料", "605123", "派克新材", "保留", "高端环锻件，偏高端制造中军。", "高端装备和商业航天链放量共振。", "跌破中期平台且无订单催化。"],
+          ["高端材料", "688102", "斯瑞新材", "观察期", "高端铜合金/航天材料映射，需核实订单。", "发动机材料链放量共振。", "关系证据弱且股价不承接。"],
+          ["高端材料", "688122", "西部超导", "保留", "钛合金/高温合金材料中军。", "航天材料池进入活跃池并放量修复。", "材料线退潮且跌破平台。"],
+          ["高端材料", "300034", "钢研高纳", "保留", "高温合金材料，发动机材料映射。", "高温合金与航天材料同步走强。", "跌破中期平台且无承接。"],
+          ["复材", "300777", "中简科技", "观察期", "碳纤维材料，航天复材映射。", "复材/商业航天同涨且放量突破。", "复材线退潮或跌破平台。"],
+          ["复材", "300699", "光威复材", "观察期", "碳纤维复材中军。", "复材鱼塘转强并放量突破。", "板块退潮且跌破平台。"],
+          ["卫星互联网", "002465", "海格通信", "保留", "卫星通信/地面设备中军。", "卫星通信池放量共振。", "通信军工退潮且跌破平台。"],
+          ["卫星互联网", "300045", "华力创通", "保留", "卫星导航/通信高弹性题材票。", "卫星互联网消息带动放量突破。", "高位放量滞涨或跌破10日线。"],
+          ["卫星互联网", "300762", "上海瀚讯", "观察期", "军工通信/卫星通信映射。", "卫星通信板块出现核心股带动。", "题材退潮且不承接。"],
+          ["载荷芯片", "001270", "铖昌科技", "观察期", "相控阵/T-R芯片，载荷链映射。", "卫星载荷方向放量突破。", "高估值回落且板块退潮。"],
+          ["载荷芯片", "688270", "臻镭科技", "观察期", "射频芯片/终端芯片。", "卫星互联网载荷链共振。", "放量跌破平台。"],
+          ["股权/投资人映射", "002202", "金风科技", "观察期", "用户线索：金风科技/金风投资体系入股蓝箭航天；持股比例待核实。若确认，属于蓝箭股权映射优先标的。", "蓝箭朱雀三号发射/回收节点升温，且金风科技放量异动。", "无法由公告/年报/工商穿透确认，或市场不认可。"],
+          ["股权/投资人映射", "02208.HK", "金风科技H股", "观察期", "金风科技港股同一主体映射；持股比例待核实，A股002202优先。", "蓝箭航天事件催化且AH联动。", "港股无承接或A股不跟随。"],
+          ["股权/投资人映射", "600282", "南钢股份", "观察期", "星际荣耀早期融资曾披露南京钢铁参与认购，持股比例未披露，属于投资人弱映射。", "星际荣耀双曲线三号/回收船/复用工厂事件升温，且南钢放量跟随。", "仅凭参股消息无承接，或钢铁主业拖累。"],
+          ["股权/投资人映射", "00656.HK", "复星国际", "观察期", "星际荣耀早期融资曾披露复星集团参与，持股比例未披露，港股资本映射。", "星际荣耀重大节点叠加复星平台被市场认可。", "港股流动性或主业因素压制，无事件承接。"],
+          ["股权/投资人映射", "CMBC_INTL", "民银国际", "观察期", "深蓝航天融资曾披露民银国际领投，持股比例未披露，暂作金融投资人线索。", "深蓝航天发射/回收节点升温，并找到可交易映射平台。", "无法映射到可交易标的或无市场认可。"],
+          ["股权/投资人映射", "待核实", "火箭公司投资人池", "观察期", "蓝箭、天兵、星河动力等融资方多为基金或非上市平台，持续穿透。", "上市公司公告、年报、互动易或工商穿透确认直接/间接持股。", "仅为传闻或基金LP关系过远。"]
+        ]
+      },
+      {
+        id: "rubin-coolant",
+        name: "Rubin 液冷/冷却液",
+        status: "富矿池",
+        nextCheck: "每日盘中",
+        thesis: "AI硬件扩散到液冷和冷却液材料，重点看氟化液/有机氟/电子化学品是否持续放量。",
+        core: ["巨化股份", "新宙邦"],
+        tags: ["AI硬件", "冷却液", "氟化工"],
+        events: [
+          "英伟达 Rubin、AI服务器液冷、数据中心散热相关催化。",
+          "巨化股份、新宙邦是否继续高成交和趋势承接。"
+        ],
+        rules: [
+          "升级：巨化/新宙邦同步强，永和/三美等扩散。",
+          "降级：核心票放量跌破关键支撑且二线不承接。"
+        ],
+        stocks: [
+          ["中军", "600160", "巨化股份", "保留", "氟化工容量中军。", "回踩承接或放量突破。", "涨停后承接失败。"],
+          ["弹性", "300037", "新宙邦", "保留", "电子化学品/有机氟弹性。", "站稳90或回踩承接。", "跌破关键支撑。"],
+          ["扩散", "605020", "永和股份", "观察期", "氟化工一体化。", "核心强后放量补涨。", "核心转弱且不承接。"],
+          ["扩散", "603379", "三美股份", "观察期", "制冷剂/氟化工扩散。", "板块扩散时放量。", "冲高回落无承接。"]
+        ]
+      },
+      {
+        id: "copper-foil",
+        name: "铜箔/铜资源映射",
+        status: "观察池",
+        nextCheck: "每日收盘",
+        thesis: "铜冠铜箔高弹性核心和铜陵有色资源中军之间的长期映射链。当前需要重新确认承接。",
+        core: ["铜冠铜箔", "铜陵有色"],
+        tags: ["长期映射", "资源中军", "观察期"],
+        events: [
+          "铜冠铜箔是否仍有高成交辨识度。",
+          "铜陵有色是否重新站回承接线。"
+        ],
+        rules: [
+          "升级：铜陵有色重新站回7.7并放量，后续再看8元。",
+          "降级：跌停后无修复，补涨逻辑短线失效。"
+        ],
+        stocks: [
+          ["核心", "301217", "铜冠铜箔", "观察期", "铜箔/PCB材料高弹性核心。", "高位分歧后重新转强。", "高位连续退潮。"],
+          ["映射中军", "000630", "铜陵有色", "降级", "铜资源中军+铜箔资产映射。", "重新站回7.7/8.0。", "跌停后无修复或继续破位。"]
+        ]
+      },
+      {
+        id: "han-laser",
+        name: "PCB设备/大族链",
+        status: "观察池",
+        nextCheck: "每日收盘",
+        thesis: "大族数控高弹性核心与大族激光平台映射，是子母/分拆映射模板链。",
+        core: ["大族数控", "大族激光"],
+        tags: ["模板链", "PCB设备", "长期观察"],
+        events: [
+          "大族数控是否保持高位辨识度。",
+          "大族激光是否缩量止跌或放量修复。"
+        ],
+        rules: [
+          "升级：大族数控强势，大族激光放量修复。",
+          "降级：两者同步放量下跌。"
+        ],
+        stocks: [
+          ["核心", "301200", "大族数控", "保留", "PCB设备高弹性核心。", "维持高位强度。", "高位退潮。"],
+          ["映射平台", "002008", "大族激光", "观察期", "母公司/平台映射。", "缩量回踩后放量修复。", "继续放量下跌。"]
+        ]
+      }
+    ];
+
+    const classForStatus = (status) => {
+      if (status === "富矿池") return "rich";
+      if (status === "活跃池") return "active-tag";
+      if (status === "观察池") return "watch";
+      if (status === "贫瘠池") return "poor";
+      if (status === "保留") return "keep";
+      if (status === "观察期") return "probation";
+      if (status === "降级") return "downgrade";
+      if (status === "剔除") return "remove";
+      return "active-tag";
+    };
+
+    const state = {
+      selected: ponds[0].id,
+      search: "",
+      status: "all"
+    };
+
+    const els = {
+      searchInput: document.getElementById("searchInput"),
+      statusFilter: document.getElementById("statusFilter"),
+      pondList: document.getElementById("pondList"),
+      pondName: document.getElementById("pondName"),
+      pondThesis: document.getElementById("pondThesis"),
+      pondTags: document.getElementById("pondTags"),
+      metricStatus: document.getElementById("metricStatus"),
+      metricCore: document.getElementById("metricCore"),
+      metricStocks: document.getElementById("metricStocks"),
+      metricNext: document.getElementById("metricNext"),
+      eventList: document.getElementById("eventList"),
+      ruleList: document.getElementById("ruleList"),
+      stockTable: document.getElementById("stockTable")
+    };
+
+    function matchesSearch(pond) {
+      const q = state.search.trim().toLowerCase();
+      if (!q) return true;
+      const haystack = [
+        pond.name,
+        pond.status,
+        pond.thesis,
+        ...pond.core,
+        ...pond.tags,
+        ...pond.stocks.flat()
+      ].join(" ").toLowerCase();
+      return haystack.includes(q);
+    }
+
+    function filteredPonds() {
+      return ponds.filter((pond) => {
+        const statusOk = state.status === "all" || pond.status === state.status;
+        return statusOk && matchesSearch(pond);
+      });
+    }
+
+    function renderPondList() {
+      const list = filteredPonds();
+      if (!list.length) {
+        els.pondList.innerHTML = '<div class="empty">没有匹配的鱼塘</div>';
+        return;
+      }
+      if (!list.some((pond) => pond.id === state.selected)) {
+        state.selected = list[0].id;
+      }
+      els.pondList.innerHTML = list.map((pond) => `
+        <button class="pond-button ${pond.id === state.selected ? "active" : ""}" data-id="${pond.id}">
+          <div class="pond-title">
+            <span>${pond.name}</span>
+            <span class="tag ${classForStatus(pond.status)}">${pond.status}</span>
+          </div>
+          <div class="pond-meta">${pond.core.join(" / ")}</div>
+        </button>
+      `).join("");
+      els.pondList.querySelectorAll("button").forEach((button) => {
+        button.addEventListener("click", () => {
+          state.selected = button.dataset.id;
+          render();
+        });
+      });
+    }
+
+    function renderSelectedPond() {
+      const pond = ponds.find((item) => item.id === state.selected) || filteredPonds()[0] || ponds[0];
+      els.pondName.textContent = pond.name;
+      els.pondThesis.textContent = pond.thesis;
+      els.pondTags.innerHTML = [
+        `<span class="tag ${classForStatus(pond.status)}">${pond.status}</span>`,
+        ...pond.tags.map((tag) => `<span class="tag active-tag">${tag}</span>`)
+      ].join("");
+      els.metricStatus.textContent = pond.status;
+      els.metricCore.textContent = pond.core.length;
+      els.metricStocks.textContent = pond.stocks.length;
+      els.metricNext.textContent = pond.nextCheck;
+      els.eventList.innerHTML = pond.events.map((event) => `<li>${event}</li>`).join("");
+      els.ruleList.innerHTML = pond.rules.map((rule) => `<li>${rule}</li>`).join("");
+      els.stockTable.innerHTML = pond.stocks.map((stock) => `
+        <tr>
+          <td>${stock[0]}</td>
+          <td class="code">${stock[1]}</td>
+          <td><strong>${stock[2]}</strong></td>
+          <td><span class="tag ${classForStatus(stock[3])}">${stock[3]}</span></td>
+          <td>${stock[4]}</td>
+          <td>${stock[5]}</td>
+          <td>${stock[6]}</td>
+        </tr>
+      `).join("");
+    }
+
+    function render() {
+      renderPondList();
+      renderSelectedPond();
+    }
+
+    els.searchInput.addEventListener("input", (event) => {
+      state.search = event.target.value;
+      render();
+    });
+
+    els.statusFilter.addEventListener("change", (event) => {
+      state.status = event.target.value;
+      render();
+    });
+
+    render();
+  </script>
+</body>
+</html>
