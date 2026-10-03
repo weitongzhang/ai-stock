@@ -281,6 +281,27 @@
       ]
     },
     {
+      "name": "socratic-questioning",
+      "domain": "methodology",
+      "type": "clarification-methodology",
+      "path": "skills/methodology/socratic-questioning",
+      "runtime_path": "$USERPROFILE/.codex/skills/socratic-questioning",
+      "purpose": "用苏格拉底提问法在回答前澄清用户目标、假设、约束、风险偏好、关键定义和成功标准，避免过早下结论并提升分析对齐度。",
+      "coordinates": [
+        "qiushi-stock-analysis",
+        "a-share-stock-trade-operator",
+        "a-share-market-flow-analyst",
+        "watchlist-tracker"
+      ],
+      "provides": [
+        "intent-clarification",
+        "assumption-probing",
+        "constraint-discovery",
+        "success-criteria-summary",
+        "decision-ready-working-assumptions"
+      ]
+    },
+    {
       "name": "chen-xiaoqun-perspective",
       "domain": "stock-selection",
       "type": "methodology-perspective",

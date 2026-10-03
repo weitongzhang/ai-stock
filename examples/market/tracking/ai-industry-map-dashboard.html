@@ -1,0 +1,1313 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AI产业图谱鱼塘看板</title>
+  <style>
+    :root {
+      --bg: #eef4f9;
+      --panel: #ffffff;
+      --ink: #0b1d35;
+      --muted: #5c6c80;
+      --line: #d5e0eb;
+      --blue-900: #102d57;
+      --blue-700: #245ca8;
+      --blue-500: #377bd2;
+      --blue-100: #e7f1ff;
+      --green: #15803d;
+      --amber: #b45309;
+      --red: #b91c1c;
+      --shadow: 0 10px 26px rgba(20, 38, 66, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--bg);
+      font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+      letter-spacing: 0;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    .app-header {
+      background: #071326;
+      color: #fff;
+      border-bottom: 4px solid #e44535;
+    }
+
+    .header-inner {
+      max-width: 1480px;
+      margin: 0 auto;
+      padding: 22px 24px 24px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 24px;
+      align-items: end;
+    }
+
+    .title {
+      margin: 0 0 8px;
+      font-size: 30px;
+      line-height: 1.2;
+      font-weight: 800;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: #c8d5e7;
+      font-size: 15px;
+      line-height: 1.7;
+    }
+
+    .source {
+      text-align: right;
+      color: #dce8f7;
+      font-size: 13px;
+      line-height: 1.8;
+      white-space: nowrap;
+    }
+
+    .page {
+      max-width: 1480px;
+      margin: 0 auto;
+      padding: 18px 24px 36px;
+    }
+
+    .toolbar {
+      display: grid;
+      grid-template-columns: minmax(260px, 420px) 1fr;
+      gap: 14px;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .search {
+      height: 42px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      padding: 0 14px;
+      color: var(--ink);
+      font-size: 15px;
+      outline: none;
+    }
+
+    .quick-filters {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+    }
+
+    .chip,
+    .tag,
+    .role {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 28px;
+      border-radius: 999px;
+      padding: 0 11px;
+      line-height: 1;
+      font-size: 13px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .chip {
+      border: 1px solid var(--line);
+      background: #fff;
+      color: #243956;
+      cursor: pointer;
+    }
+
+    .chip.active {
+      border-color: var(--blue-500);
+      background: var(--blue-100);
+      color: #0751b8;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 16px;
+      align-items: start;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+
+    .panel-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 18px 18px 0;
+    }
+
+    .panel-title h2 {
+      margin: 0;
+      font-size: 20px;
+      line-height: 1.25;
+    }
+
+    .count-badge {
+      min-width: 46px;
+      height: 28px;
+      border-radius: 999px;
+      background: #edf4ff;
+      color: #0751b8;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 13px;
+    }
+
+    .map-panel {
+      position: sticky;
+      top: 12px;
+      overflow: hidden;
+    }
+
+    .ring {
+      width: 100%;
+      height: 330px;
+      margin: 8px auto 8px;
+      position: relative;
+    }
+
+    .ring-actions {
+      display: flex;
+      justify-content: center;
+      padding: 0 16px 14px;
+    }
+
+    .selection-card {
+      margin: 0 16px 14px;
+      border: 1px solid #d5e0eb;
+      border-radius: 8px;
+      background: #f8fbff;
+      padding: 12px 12px;
+      display: grid;
+      gap: 8px;
+      color: #263b55;
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .selection-card strong {
+      display: block;
+      color: var(--ink);
+      font-size: 15px;
+      line-height: 1.3;
+    }
+
+    .selection-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .selection-meta span {
+      min-height: 24px;
+      border-radius: 999px;
+      background: #edf4ff;
+      color: #0f5dc7;
+      display: inline-flex;
+      align-items: center;
+      padding: 0 8px;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .selection-lines {
+      max-height: 96px;
+      overflow: auto;
+      padding-right: 4px;
+    }
+
+    .zoom-button {
+      min-height: 34px;
+      border: 1px solid #bdd3ec;
+      border-radius: 8px;
+      background: #edf4ff;
+      color: #0f5dc7;
+      padding: 0 12px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 800;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .ring-empty {
+      position: absolute;
+      inset: 18px;
+      border: 1px dashed #b8c8db;
+      border-radius: 8px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+      background: #f8fbff;
+    }
+
+    .ring-empty.show {
+      display: flex;
+    }
+
+    .ring-canvas {
+      width: 100%;
+      height: 100%;
+      display: none;
+      cursor: pointer;
+    }
+
+    .ring-canvas.show {
+      display: block;
+    }
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      padding: 18px;
+    }
+
+    .metric {
+      background: #f1f6fb;
+      border-radius: 8px;
+      padding: 14px 14px;
+      min-height: 82px;
+    }
+
+    .metric strong {
+      display: block;
+      font-size: 24px;
+      line-height: 1.25;
+      margin-bottom: 7px;
+    }
+
+    .metric span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .detail {
+      padding: 0 18px 18px;
+      color: #263b55;
+      line-height: 1.75;
+      font-size: 15px;
+    }
+
+    .detail strong { color: var(--ink); }
+
+    .table-panel {
+      overflow: hidden;
+    }
+
+    .table-tabs {
+      display: flex;
+      gap: 8px;
+      padding: 16px 18px 0;
+      flex-wrap: wrap;
+    }
+
+    .tab-button {
+      height: 36px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #f8fbff;
+      color: #263b55;
+      padding: 0 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 800;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .tab-button.active {
+      background: #0f5dc7;
+      border-color: #0f5dc7;
+      color: #fff;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      padding: 12px 18px 18px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 980px;
+      table-layout: fixed;
+    }
+
+    th, td {
+      border-bottom: 1px solid #e7edf5;
+      padding: 13px 10px;
+      text-align: left;
+      vertical-align: middle;
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    th {
+      color: #425872;
+      background: #f8fbff;
+      font-weight: 800;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+
+    .col-market { width: 74px; }
+    .col-code { width: 92px; }
+    .col-name { width: 126px; }
+    .col-layer { width: 126px; }
+    .col-role { width: 118px; }
+    .col-tags { width: 280px; }
+    .col-link { width: 118px; }
+
+    .name-cell {
+      font-weight: 800;
+      color: var(--ink);
+    }
+
+    .code-cell {
+      color: #263b55;
+      font-family: Consolas, "Courier New", monospace;
+      font-weight: 700;
+    }
+
+    .tag {
+      margin: 2px 4px 2px 0;
+      background: #edf4ff;
+      color: #0f5dc7;
+      min-height: 24px;
+      padding: 0 8px;
+      font-size: 12px;
+    }
+
+    .role {
+      min-width: 72px;
+      min-height: 26px;
+      padding: 0 9px;
+      font-size: 12px;
+    }
+
+    .role.core { background: #eaf6ee; color: var(--green); }
+    .role.map { background: #fff4df; color: var(--amber); }
+    .role.watch { background: #eef2ff; color: #4338ca; }
+    .role.global { background: #e6f7ff; color: #0369a1; }
+
+    .link-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 32px;
+      border-radius: 7px;
+      padding: 0 10px;
+      background: #0f5dc7;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .empty {
+      padding: 34px 18px;
+      text-align: center;
+      color: var(--muted);
+      display: none;
+    }
+
+    .chart-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(4, 12, 24, 0.72);
+      z-index: 20;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 22px;
+    }
+
+    .chart-modal.open {
+      display: flex;
+    }
+
+    .chart-dialog {
+      width: min(1180px, 96vw);
+      height: min(860px, 92vh);
+      background: #f7fbff;
+      border: 1px solid #cbd9e8;
+      border-radius: 10px;
+      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.25);
+      display: grid;
+      grid-template-rows: auto 1fr;
+      overflow: hidden;
+    }
+
+    .chart-dialog-header {
+      min-height: 64px;
+      padding: 14px 18px;
+      border-bottom: 1px solid #d8e3ef;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      background: #fff;
+    }
+
+    .chart-dialog-title {
+      margin: 0;
+      font-size: 20px;
+      line-height: 1.25;
+      font-weight: 900;
+    }
+
+    .chart-dialog-subtitle {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .close-button {
+      min-width: 72px;
+      height: 36px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .chart-large {
+      min-height: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    @media (max-width: 1100px) {
+      .layout { grid-template-columns: 1fr; }
+      .map-panel { position: static; }
+      .summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .toolbar { grid-template-columns: 1fr; }
+      .quick-filters { justify-content: flex-start; }
+      .source { text-align: left; white-space: normal; }
+      .header-inner { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 620px) {
+      .header-inner, .page { padding-left: 14px; padding-right: 14px; }
+      .title { font-size: 24px; }
+      .summary-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <div class="header-inner">
+      <div>
+        <h1 class="title">AI产业图谱鱼塘看板</h1>
+        <p class="subtitle">按国泰海通 AI 产业图谱拆成可筛选标签池，联动 A 股和美股映射标的。点击 A 股可跳转同花顺个股页。</p>
+      </div>
+      <div class="source">
+        来源：国泰海通研究所科技团队图谱整理<br />
+        图谱更新时间：2026年5月 / 看板版本：2026-06-24
+      </div>
+    </div>
+  </header>
+
+  <main class="page">
+    <section class="toolbar">
+      <input id="searchInput" class="search" placeholder="搜索标的、代码、标签，例如：PCB、英伟达、光模块" />
+      <div class="quick-filters" id="quickFilters"></div>
+    </section>
+
+    <section class="layout">
+      <aside class="panel map-panel">
+        <div class="ring" id="industryRing">
+          <canvas class="ring-canvas" id="fallbackRing" width="760" height="760"></canvas>
+          <div class="ring-empty" id="ringEmpty">ECharts 加载失败时仍可使用下方标签筛选。<br />联网后刷新即可显示交互环形图。</div>
+        </div>
+        <div class="selection-card" id="selectionCard"></div>
+        <div class="ring-actions">
+          <button class="zoom-button" id="openChartModal">放大选择图谱</button>
+        </div>
+      </aside>
+
+      <section class="content-grid">
+        <section class="panel">
+          <div class="panel-title">
+            <h2 id="selectedTitle">全部 AI 图谱标的</h2>
+            <span class="count-badge" id="resultCount">0</span>
+          </div>
+          <div class="summary-grid">
+            <div class="metric"><strong id="aCount">0</strong><span>A 股标的</span></div>
+            <div class="metric"><strong id="usCount">0</strong><span>美股/海外标的</span></div>
+            <div class="metric"><strong id="coreCount">0</strong><span>核心标的</span></div>
+            <div class="metric"><strong id="mapCount">0</strong><span>补涨/映射标的</span></div>
+          </div>
+          <div class="detail" id="tagDetail"></div>
+        </section>
+
+        <section class="panel table-panel">
+          <div class="panel-title">
+            <h2>标的列表</h2>
+            <span class="count-badge" id="tableCount">0</span>
+          </div>
+          <div class="table-tabs" id="marketTabs"></div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th class="col-market">市场</th>
+                  <th class="col-code">代码</th>
+                  <th class="col-name">名称</th>
+                  <th class="col-layer">层级</th>
+                  <th class="col-role">角色</th>
+                  <th class="col-tags">标签</th>
+                  <th>图谱逻辑</th>
+                  <th class="col-link">跳转</th>
+                </tr>
+              </thead>
+              <tbody id="stockBody"></tbody>
+            </table>
+            <div id="emptyState" class="empty">当前筛选没有匹配标的。</div>
+          </div>
+        </section>
+      </section>
+    </section>
+  </main>
+
+  <div class="chart-modal" id="chartModal" aria-hidden="true">
+    <div class="chart-dialog">
+      <div class="chart-dialog-header">
+        <div>
+          <h2 class="chart-dialog-title">AI产业图谱三层选择</h2>
+          <p class="chart-dialog-subtitle">中心 / 产业层 / 细分赛道。悬停产业层会联动高亮外层子分类，国内与海外代表在提示框和表格中查看。</p>
+        </div>
+        <button class="close-button" id="closeChartModal">关闭</button>
+      </div>
+      <div class="chart-large" id="industryRingLarge"></div>
+    </div>
+  </div>
+
+  <script src="https://cdn.staticfile.net/echarts/5.6.0/echarts.min.js"></script>
+  <script>
+    const layers = [
+      {
+        name: "AI应用层",
+        tags: [
+          "AI Agent/企业服务",
+          "AI办公",
+          "AI教育",
+          "AI医疗健康",
+          "AI金融",
+          "AI财税政务",
+          "AI汽车/自动驾驶/物理AI",
+          "AI机器人/具身智能",
+          "AI商业",
+          "端侧AI/AI手机&PC",
+          "AI能源",
+          "AI感知",
+          "AI脑机",
+          "AI工业设计"
+        ]
+      },
+      {
+        name: "模型与框架层",
+        tags: [
+          "MLOps/AI平台",
+          "大模型厂商"
+        ]
+      },
+      {
+        name: "AI服务层",
+        tags: [
+          "云计算/AI Cloud",
+          "向量数据库",
+          "AI数据/智能体工程",
+          "AI网络安全"
+        ]
+      },
+      {
+        name: "基础算力层",
+        tags: [
+          "AI芯片/GPU/ASIC",
+          "CPU",
+          "晶圆代工",
+          "封装/测试",
+          "存储/HBM",
+          "光芯片/光模块",
+          "PCB",
+          "AI服务器/整机",
+          "网络设备及芯片",
+          "数据中心/IDC",
+          "算力租赁",
+          "光连接线缆与组件",
+          "AI芯片EDA/设计工具",
+          "电力/UPS/冷却"
+        ]
+      }
+    ];
+
+    const tagDetails = {
+      "AI芯片/GPU/ASIC": "全球算力核心，A股主要做国产替代和产业映射，美股核心看英伟达、AMD、博通等。",
+      "光芯片/光模块": "AI 数据中心网络升级的高景气方向，A股核心集中在光模块、光器件和光芯片。",
+      "PCB": "AI 服务器带来高速 PCB、CCL、铜箔、玻纤和树脂价值量提升，是硬件上游补涨重点。",
+      "存储/HBM": "HBM 是 AI 训练和推理的关键瓶颈，海外核心在海力士、三星、美光，A股看存储模组和封测映射。",
+      "电力/UPS/冷却": "AI 数据中心耗电与散热约束增强，液冷、氟化液、UPS、电网设备是扩散方向。",
+      "云计算/AI Cloud": "海外云厂商资本开支决定 AI 硬件景气，国内云厂商决定算力租赁和 IDC 弹性。",
+      "AI办公": "应用层目前更看商业化验证，不宜只因泛 AI 标签追高。",
+      "AI机器人/具身智能": "机器人是 AI 从软件走向物理世界的重要出口，A股适合跟踪执行器、电机、减速器和传感器。"
+    };
+
+    const prototypeSectors = [
+      { layer: "AI应用层", tag: "AI Agent/企业服务", domestic: "泛微网络、汉得信息、用友网络、鼎捷软件、软通动力、中控技术、科大讯飞、创意信息、浩瀚深度、传音控股、拓维信息、优刻得", overseas: "Salesforce、ServiceNow、Microsoft、SAP、Oracle、UiPath、Palantir" },
+      { layer: "AI应用层", tag: "AI办公", domestic: "金山办公、合合信息、福昕软件、万兴科技", overseas: "Microsoft、Google、Adobe、Zoom、Atlassian、Box、Monday.com" },
+      { layer: "AI应用层", tag: "AI教育", domestic: "科大讯飞、视源股份、卓越教育、新开普、佳发教育、正元智慧", overseas: "Duolingo、Coursera、Udemy、Chegg、TAL、EDU、GOTU" },
+      { layer: "AI应用层", tag: "AI医疗健康", domestic: "卫宁健康、创业慧康、东软集团、润达医疗、久远银海、嘉和美康、讯飞医疗科技、晶泰科技、英矽智能", overseas: "Tempus AI、Recursion、Schrodinger、Exscientia、GE Healthcare、Guardant Health、Natera、Doximity" },
+      { layer: "AI应用层", tag: "AI金融", domestic: "同花顺、恒生电子、指南针、新致软件、新大陆、新国都、宇信科技、广电运通、京北方、连连数字", overseas: "Fiserv、SS&C Technologies、Visa、Circle、PayPal" },
+      { layer: "AI应用层", tag: "AI财税政务", domestic: "中科江南、博思软件、新点软件、南威软件、数字政通、浪潮软件、税友股份", overseas: "Intuit、Workday" },
+      { layer: "AI应用层", tag: "AI汽车/自动驾驶/物理AI", domestic: "五一视界、佳都科技、希迪智驾、思维列控、捷顺科技、博泰车联、千方科技、经纬恒润、四维图新、光庭信息、小马智行、中科创达、虹软科技、万集科技、群核科技、索辰科技、地平线机器人、黑芝麻智能", overseas: "TESLA、Waymo" },
+      { layer: "AI应用层", tag: "AI机器人/具身智能", domestic: "卧龙机器人、越疆、极智嘉、云鲸、优必选、埃斯顿、亿嘉和、新松机器人、鸣志电器、拓斯达、神州泰岳、长盛轴承、中控技术、奥普光电、五洲新春、宇树科技、井松智能、国机科技", overseas: "Tesla、Richtech Robotics、NVIDIA、Amazon、Rockwell Automation、Honeywell、RTX、Palladyne AI" },
+      { layer: "AI应用层", tag: "AI商业", domestic: "汉朔科技、石基信息、光云科技、聚水潭、多点数智、明略科技", overseas: "VusionGroup、Pricer、Oracle、Amadeus、Toast、Shopify、BigCommerce、Manhattan Associates、SPS Commerce、Palantir" },
+      { layer: "AI应用层", tag: "端侧AI/AI手机&PC", domestic: "瑞芯微、恒玄科技、翱捷科技、中科创达、广和通、美格智能、移远通信", overseas: "高通、NVIDIA、ARM" },
+      { layer: "AI应用层", tag: "AI能源", domestic: "南网数字、南网科技、国能日新、国网信通、朗新科技、远光软件、恒华科技、瑞纳智能、科远智慧", overseas: "X-Energy、Bloom Energy" },
+      { layer: "AI应用层", tag: "AI感知", domestic: "海康威视、大华股份、萤石网络、千方科技、日联科技、骄成超声、思泰克、思看科技、智洋创新、容知日新", overseas: "Keysight、安捷伦、诺信、Cognex、Keyence" },
+      { layer: "AI应用层", tag: "AI脑机", domestic: "博睿科技、岩山科技、狄耐克、三博脑科、诚益通", overseas: "Neuralink、Synchron、Blackrock Neurotech、Paradromics、Kernel" },
+      { layer: "AI应用层", tag: "AI工业设计", domestic: "中望软件、浩辰软件、索辰科技、霍莱沃", overseas: "Dassault Systemes、Cadence、Siemens" },
+      { layer: "模型与框架层", tag: "MLOps/AI平台", domestic: "百度、腾讯、阿里巴巴、中科曙光、科大讯飞、范式智能", overseas: "Databricks、Snowflake、MongoDB、Palantir" },
+      { layer: "模型与框架层", tag: "大模型厂商", domestic: "智谱、MiniMax、月之暗面、DeepSeek、阿里星辰、腾讯混元、字节、腾讯、科大讯飞、百度、商汤、阶跃星辰、云知声、硅基流动、澜舟科技", overseas: "OpenAI、Anthropic、Google Gemini、Meta、Databricks" },
+      { layer: "AI服务层", tag: "云计算/AI Cloud", domestic: "深信服、云赛智联、网宿科技、优刻得、青云科技、首都在线、金山云、阿里巴巴", overseas: "Microsoft、Amazon、Alphabet、Oracle、CoreWeave、Nebius" },
+      { layer: "AI服务层", tag: "向量数据库", domestic: "达梦数据、星环科技、海量数据", overseas: "Scale AI、Databricks、Snowflake、MongoDB、Palantir" },
+      { layer: "AI服务层", tag: "AI数据/智能体工程", domestic: "商汤、迅策、滴普科技、海天瑞声、范式智能、海致科技集团、慧辰股份、上海钢联、拓尔思、托普云农", overseas: "MongoDB、Elastic、Snowflake、Oracle、Cloudflare、Couchbase" },
+      { layer: "AI服务层", tag: "AI网络安全", domestic: "深信服、奇安信、三六零、启明星辰、天融信、安恒信息、绿盟科技、安博通", overseas: "Palo Alto Networks、CrowdStrike、SentinelOne、Fortinet、Check Point Software、Zscaler、Cisco、Microsoft Security、IBM Security" },
+      { layer: "基础算力层", tag: "AI芯片/GPU/ASIC", domestic: "寒武纪、海光信息、天数智芯、壁仞科技、摩尔线程、沐曦股份、品高股份、云天励飞、智微智能、燧原科技", overseas: "英伟达、AMD、博通、Marvell、Google" },
+      { layer: "基础算力层", tag: "CPU", domestic: "海光信息、龙芯中科、中国长城、禾赛科技、兆芯集成", overseas: "AMD、Intel、ARM、QUALCOMM、英伟达" },
+      { layer: "基础算力层", tag: "晶圆代工", domestic: "中芯国际、华虹半导体", overseas: "台积电、三星" },
+      { layer: "基础算力层", tag: "封装/测试", domestic: "盛合晶微、长电科技", overseas: "日月光、Amkor" },
+      { layer: "基础算力层", tag: "存储/HBM", domestic: "德明利、佰维存储、兆易创新、大普微", overseas: "SK海力士、美光、闪迪、三星、西部数据、希捷科技" },
+      { layer: "基础算力层", tag: "光芯片/光模块", domestic: "中际旭创、新易盛、天孚通信、光迅科技、华工科技、太辰光、源杰科技", overseas: "Lumentum、Coherent、AOI" },
+      { layer: "基础算力层", tag: "PCB", domestic: "胜宏科技、沪电股份、深南电路、景旺电子、生益电子、鹏鼎控股、广合科技、方正科技", overseas: "TTM、ISU、欣兴电子" },
+      { layer: "基础算力层", tag: "AI服务器/整机", domestic: "工业富联、浪潮信息、中科曙光、紫光股份、华勤技术", overseas: "DELL、超微电脑" },
+      { layer: "基础算力层", tag: "网络设备及芯片", domestic: "锐捷网络、星网锐捷、紫光股份、中兴通讯、菲菱科思、盛科通信", overseas: "博通、Marvell、思科、Arista、CLS" },
+      { layer: "基础算力层", tag: "数据中心/IDC", domestic: "万国数据、世纪互联、润泽科技、奥飞数据、数据港、美利云、光环新网、大位科技", overseas: "Equinix、Digital Realty、CoreWeave" },
+      { layer: "基础算力层", tag: "算力租赁", domestic: "协创数据、盈泽环境、云赛智联、利通电子、润建股份、并行科技、东方国信、中贝通信、杰创智能、仕佳光子、中恒电气、世纪恒通、平治信息、利机长兴、铜牛信息、天孚科技、奥飞数据、宏景科技、恒为科技、亚康股份、智微智能", overseas: "CoreWeave、Oracle、Nebius、IREN" },
+      { layer: "基础算力层", tag: "光连接线缆与组件", domestic: "中际旭创、新易盛、天孚通信", overseas: "Corning、Amphenol" },
+      { layer: "基础算力层", tag: "AI芯片EDA/设计工具", domestic: "华大九天、概伦电子、广立微", overseas: "Synopsys、Cadence、Siemens EDA" },
+      { layer: "基础算力层", tag: "电力/UPS/冷却", domestic: "金盘科技、中国电气、伊戈尔、科华数据、科士达、英维克、申菱环境、高澜股份", overseas: "Schneider Electric、Eaton、Siemens、Vertiv、Johnson Controls、Trane Technologies" }
+    ];
+
+    const stocks = [
+      { market: "A股", code: "300308", name: "中际旭创", layer: "基础算力层", role: "A股核心", tags: ["光芯片/光模块", "AI服务器/整机"], logic: "高速光模块龙头，受益 AI 数据中心网络升级。" },
+      { market: "A股", code: "300502", name: "新易盛", layer: "基础算力层", role: "A股核心", tags: ["光芯片/光模块"], logic: "高速光模块弹性核心，适合作为光通信鱼塘强弱风向标。" },
+      { market: "A股", code: "300394", name: "天孚通信", layer: "基础算力层", role: "补涨映射", tags: ["光芯片/光模块", "光连接线缆与组件"], logic: "光器件环节高弹性，跟随光模块主线扩散。" },
+      { market: "A股", code: "002281", name: "光迅科技", layer: "基础算力层", role: "补涨映射", tags: ["光芯片/光模块"], logic: "光器件和光芯片国产替代映射。" },
+      { market: "美股", code: "LITE", name: "Lumentum", layer: "基础算力层", role: "全球映射", tags: ["光芯片/光模块"], logic: "海外光通信器件代表，映射 A 股光模块景气。" },
+      { market: "美股", code: "COHR", name: "Coherent", layer: "基础算力层", role: "全球映射", tags: ["光芯片/光模块"], logic: "海外光通信和材料器件代表。" },
+
+      { market: "A股", code: "002463", name: "沪电股份", layer: "基础算力层", role: "A股核心", tags: ["PCB", "AI服务器/整机"], logic: "AI 服务器 PCB 风向标。" },
+      { market: "A股", code: "300476", name: "胜宏科技", layer: "基础算力层", role: "A股核心", tags: ["PCB"], logic: "AI PCB 高弹性核心。" },
+      { market: "A股", code: "002916", name: "深南电路", layer: "基础算力层", role: "A股核心", tags: ["PCB", "封装/测试"], logic: "PCB 与封装基板能力兼具。" },
+      { market: "A股", code: "600183", name: "生益科技", layer: "基础算力层", role: "补涨映射", tags: ["PCB", "CCL"], logic: "覆铜板中军，承接 PCB 上游利润转移。" },
+      { market: "A股", code: "600176", name: "中国巨石", layer: "基础算力层", role: "补涨映射", tags: ["PCB", "材料上游"], logic: "特种玻纤布上游映射。" },
+      { market: "A股", code: "301217", name: "铜冠铜箔", layer: "基础算力层", role: "观察标的", tags: ["PCB", "材料上游"], logic: "高端铜箔弹性映射，需看 PCB 主线强度。" },
+      { market: "美股", code: "TTMI", name: "TTM Technologies", layer: "基础算力层", role: "全球映射", tags: ["PCB"], logic: "海外 PCB 映射标的。" },
+
+      { market: "A股", code: "300750", name: "宁德时代", layer: "基础算力层", role: "A股核心", tags: ["电力/UPS/冷却", "储能"], logic: "储能和锂电容量中军，映射 AI 数据中心用电扩张。" },
+      { market: "A股", code: "600160", name: "巨化股份", layer: "基础算力层", role: "A股核心", tags: ["电力/UPS/冷却", "冷却液"], logic: "氟化工容量中军，映射液冷冷却液材料。" },
+      { market: "A股", code: "300037", name: "新宙邦", layer: "基础算力层", role: "补涨映射", tags: ["电力/UPS/冷却", "冷却液"], logic: "电子化学品/有机氟弹性，兼具液冷和储能材料映射。" },
+      { market: "美股", code: "VRT", name: "Vertiv", layer: "基础算力层", role: "全球核心", tags: ["电力/UPS/冷却", "数据中心/IDC"], logic: "海外数据中心电力和散热设备核心。" },
+      { market: "美股", code: "ETN", name: "Eaton", layer: "基础算力层", role: "全球映射", tags: ["电力/UPS/冷却"], logic: "海外电力设备映射。" },
+
+      { market: "A股", code: "688256", name: "寒武纪", layer: "基础算力层", role: "A股核心", tags: ["AI芯片/GPU/ASIC"], logic: "国产 AI 芯片代表，估值弹性大，需订单验证。" },
+      { market: "A股", code: "688041", name: "海光信息", layer: "基础算力层", role: "A股核心", tags: ["AI芯片/GPU/ASIC", "CPU"], logic: "国产 CPU/GPU 服务器芯片映射。" },
+      { market: "美股", code: "NVDA", name: "英伟达", layer: "基础算力层", role: "全球核心", tags: ["AI芯片/GPU/ASIC"], logic: "全球 AI GPU 核心锚。" },
+      { market: "美股", code: "AMD", name: "AMD", layer: "基础算力层", role: "全球映射", tags: ["AI芯片/GPU/ASIC", "CPU"], logic: "GPU/CPU 竞争格局映射。" },
+      { market: "美股", code: "AVGO", name: "博通", layer: "基础算力层", role: "全球核心", tags: ["AI芯片/GPU/ASIC", "网络设备及芯片"], logic: "AI ASIC、交换芯片和连接链条核心。" },
+      { market: "美股", code: "ARM", name: "ARM", layer: "基础算力层", role: "全球映射", tags: ["CPU"], logic: "CPU 架构和边缘计算映射。" },
+
+      { market: "A股", code: "688012", name: "中微公司", layer: "基础算力层", role: "A股核心", tags: ["晶圆代工", "封装/测试"], logic: "半导体设备国产替代核心。" },
+      { market: "A股", code: "002371", name: "北方华创", layer: "基础算力层", role: "A股核心", tags: ["晶圆代工", "封装/测试"], logic: "半导体设备平台型龙头。" },
+      { market: "A股", code: "688072", name: "拓荆科技", layer: "基础算力层", role: "补涨映射", tags: ["晶圆代工"], logic: "薄膜沉积设备弹性映射。" },
+      { market: "美股", code: "TSM", name: "台积电", layer: "基础算力层", role: "全球核心", tags: ["晶圆代工"], logic: "先进制程代工核心。" },
+      { market: "美股", code: "ASML", name: "ASML", layer: "基础算力层", role: "全球核心", tags: ["晶圆代工"], logic: "先进制程设备核心。" },
+      { market: "美股", code: "AMAT", name: "应用材料", layer: "基础算力层", role: "全球映射", tags: ["晶圆代工"], logic: "海外半导体设备映射。" },
+
+      { market: "A股", code: "688525", name: "佰维存储", layer: "基础算力层", role: "补涨映射", tags: ["存储/HBM"], logic: "存储模组映射 HBM 和 AI 终端存储景气。" },
+      { market: "A股", code: "603986", name: "兆易创新", layer: "基础算力层", role: "观察标的", tags: ["存储/HBM"], logic: "存储和 MCU 方向观察。" },
+      { market: "美股", code: "MU", name: "美光科技", layer: "基础算力层", role: "全球核心", tags: ["存储/HBM"], logic: "海外存储/HBM 核心。" },
+      { market: "美股", code: "005930.KS", name: "三星电子", layer: "基础算力层", role: "全球映射", tags: ["存储/HBM"], logic: "HBM 和存储大厂。" },
+
+      { market: "A股", code: "601138", name: "工业富联", layer: "基础算力层", role: "A股核心", tags: ["AI服务器/整机"], logic: "AI 服务器整机核心。" },
+      { market: "A股", code: "000977", name: "浪潮信息", layer: "基础算力层", role: "A股核心", tags: ["AI服务器/整机"], logic: "服务器整机和国产算力映射。" },
+      { market: "A股", code: "603019", name: "中科曙光", layer: "基础算力层", role: "A股核心", tags: ["AI服务器/整机", "算力租赁"], logic: "国产服务器和算力基础设施映射。" },
+      { market: "美股", code: "DELL", name: "戴尔科技", layer: "基础算力层", role: "全球映射", tags: ["AI服务器/整机"], logic: "海外 AI 服务器整机映射。" },
+      { market: "美股", code: "SMCI", name: "超微电脑", layer: "基础算力层", role: "全球映射", tags: ["AI服务器/整机"], logic: "海外 AI 服务器弹性标的。" },
+
+      { market: "A股", code: "688111", name: "金山办公", layer: "AI应用层", role: "观察标的", tags: ["AI办公"], logic: "AI 办公商业化观察样本。" },
+      { market: "A股", code: "002230", name: "科大讯飞", layer: "AI应用层", role: "观察标的", tags: ["AI教育", "AI办公"], logic: "大模型和教育办公应用映射，需看商业化。" },
+      { market: "A股", code: "300124", name: "汇川技术", layer: "AI应用层", role: "A股核心", tags: ["AI机器人/具身智能", "AI工业设计"], logic: "工业自动化和机器人执行层中军。" },
+      { market: "A股", code: "600580", name: "卧龙电驱", layer: "AI应用层", role: "补涨映射", tags: ["AI机器人/具身智能", "AI汽车/自动驾驶/物理AI"], logic: "电机电驱映射机器人和汽车智能化。" },
+      { market: "美股", code: "ADBE", name: "Adobe", layer: "AI应用层", role: "全球映射", tags: ["AI办公"], logic: "海外 AI 创作软件映射。" },
+      { market: "美股", code: "NOW", name: "ServiceNow", layer: "AI应用层", role: "全球映射", tags: ["AI Agent/企业服务"], logic: "企业 AI Agent 和流程自动化映射。" },
+      { market: "美股", code: "TSLA", name: "特斯拉", layer: "AI应用层", role: "全球核心", tags: ["AI汽车/自动驾驶/物理AI", "AI机器人/具身智能"], logic: "自动驾驶和机器人具身智能全球锚。" },
+
+      { market: "A股", code: "300496", name: "中科创达", layer: "模型与框架层", role: "观察标的", tags: ["大模型厂商", "MLOps/AI平台"], logic: "端侧智能操作系统和模型工具链映射，偏应用框架层观察。" },
+      { market: "A股", code: "300624", name: "万兴科技", layer: "模型与框架层", role: "观察标的", tags: ["大模型厂商"], logic: "AI 创作工具和模型应用平台映射。" },
+      { market: "A股", code: "688327", name: "云从科技", layer: "模型与框架层", role: "观察标的", tags: ["大模型厂商", "AI感知"], logic: "AI 平台和行业大模型观察标的。" },
+      { market: "A股", code: "300229", name: "拓尔思", layer: "模型与框架层", role: "观察标的", tags: ["大模型厂商", "AI数据/智能体工程"], logic: "语义智能、数据和行业模型映射。" },
+      { market: "A股", code: "688206", name: "概伦电子", layer: "基础算力层", role: "补涨映射", tags: ["AI芯片EDA/设计工具"], logic: "EDA 工具链映射 AI 芯片设计环节。" },
+      { market: "A股", code: "301269", name: "华大九天", layer: "基础算力层", role: "A股核心", tags: ["AI芯片EDA/设计工具"], logic: "国产 EDA 核心，映射芯片设计工具链。" },
+      { market: "美股", code: "AI", name: "C3.ai", layer: "模型与框架层", role: "全球映射", tags: ["MLOps/AI平台"], logic: "海外企业 AI 平台和模型运营映射。" },
+      { market: "美股", code: "PLTR", name: "Palantir", layer: "模型与框架层", role: "全球核心", tags: ["MLOps/AI平台", "AI数据/智能体工程"], logic: "AI 平台、数据工程和企业智能决策全球核心。" },
+      { market: "美股", code: "S", name: "SentinelOne", layer: "模型与框架层", role: "全球映射", tags: ["MLOps/AI平台", "AI网络安全"], logic: "AI 安全平台映射。" },
+      { market: "美股", code: "DDOG", name: "Datadog", layer: "模型与框架层", role: "全球映射", tags: ["MLOps/AI平台"], logic: "云监控和模型运维平台映射。" },
+      { market: "美股", code: "SNPS", name: "Synopsys", layer: "基础算力层", role: "全球核心", tags: ["AI芯片EDA/设计工具"], logic: "全球 EDA 龙头，映射芯片设计工具链。" },
+      { market: "美股", code: "CDNS", name: "Cadence", layer: "基础算力层", role: "全球核心", tags: ["AI芯片EDA/设计工具"], logic: "全球 EDA 核心。" },
+      { market: "美股", code: "SOUN", name: "SoundHound AI", layer: "模型与框架层", role: "全球映射", tags: ["大模型厂商"], logic: "语音 AI 和垂直模型映射。" },
+
+      { market: "美股", code: "MSFT", name: "微软", layer: "AI服务层", role: "全球核心", tags: ["云计算/AI Cloud", "AI办公"], logic: "云、模型和办公 AI 的全球核心。" },
+      { market: "美股", code: "GOOGL", name: "谷歌", layer: "AI服务层", role: "全球核心", tags: ["云计算/AI Cloud", "大模型厂商"], logic: "云和大模型核心。" },
+      { market: "美股", code: "AMZN", name: "亚马逊", layer: "AI服务层", role: "全球核心", tags: ["云计算/AI Cloud"], logic: "AWS 资本开支和云服务映射。" },
+      { market: "美股", code: "ORCL", name: "甲骨文", layer: "AI服务层", role: "全球映射", tags: ["云计算/AI Cloud", "数据库"], logic: "AI 云基础设施和数据库映射。" },
+      { market: "美股", code: "MDB", name: "MongoDB", layer: "AI服务层", role: "全球映射", tags: ["向量数据库"], logic: "数据库和向量检索映射。" },
+      { market: "美股", code: "SNOW", name: "Snowflake", layer: "AI服务层", role: "全球映射", tags: ["向量数据库", "AI数据/智能体工程"], logic: "云数据平台和 AI 数据工程映射。" },
+      { market: "美股", code: "CRWD", name: "CrowdStrike", layer: "AI服务层", role: "全球核心", tags: ["AI网络安全"], logic: "AI 网络安全海外核心。" },
+      { market: "美股", code: "PANW", name: "Palo Alto Networks", layer: "AI服务层", role: "全球核心", tags: ["AI网络安全"], logic: "网络安全平台核心。" }
+    ];
+
+    const quickFilters = ["全部", "核心标的", "补涨映射", "观察标的"];
+    const marketTabs = ["A股标的", "美股映射标的"];
+    const layerColors = ["#173765", "#265da2", "#3d82d7", "#93bde4"];
+    const state = { tag: "全部", quick: "全部", market: "A股标的", search: "" };
+    let industryChart = null;
+    let industryChartLarge = null;
+    let hoveredChartData = null;
+
+    const roleClass = (role) => {
+      if (role.includes("核心") && role.includes("全球")) return "global";
+      if (role.includes("核心")) return "core";
+      if (role.includes("补涨") || role.includes("映射")) return "map";
+      return "watch";
+    };
+
+    const normalizeName = (name) => name
+      .replace(/\s+/g, " ")
+      .replace(/、/g, ",")
+      .replace(/，/g, ",")
+      .trim()
+      .toLowerCase();
+
+    const securityCodeByName = {
+      "泛微网络":"603039","汉得信息":"300170","用友网络":"600588","鼎捷软件":"300378","软通动力":"301236","中控技术":"688777","科大讯飞":"002230","创意信息":"300366","浩瀚深度":"688292","传音控股":"688036","拓维信息":"002261","优刻得":"688158",
+      "金山办公":"688111","合合信息":"688615","福昕软件":"688095","万兴科技":"300624","视源股份":"002841","卓越教育":"03978.HK","新开普":"300248","佳发教育":"300559","正元智慧":"300645",
+      "卫宁健康":"300253","创业慧康":"300451","东软集团":"600718","润达医疗":"603108","久远银海":"002777","嘉和美康":"688246","讯飞医疗科技":"未上市","晶泰科技":"02228.HK","英矽智能":"未上市",
+      "同花顺":"300033","恒生电子":"600570","指南针":"300803","新致软件":"688590","新大陆":"000997","新国都":"300130","宇信科技":"300674","广电运通":"002152","京北方":"002987","连连数字":"02598.HK",
+      "中科江南":"301153","博思软件":"300525","新点软件":"688232","南威软件":"603636","数字政通":"300075","浪潮软件":"600756","税友股份":"603171",
+      "佳都科技":"600728","思维列控":"603508","捷顺科技":"002609","千方科技":"002373","经纬恒润":"688326","四维图新":"002405","光庭信息":"301221","小马智行":"PONY","中科创达":"300496","虹软科技":"688088","万集科技":"300552","索辰科技":"688507","地平线机器人":"09660.HK","黑芝麻智能":"02533.HK","五一视界":"未上市","希迪智驾":"未上市","博泰车联":"未上市","群核科技":"未上市",
+      "埃斯顿":"002747","亿嘉和":"603666","鸣志电器":"603728","拓斯达":"300607","神州泰岳":"300002","长盛轴承":"300718","奥普光电":"002338","五洲新春":"603667","井松智能":"688251","新松机器人":"300024","优必选":"09880.HK","越疆":"02432.HK","卧龙机器人":"未上市","极智嘉":"未上市","云鲸":"未上市","宇树科技":"未上市","国机科技":"未上市",
+      "汉朔科技":"301275","石基信息":"002153","光云科技":"688365","聚水潭":"06687.HK","多点数智":"02586.HK","明略科技":"未上市",
+      "瑞芯微":"603893","恒玄科技":"688608","翱捷科技":"688220","广和通":"300638","美格智能":"002881","移远通信":"603236",
+      "南网科技":"688248","国能日新":"301162","国网信通":"600131","朗新科技":"300682","远光软件":"002063","恒华科技":"300365","瑞纳智能":"301129","科远智慧":"002380","南网数字":"未上市",
+      "海康威视":"002415","大华股份":"002236","萤石网络":"688475","日联科技":"688531","骄成超声":"688392","思泰克":"301568","思看科技":"688583","智洋创新":"688191","容知日新":"688768","博睿科技":"688229","岩山科技":"002195","狄耐克":"300884","三博脑科":"301293","诚益通":"300430",
+      "中望软件":"688083","浩辰软件":"688657","霍莱沃":"688682",
+      "百度":"BIDU","腾讯":"00700.HK","阿里巴巴":"BABA","中科曙光":"603019","范式智能":"06682.HK","商汤":"00020.HK","云知声":"09678.HK","智谱":"未上市","MiniMax":"未上市","月之暗面":"未上市","DeepSeek":"未上市","阿里星辰":"未上市","腾讯混元":"未上市","字节":"未上市","阶跃星辰":"未上市","硅基流动":"未上市","澜舟科技":"未上市",
+      "深信服":"300454","云赛智联":"600602","网宿科技":"300017","青云科技":"688316","首都在线":"300846","金山云":"KC","达梦数据":"688692","星环科技":"688031","海量数据":"603138","迅策":"未上市","滴普科技":"未上市","海天瑞声":"688787","范式智能":"06682.HK","海致科技集团":"未上市","慧辰股份":"688500","上海钢联":"300226","拓尔思":"300229","托普云农":"301556","奇安信":"688561","三六零":"601360","启明星辰":"002439","天融信":"002212","安恒信息":"688023","绿盟科技":"300369","安博通":"688168",
+      "寒武纪":"688256","海光信息":"688041","天数智芯":"未上市","壁仞科技":"未上市","摩尔线程":"未上市","沐曦股份":"未上市","品高股份":"688227","云天励飞":"688343","智微智能":"001339","燧原科技":"未上市","龙芯中科":"688047","中国长城":"000066","禾赛科技":"HSAI","兆芯集成":"未上市","中芯国际":"688981","华虹半导体":"01347.HK","盛合晶微":"未上市","长电科技":"600584","德明利":"001309","佰维存储":"688525","兆易创新":"603986","大普微":"未上市",
+      "中际旭创":"300308","新易盛":"300502","天孚通信":"300394","光迅科技":"002281","华工科技":"000988","太辰光":"300570","源杰科技":"688498","胜宏科技":"300476","沪电股份":"002463","深南电路":"002916","景旺电子":"603228","生益电子":"688183","鹏鼎控股":"002938","广合科技":"001389","方正科技":"600601",
+      "工业富联":"601138","浪潮信息":"000977","紫光股份":"000938","华勤技术":"603296","锐捷网络":"301165","星网锐捷":"002396","中兴通讯":"000063","菲菱科思":"301191","盛科通信":"688702","万国数据":"GDS","世纪互联":"VNET","润泽科技":"300442","奥飞数据":"300738","数据港":"603881","美利云":"000815","光环新网":"300383","大位科技":"600589",
+      "协创数据":"300857","盈泽环境":"待核","利通电子":"603629","润建股份":"002929","并行科技":"839493","东方国信":"300166","中贝通信":"603220","杰创智能":"301248","仕佳光子":"688313","中恒电气":"002364","世纪恒通":"301428","平治信息":"300571","利机长兴":"待核","铜牛信息":"300895","天孚科技":"300394","宏景科技":"301396","恒为科技":"603496","亚康股份":"301085",
+      "华大九天":"301269","概伦电子":"688206","广立微":"301095","金盘科技":"688676","中国电气":"未上市","伊戈尔":"002922","科华数据":"002335","科士达":"002518","英维克":"002837","申菱环境":"301018","高澜股份":"300499",
+      "Microsoft":"MSFT","微软":"MSFT","Google":"GOOGL","谷歌":"GOOGL","Alphabet":"GOOGL","Amazon":"AMZN","亚马逊":"AMZN","Oracle":"ORCL","甲骨文":"ORCL","NVIDIA":"NVDA","英伟达":"NVDA","AMD":"AMD","博通":"AVGO","Marvell":"MRVL","ARM":"ARM","高通":"QCOM","QUALCOMM":"QCOM","Intel":"INTC","台积电":"TSM","三星":"005930.KS","日月光":"ASX","Amkor":"AMKR","DELL":"DELL","戴尔科技":"DELL","超微电脑":"SMCI","Databricks":"未上市","Snowflake":"SNOW","MongoDB":"MDB","Palantir":"PLTR","OpenAI":"未上市","Anthropic":"未上市","Google Gemini":"GOOGL","Meta":"META","CoreWeave":"CRWV","Nebius":"NBIS","CrowdStrike":"CRWD","Palo Alto Networks":"PANW","SentinelOne":"S","Fortinet":"FTNT","Zscaler":"ZS","Cisco":"CSCO","思科":"CSCO","Salesforce":"CRM","ServiceNow":"NOW","SAP":"SAP","UiPath":"PATH","Adobe":"ADBE","Zoom":"ZM","Atlassian":"TEAM","Box":"BOX","Monday.com":"MNDY","Tesla":"TSLA","TESLA":"TSLA","Waymo":"未上市",
+      "Duolingo":"DUOL","Coursera":"COUR","Udemy":"UDMY","Chegg":"CHGG","TAL":"TAL","EDU":"EDU","GOTU":"GOTU",
+      "Tempus AI":"TEM","Recursion":"RXRX","Schrodinger":"SDGR","Exscientia":"EXAI","GE Healthcare":"GEHC","Guardant Health":"GH","Natera":"NTRA","Doximity":"DOCS",
+      "Fiserv":"FI","SS&C Technologies":"SSNC","Visa":"V","Circle":"CRCL","PayPal":"PYPL","Intuit":"INTU","Workday":"WDAY",
+      "Richtech Robotics":"RR","Rockwell Automation":"ROK","Honeywell":"HON","RTX":"RTX","Palladyne AI":"PDYN",
+      "VusionGroup":"VU.PA","Pricer":"PRIC-B.ST","Amadeus":"AMS.MC","Toast":"TOST","Shopify":"SHOP","BigCommerce":"BIGC","Manhattan Associates":"MANH","SPS Commerce":"SPSC",
+      "X-Energy":"XE","Bloom Energy":"BE","Keysight":"KEYS","安捷伦":"A","诺信":"NDSN","Cognex":"CGNX","Keyence":"6861.T",
+      "Neuralink":"未上市","Synchron":"未上市","Blackrock Neurotech":"未上市","Paradromics":"未上市","Kernel":"未上市",
+      "Dassault Systemes":"DSY.PA","Cadence":"CDNS","Siemens":"SIE.DE","Scale AI":"未上市","Elastic":"ESTC","Cloudflare":"NET","Couchbase":"BASE",
+      "Check Point Software":"CHKP","Microsoft Security":"MSFT","IBM Security":"IBM","SK海力士":"000660.KS","美光":"MU","闪迪":"SNDK","西部数据":"WDC","希捷科技":"STX",
+      "Lumentum":"LITE","Coherent":"COHR","AOI":"AAOI","TTM":"TTMI","ISU":"007660.KS","欣兴电子":"3037.TW",
+      "Arista":"ANET","CLS":"CLS.TO","Equinix":"EQIX","Digital Realty":"DLR","IREN":"IREN","Corning":"GLW","Amphenol":"APH",
+      "Synopsys":"SNPS","Siemens EDA":"SIE.DE","Schneider Electric":"SU.PA","Eaton":"ETN","Vertiv":"VRT","Johnson Controls":"JCI","Trane Technologies":"TT"
+    };
+
+    const codeForName = (name) => securityCodeByName[name] || securityCodeByName[normalizeName(name)] || "待补";
+
+    const searchLink = (item) => {
+      if (item.market === "A股") return `https://search.10jqka.com.cn/search?w=${encodeURIComponent(item.name)}`;
+      return `https://so.eastmoney.com/web/s?keyword=${encodeURIComponent(item.name + " " + item.code)}`;
+    };
+
+    const quoteLink = (item) => {
+      if (item.market === "A股" && /^\d{6}$/.test(item.code)) return `https://stockpage.10jqka.com.cn/${item.code}/`;
+      if (item.market === "美股" && /^[A-Z.]+$/.test(item.code)) return `https://quote.eastmoney.com/us/${encodeURIComponent(item.code)}.html`;
+      if (item.market === "美股" && /^\d{5}\.HK$/.test(item.code)) return `https://quote.eastmoney.com/hk/${item.code.slice(0, 5)}.html`;
+      if (item.market === "美股" && item.code && !["待补", "待核", "未上市"].includes(item.code)) return `https://finance.yahoo.com/quote/${encodeURIComponent(item.code)}`;
+      return searchLink(item);
+    };
+
+    const linkLabel = (item) => {
+      if (item.market === "A股" && /^\d{6}$/.test(item.code)) return "同花顺";
+      if (item.market === "美股" && item.code && !["待补", "待核", "未上市"].includes(item.code)) return "东方财富";
+      return "搜索";
+    };
+
+    const splitNames = (text) => text
+      .split(/[、,，]/)
+      .map(name => name.trim())
+      .filter(Boolean);
+
+    function stockLookupByName(market, name) {
+      const target = normalizeName(name);
+      return stocks.find(item => item.market === market && normalizeName(item.name) === target)
+        || stocks.find(item => item.market === market && (normalizeName(item.name).includes(target) || target.includes(normalizeName(item.name))));
+    }
+
+    function representativeRowsForSector(sector, market) {
+      const text = market === "A股" ? sector.domestic : sector.overseas;
+      return splitNames(text).map(name => {
+        const hit = stockLookupByName(market, name);
+        if (hit) {
+          return { ...hit, tags: Array.from(new Set([...hit.tags, sector.tag])), logic: hit.logic || `${sector.tag}代表标的。` };
+        }
+        return {
+          market,
+          code: codeForName(name),
+          name,
+          layer: sector.layer,
+          role: market === "A股" ? "原型图国内代表" : "原型图海外代表",
+          tags: [sector.tag],
+          logic: "来自原型图代表标的。"
+        };
+      });
+    }
+
+    const roleBucket = (item) => {
+      if (item.market === "美股" && item.role.includes("核心")) return "全球核心";
+      if (item.market === "美股") return "美股映射";
+      if (item.role.includes("核心")) return "A股核心";
+      if (item.role.includes("补涨") || item.role.includes("映射")) return "补涨映射";
+      return "观察标的";
+    };
+
+    const shortTag = (tag) => {
+      const map = {
+        "AI汽车/自动驾驶/物理AI": "AI汽车",
+        "MLOps/AI平台": "MLOps",
+        "光芯片/光模块": "光模块",
+        "AI服务器/整机": "AI服务器",
+        "网络设备及芯片": "网络芯片",
+        "数据中心/IDC": "IDC",
+        "光连接线缆与组件": "光连接",
+        "电力/UPS/冷却": "电力液冷"
+      };
+      return map[tag] || tag;
+    };
+
+    function buildSunburstData() {
+      return [{
+        name: "AI产业图谱",
+        filterTag: "全部",
+        itemStyle: { color: "#071326" },
+        children: layers.map((layer, layerIndex) => ({
+          name: layer.name,
+          filterTag: layer.name,
+          value: prototypeSectors.filter(item => item.layer === layer.name).length,
+          itemStyle: { color: layerColors[layerIndex] },
+          children: prototypeSectors
+            .filter(item => item.layer === layer.name)
+            .map((sector, tagIndex) => ({
+              name: sector.tag,
+              filterTag: sector.tag,
+              domestic: sector.domestic,
+              overseas: sector.overseas,
+              value: 1,
+              itemStyle: {
+                color: echarts.color.lift(layerColors[layerIndex], 0.12 + (tagIndex % 4) * 0.08)
+              }
+            }))
+        }))
+      }];
+    }
+
+    function chartOption(isLarge) {
+      return {
+        backgroundColor: "transparent",
+        tooltip: {
+          show: isLarge,
+          trigger: "item",
+          appendToBody: true,
+          confine: false,
+          extraCssText: "max-width:420px;white-space:normal;line-height:1.6;",
+          formatter: params => {
+            const filterTag = params.data && params.data.filterTag ? params.data.filterTag : params.name;
+            const count = filterTag === "全部"
+              ? stocks.length
+              : stocks.filter(item => item.tags.includes(filterTag) || item.layer === filterTag || matchesLayerByName(item, filterTag)).length;
+            const domestic = params.data && params.data.domestic ? `<br/><strong>国内代表：</strong>${params.data.domestic}` : "";
+            const overseas = params.data && params.data.overseas ? `<br/><strong>海外代表：</strong>${params.data.overseas}` : "";
+            return `<strong>${params.name}</strong><br/>筛选标签：${filterTag}<br/>对应表格标的：${count} 个${domestic}${overseas}<br/>点击筛选`;
+          }
+        },
+        series: [{
+          type: "sunburst",
+          data: buildSunburstData(),
+          radius: isLarge ? ["8%", "96%"] : ["10%", "96%"],
+          center: ["50%", "50%"],
+          sort: null,
+          nodeClick: false,
+          triggerEvent: true,
+          emphasis: {
+            focus: "descendant",
+            itemStyle: {
+              shadowBlur: 14,
+              shadowColor: "rgba(9, 31, 64, 0.24)"
+            }
+          },
+          blur: {
+            itemStyle: { opacity: 0.22 },
+            label: { opacity: 0.32 }
+          },
+          itemStyle: {
+            borderColor: "#ffffff",
+            borderWidth: isLarge ? 2 : 1.5
+          },
+          label: {
+            rotate: "radial",
+            color: "#ffffff",
+            fontSize: isLarge ? 12 : 9,
+            fontWeight: 800,
+            minAngle: isLarge ? 5 : 10,
+            overflow: "truncate"
+          },
+          levels: [
+            {},
+            {
+              r0: "0%",
+              r: "30%",
+              label: {
+                rotate: 0,
+                fontSize: isLarge ? 18 : 14,
+                fontWeight: 900,
+                color: "#ffffff"
+              },
+              itemStyle: {
+                color: "#071326",
+                borderWidth: 4
+              }
+            },
+            {
+              r0: "32%",
+              r: "58%",
+              label: {
+                rotate: 0,
+                fontSize: isLarge ? 14 : 11,
+                color: "#ffffff"
+              }
+            },
+            {
+              r0: "60%",
+              r: "96%",
+              label: {
+                formatter: params => shortTag(params.name),
+                rotate: "radial",
+                fontSize: isLarge ? 11 : 9,
+                color: "#102d57",
+                width: isLarge ? 92 : 62,
+                overflow: "truncate"
+              },
+              itemStyle: {
+                borderWidth: 1.5
+              }
+            }
+          ]
+        }]
+      };
+    }
+
+    function bindChartClick(chart) {
+      chart.off("click");
+      chart.off("mouseover");
+      chart.on("mouseover", params => {
+        hoveredChartData = params.data || null;
+      });
+      chart.getZr().off("click");
+      chart.getZr().on("click", () => {
+        if (hoveredChartData) {
+          applyChartSelection(hoveredChartData);
+        }
+      });
+      chart.on("click", params => {
+        applyChartSelection(params.data || {});
+      });
+    }
+
+    function applyChartSelection(data) {
+      const nextTag = data.filterTag || (data.name === "AI产业图谱" ? "全部" : data.name);
+      state.tag = nextTag || "全部";
+      if (data.marketTab) {
+        state.market = data.marketTab;
+        state.quick = "全部";
+      }
+      render();
+    }
+
+    function renderIndustryRing() {
+      const wrap = document.getElementById("industryRing");
+      const empty = document.getElementById("ringEmpty");
+      if (!window.echarts) {
+        if (empty) empty.classList.add("show");
+        return;
+      }
+      if (empty) empty.classList.remove("show");
+      if (!wrap) return;
+      if (!industryChart) {
+        industryChart = echarts.init(wrap, null, { renderer: "canvas" });
+        bindChartClick(industryChart);
+        window.addEventListener("resize", () => {
+          industryChart && industryChart.resize();
+          industryChartLarge && industryChartLarge.resize();
+        });
+      }
+
+      industryChart.setOption(chartOption(false), true);
+
+      if (state.tag !== "全部") {
+        industryChart.dispatchAction({ type: "highlight", name: state.tag });
+      }
+    }
+
+    function renderMarketTabs() {
+      const wrap = document.getElementById("marketTabs");
+      wrap.innerHTML = marketTabs.map(tab => `<button class="tab-button ${state.market === tab ? "active" : ""}" data-market-tab="${tab}">${tab}</button>`).join("");
+      wrap.querySelectorAll("[data-market-tab]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          state.market = btn.dataset.marketTab;
+          render();
+        });
+      });
+    }
+
+    function renderQuickFilters() {
+      const wrap = document.getElementById("quickFilters");
+      wrap.innerHTML = quickFilters.map(name => `<button class="chip ${state.quick === name ? "active" : ""}" data-quick="${name}">${name}</button>`).join("");
+      wrap.querySelectorAll("[data-quick]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          state.quick = btn.dataset.quick;
+          render();
+        });
+      });
+    }
+
+    function matchesQuick(item) {
+      if (state.quick === "全部") return true;
+      if (state.quick === "核心标的") return item.role.includes("核心");
+      if (state.quick === "补涨映射") return item.role.includes("补涨") || item.role.includes("映射");
+      if (state.quick === "观察标的") return item.role.includes("观察");
+      return true;
+    }
+
+    function matchesSearch(item) {
+      const q = state.search.trim().toLowerCase();
+      if (!q) return true;
+      return [item.market, item.code, item.name, item.layer, item.role, item.logic, ...item.tags]
+        .join(" ")
+        .toLowerCase()
+        .includes(q);
+    }
+
+    function selectedLayer() {
+      return layers.find(layer => layer.name === state.tag) || null;
+    }
+
+    function matchesLayerByName(item, layerName) {
+      const layer = layers.find(entry => entry.name === layerName);
+      if (!layer) return false;
+      return item.layer === layer.name || item.tags.some(tag => layer.tags.includes(tag));
+    }
+
+    function matchesSelectedTag(item) {
+      if (state.tag === "全部") return true;
+      const layer = selectedLayer();
+      if (layer) {
+        return matchesLayerByName(item, layer.name);
+      }
+      return item.tags.includes(state.tag) || item.layer === state.tag;
+    }
+
+    function filteredStocks() {
+      const sector = prototypeSectors.find(item => item.tag === state.tag);
+      if (sector) {
+        const market = state.market === "A股标的" ? "A股" : "美股";
+        const rows = representativeRowsForSector(sector, market)
+          .filter(item => matchesQuick(item) && matchesSearch(item));
+        return rows;
+      }
+      const layer = layers.find(item => item.name === state.tag);
+      if (layer) {
+        const market = state.market === "A股标的" ? "A股" : "美股";
+        return prototypeSectors
+          .filter(item => item.layer === layer.name)
+          .flatMap(item => representativeRowsForSector(item, market))
+          .filter(item => matchesQuick(item) && matchesSearch(item));
+      }
+      return stocks.filter(item => {
+        const marketOk = state.market === "A股标的" ? item.market === "A股" : item.market === "美股";
+        return marketOk && matchesSelectedTag(item) && matchesQuick(item) && matchesSearch(item);
+      });
+    }
+
+    function renderSummary(rows) {
+      document.getElementById("selectedTitle").textContent = `${state.market} / ${state.tag === "全部" ? "全部 AI 图谱" : state.tag}`;
+      document.getElementById("resultCount").textContent = rows.length;
+      document.getElementById("tableCount").textContent = rows.length;
+      const tagPool = stocks.filter(item => matchesSelectedTag(item));
+      const sector = prototypeSectors.find(item => item.tag === state.tag);
+      const layer = layers.find(item => item.name === state.tag);
+      const layerSectors = layer ? prototypeSectors.filter(item => item.layer === layer.name) : [];
+      const protoA = sector
+        ? splitNames(sector.domestic).length
+        : layerSectors.reduce((sum, item) => sum + splitNames(item.domestic).length, 0);
+      const protoUS = sector
+        ? splitNames(sector.overseas).length
+        : layerSectors.reduce((sum, item) => sum + splitNames(item.overseas).length, 0);
+      document.getElementById("aCount").textContent = sector || layer ? protoA : tagPool.filter(x => x.market === "A股").length;
+      document.getElementById("usCount").textContent = sector || layer ? protoUS : tagPool.filter(x => x.market === "美股").length;
+      document.getElementById("coreCount").textContent = rows.filter(x => x.role.includes("核心")).length;
+      document.getElementById("mapCount").textContent = rows.filter(x => x.role.includes("补涨") || x.role.includes("映射")).length;
+      const detail = state.tag === "全部"
+        ? "当前展示图谱全部录入标的。建议用环形标签先定位产业位置，再看角色标签区分全球核心、A股核心、补涨映射和观察标的。"
+        : (tagDetails[state.tag] || "该标签来自 AI 产业图谱，当前用于定位产业链位置和筛选对应 A股/美股标的。后续可继续补充催化事件、强弱状态和失效条件。");
+      document.getElementById("tagDetail").innerHTML = `<strong>当前筛选：</strong>${state.tag} / ${state.market} / ${state.quick}<br /><strong>标签说明：</strong>${detail}`;
+    }
+
+    function renderSelectionCard() {
+      const card = document.getElementById("selectionCard");
+      if (!card) return;
+      const sector = prototypeSectors.find(item => item.tag === state.tag);
+      const layer = layers.find(item => item.name === state.tag);
+      if (layer) {
+        const layerSectors = prototypeSectors.filter(item => item.layer === layer.name);
+        const domesticCount = layerSectors.reduce((sum, item) => sum + splitNames(item.domestic).length, 0);
+        const overseasCount = layerSectors.reduce((sum, item) => sum + splitNames(item.overseas).length, 0);
+        card.innerHTML = `
+          <strong>${layer.name}</strong>
+          <div class="selection-meta"><span>${layerSectors.length} 个子分类</span><span>${domesticCount + overseasCount} 个表格标的</span></div>
+          <div class="selection-lines"><b>子分类：</b>${layerSectors.map(item => item.tag).join("、")}<br /><b>国内：</b>${domesticCount} 个　<b>海外：</b>${overseasCount} 个</div>
+        `;
+        return;
+      }
+      if (!sector) {
+        card.innerHTML = `
+          <strong>全部图谱</strong>
+          <div class="selection-meta"><span>点击扇区筛选</span><span>${stocks.length} 个表格标的</span></div>
+          <div class="selection-lines">小图用于快速定位，完整国内/海外代表请点击“放大选择图谱”。</div>
+        `;
+        return;
+      }
+      const count = splitNames(sector.domestic).length + splitNames(sector.overseas).length;
+      card.innerHTML = `
+        <strong>${sector.tag}</strong>
+        <div class="selection-meta"><span>${sector.layer}</span><span>${count} 个表格标的</span></div>
+        <div class="selection-lines"><b>国内：</b>${sector.domestic}<br /><b>海外：</b>${sector.overseas}</div>
+      `;
+    }
+
+    function renderTable(rows) {
+      const body = document.getElementById("stockBody");
+      const empty = document.getElementById("emptyState");
+      empty.style.display = rows.length ? "none" : "block";
+      body.innerHTML = rows.map(item => `
+        <tr>
+          <td>${item.market}</td>
+          <td class="code-cell">${item.code}</td>
+          <td class="name-cell">${item.name}</td>
+          <td>${item.layer}</td>
+          <td><span class="role ${roleClass(item.role)}">${item.role}</span></td>
+          <td>${item.tags.map(tag => `<span class="tag">${tag}</span>`).join("")}</td>
+          <td>${item.logic}</td>
+          <td><a class="link-button" target="_blank" rel="noopener" href="${quoteLink(item)}">${linkLabel(item)}</a></td>
+        </tr>
+      `).join("");
+    }
+
+    function render() {
+      renderQuickFilters();
+      renderIndustryRing();
+      renderMarketTabs();
+      const rows = filteredStocks();
+      renderSummary(rows);
+      renderSelectionCard();
+      renderTable(rows);
+    }
+
+    document.getElementById("searchInput").addEventListener("input", event => {
+      state.search = event.target.value;
+      render();
+    });
+
+    document.getElementById("openChartModal").addEventListener("click", () => {
+      const modal = document.getElementById("chartModal");
+      modal.classList.add("open");
+      modal.setAttribute("aria-hidden", "false");
+      if (window.echarts) {
+        const large = document.getElementById("industryRingLarge");
+        if (!industryChartLarge) {
+          industryChartLarge = echarts.init(large, null, { renderer: "canvas" });
+          bindChartClick(industryChartLarge);
+        }
+        industryChartLarge.setOption(chartOption(true), true);
+        setTimeout(() => industryChartLarge && industryChartLarge.resize(), 30);
+      }
+    });
+
+    document.getElementById("closeChartModal").addEventListener("click", () => {
+      const modal = document.getElementById("chartModal");
+      modal.classList.remove("open");
+      modal.setAttribute("aria-hidden", "true");
+    });
+
+    document.getElementById("chartModal").addEventListener("click", event => {
+      if (event.target.id === "chartModal") {
+        document.getElementById("closeChartModal").click();
+      }
+    });
+
+    render();
+  </script>
+</body>
+</html>

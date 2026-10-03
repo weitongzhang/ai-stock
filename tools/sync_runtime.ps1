@@ -14,6 +14,7 @@ $skills = @{
   "a-share-fibonacci-trade-planner" = "skills\stock-selection\a-share-fibonacci-trade-planner"
   "a-share-halfway-trade-screener" = "skills\stock-selection\a-share-halfway-trade-screener"
   "qiushi-stock-analysis" = "skills\methodology\qiushi-stock-analysis"
+  "socratic-questioning" = "skills\methodology\socratic-questioning"
   "chen-xiaoqun-perspective" = "skills\stock-selection\chen-xiaoqun-perspective"
   "model-xiansheng-perspective" = "skills\methodology\model-xiansheng-perspective"
   "csc-juzi-mcp" = "skills\institutional-research\csc-juzi-mcp"

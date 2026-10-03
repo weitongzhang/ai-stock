@@ -1,0 +1,4 @@
+interface:
+  display_name: "Socratic Questioning"
+  short_description: "Clarify goals before solving tasks"
+  default_prompt: "Use $socratic-questioning to clarify my goal, assumptions, constraints, and success criteria before answering."
